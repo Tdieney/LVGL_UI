@@ -1,0 +1,40 @@
+# Compiled binaries & executables
+*.exe
+*.elf
+*.bin
+*.hex
+*.out
+*.o
+*.obj
+*.a
+*.lib
+
+# CMake & Build outputs
+build/
+sim_pc/build/
+CMakeFiles/
+CMakeCache.txt
+build.ninja
+.ninja_*
+cmake_install.cmake
+
+# IDEs & Local configurations
+.claude/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Web / Node dependencies & build
+node_modules/
+dist/
+.vite/
+
+# OS generated files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Temporary / Log files
+*.log
+*.tmp
