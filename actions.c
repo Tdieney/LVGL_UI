@@ -16,23 +16,36 @@ void action_tab_graphs(lv_event_t * e)      { (void) e; ui_request_tab(TAB_GRAPH
 void action_tab_diagnostics(lv_event_t * e) { (void) e; ui_request_tab(TAB_DIAGNOSTICS); }
 void action_tab_settings(lv_event_t * e)    { (void) e; ui_request_tab(TAB_SETTINGS); }
 
-// Motor actions write directly into `motorCmd` (Tx, see motor_comm_protocol.h
+// Motor actions write directly into `motorCmd` (Tx, see motor_comm.h
 // / screens.h) — no command-callback layer in between. main.c's only job is
 // to transmit whatever is currently in `motorCmd` on its own periodic timer.
-// State changes the UI actually SHOWS (motor state, direction, mode) come
-// back through `motorStatusFast`/`motorStatusSlow` (Rx), never read back from
-// `motorCmd` — see the "wait for telemetry echo" comments in screens.c.
+// Feedback and confirmed motor state/direction come back through
+// `motorStatusFast`/`motorStatusSlow` (Rx). The Control mode editor is the one
+// exception: it follows the operator's `motorCmd.opMode` immediately so it is
+// still usable while disconnected.
 
 void action_motor_start(lv_event_t * e) {
     (void) e;
-    if (motor_is_running()) return;
+    // Command state is the immediate source of truth while feedback is still
+    // in flight. Without this guard, tapping START twice before the first
+    // status echo resets the run-time origin on the second tap. A confirmed
+    // FAULT also blocks START — the operator must resolve the fault first
+    // (the Control screen mirrors this by dimming the button).
+    if (motorCmd.bits.cmd || motor_is_running()) return;
+    if (ui_motor_status_fast()->bits.motorState == MOTOR_STATE_FAULT) return;
     motorCmd.bits.cmd = 1;
+    ui_runtime_on_start();
 }
 
 void action_motor_stop(lv_event_t * e) {
     (void) e;
-    if (!motor_is_running()) return;
+    // STOP must never depend on a connected/updated status frame. In the
+    // START-to-first-echo window (or on a silent link) motor_is_running() can
+    // still be false while cmd is already 1; returning there would leave the
+    // transmitted command latched at START until a later valid status frame.
+    if (!motorCmd.bits.cmd && !motor_is_running()) return;
     motorCmd.bits.cmd = 0;
+    ui_runtime_on_stop();
 }
 
 void action_motor_dir_fwd(lv_event_t * e) {
@@ -46,7 +59,7 @@ void action_motor_dir_rev(lv_event_t * e) {
 }
 
 // ctrlValRaw is a single field shared by every opMode (see
-// motor_comm_protocol.h) — moving the speed slider always forces opMode back
+// motor_comm.h) — moving the speed slider always forces opMode back
 // to SPEED so the value is never misinterpreted as e.g. a torque command.
 void action_motor_speed_change(lv_event_t * e) {
     lv_obj_t *slider = lv_event_get_target(e);
@@ -55,40 +68,17 @@ void action_motor_speed_change(lv_event_t * e) {
     motorCmd.bits.ctrlValRaw = (uint32_t) val;
 }
 
-// Switching mode always zeros ctrlValRaw. Without this, the raw value left
-// over from whichever mode was active before would get reinterpreted in the
-// new mode's units the instant you switch (e.g. "50" meant as a torque
-// percent suddenly read back as 50 RPM) — a real safety hazard, not just a
-// display glitch. The operator must explicitly set a new value after
-// switching mode; nothing carries over.
-void action_mode_select(lv_event_t * e) {
-    int32_t mode = (int32_t) (uintptr_t) lv_event_get_user_data(e);
-    motorCmd.bits.opMode     = (uint32_t) mode;
-    motorCmd.bits.ctrlValRaw = 0;
-    motorCmd.bits.limitRaw   = 0; // secondary limit is also opMode-shared — clear on switch
-}
-
-// The Control torque slider now runs directly in mN.m (0..UI_MAX_TORQUE_MNM),
-// and the wire field IS an absolute mN.m magnitude — so the value goes
-// straight onto the wire, no percent conversion.
+// TORQUE keeps its on-wire OpMode_e value, but its primary target is now q-axis
+// current in mA. The slider operates directly in that raw unit.
 void action_torque_change(lv_event_t * e) {
     lv_obj_t *slider = lv_event_get_target(e);
-    int32_t   mnm    = lv_slider_get_value(slider); // mN.m, 0..UI_MAX_TORQUE_MNM
+    int32_t   ma     = lv_slider_get_value(slider); // mA, 0..UI_MAX_CURRENT_MA
     motorCmd.bits.opMode     = OP_MODE_TORQUE;
-    motorCmd.bits.ctrlValRaw = (uint32_t) mnm;
-}
-
-// OPEN_LOOP's ctrlValRaw is PWM duty, 0.1%/LSB (motor_comm_protocol.h) — the
-// slider is a plain 0-100% control, so scale by 10 going onto the wire.
-void action_openloop_change(lv_event_t * e) {
-    lv_obj_t *slider = lv_event_get_target(e);
-    int32_t   pct    = lv_slider_get_value(slider); // 0-100%
-    motorCmd.bits.opMode     = OP_MODE_OPEN_LOOP;
-    motorCmd.bits.ctrlValRaw = (uint32_t) (pct * 10);
+    motorCmd.bits.ctrlValRaw = (uint32_t) ma;
 }
 
 // POSITION's ctrlValRaw is a target ANGLE at 0.1 deg/LSB (0..3600 = 0..360 deg,
-// see motor_comm_protocol.h). The Control POSITION control is an lv_arc rotary
+// see motor_comm.h). The Control POSITION control is an lv_arc rotary
 // knob whose value range IS 0..UI_POSITION_MAX_RAW, so the value goes straight
 // onto ctrlValRaw — read it with lv_arc_get_value, no conversion.
 void action_position_change(lv_event_t * e) {
@@ -98,14 +88,8 @@ void action_position_change(lv_event_t * e) {
     motorCmd.bits.ctrlValRaw = (uint32_t) deciDeg;
 }
 
-// No wire message exists yet for any of these 4 — motor_comm_protocol.h only
-// defines MotorCmd_t (start/stop/dir/opMode/ctrlValRaw). See UART_PROTOCOL.md
-// sec. 6 for what each would need before it can do anything real.
-
-void action_calibrate(lv_event_t * e) {
-    (void) e;
-    // TODO: no MsgId_e for this yet.
-}
+// Diagnostics still has no clear-fault wire command. RS-485 Settings are local
+// to the HMI and commit through the platform hooks documented in screens.h.
 
 void action_clear_faults(lv_event_t * e) {
     (void) e;
@@ -116,10 +100,12 @@ void action_clear_faults(lv_event_t * e) {
 
 void action_save_config(lv_event_t * e) {
     (void) e;
-    // TODO: no config read/write message defined yet.
+    (void) ui_rs485_save_config();
 }
 
 void action_load_defaults(lv_event_t * e) {
     (void) e;
-    // TODO: no config read/write message defined yet.
+    // RESET edits the pending UI values only. The operator must press SAVE to
+    // apply/persist them, preventing an accidental reset tap from changing UART.
+    ui_rs485_reset_config();
 }

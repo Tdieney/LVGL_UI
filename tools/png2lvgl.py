@@ -132,7 +132,7 @@ def main():
     lines = []
     for i in range(0, len(data), 16):
         chunk = data[i : i + 16]
-        lines.append("    " + "".join(f"0x{b:02x}, " for b in chunk))
+        lines.append("    " + ", ".join(f"0x{b:02x}" for b in chunk) + ",")
 
     with open(args.output, "w", newline="\n") as f:
         f.write(HEADER.format(name=args.name))

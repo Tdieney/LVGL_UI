@@ -94,12 +94,12 @@ Two secondary parts:
   for the icon + the label text. Link pill text is `"RS-485 | <baud>"` (was `"UART | 115200"`).
 - **ALL icons in the app are custom `ALPHA_4BIT` images now — the FontAwesome font `ui_font_icons20` was
   removed** (a later review extended the tab-icon treatment to the Monitor rows + Diagnostics rows/marks,
-  after which nothing referenced the FA font). `tools/gen_icons.py` draws all 19 (6 tabs + bolt/battery/
-  power/eff/thermo/crosshairs/encoder/link + check/xmark + chevron + cw/ccw) as alpha masks matching the
+  after which nothing referenced the FA font). `tools/gen_icons.py` draws the 14 currently used icons
+  (6 tabs + bolt/thermo/link + check/xmark + chevron + cw/ccw) as alpha masks matching the
   mockup SVGs — 24×24 by default, but a per-icon `SIZES` override renders **cw/ccw at 34×34** (the direction
   rotation arrows sit centered on a 52px button, and alpha images can't be zoomed at runtime, so a bigger
   button icon must be drawn bigger natively). `cw`/`ccw` are chunky open "redo/undo" rings with a SOLID
-  triangular arrowhead (drawn from `drafts/cw.png`/`drafts/ccw.png`; CCW is the exact horizontal mirror of CW).
+  triangular arrowhead; CCW is the exact horizontal mirror of CW.
   `images.h` declares them as `ui_icon_*`. Recolor via `img_recolor`+`img_recolor_opa=COVER` (Monitor/Diag
   type icons → `COLOR_TEXT_VL`; Diag status mark → `ui_icon_check` green / `ui_icon_xmark` red, swapped with
   `lv_img_set_src` in the tick). Need a new icon? add a draw fn in `gen_icons.py`, a png2lvgl line in
@@ -195,7 +195,7 @@ Two secondary parts:
 - **Settings' UART section is now "RS-485 CONFIGURATION"** with a plain-text `INTERFACE: RS-485` row (not a
   dropdown — it's fixed hardware) and baud options extended to `921600` (was capped at `460800`). The old
   "MODBUS / PROTOCOL" card (Protocol/Frame/Timeout/Retries) is gone — entirely made-up display text; this
-  repo's real framing is `motor_comm_protocol.h`'s SOF/ID/LEN/PAYLOAD/EOF, not Modbus RTU, and Timeout/
+  repo's real framing is `motor_comm.h`'s SOF/ID/LEN/PAYLOAD/EOF, not Modbus RTU, and Timeout/
   Retries were never wired to anything. Don't recreate a fake-data card like it. **The BAUD/PARITY/STOP-BITS
   dropdowns are now LIVE and exported** (`ui_rs485_baud`/`ui_rs485_parity`/`ui_rs485_stopbits`, `extern` in
   `screens.h`, defined in `screens.c`): each dropdown inits FROM the global and writes back on change, so
@@ -224,7 +224,7 @@ Two secondary parts:
   invalidation), `label_color_if_changed()`, per-widget band/state caches (only restyle on transitions),
   `fmt_fixed()` (fixed-point formatting, no float printf). Dynamic value labels get **fixed sizes**
   (`lv_obj_set_size` + `LV_LABEL_LONG_CLIP`) so text changes never trigger flex re-layout.
-- **No bridge struct — the UI reads/writes the 3 wire structs from `motor_comm_protocol.h` directly**
+- **No bridge struct — the UI reads/writes the 3 wire structs from `motor_comm.h` directly**
   (user's explicit choice, replacing an earlier `ms_t` design): `motorCmd` (Tx, `MotorCmd_t` — `actions.c`
   writes `.bits.cmd/.dir/.opMode/.ctrlValRaw/.limitRaw` straight into it; **frame is now 6 bytes** —
   `MotorCmd_t` gained a 16-bit `limitRaw` secondary-limit field, container became `uint64_t`/`bytes[8]`, TX
@@ -240,7 +240,7 @@ Two secondary parts:
   `motorStatusFast.bits.motorState`). `motorConnected` is a 4th plain global, deliberately NOT part of any
   wire struct — set to 0 by whoever parses UART (or `demo_sim.c`) on a receive timeout.
 - **`ctrlValRaw` (and now `limitRaw`) is one field shared by every `opMode`** (SPEED/TORQUE/OPEN_LOOP/POSITION
-  all reuse both, meaning depends on which mode is active — see `motor_comm_protocol.h`; `limitRaw` =
+  all reuse both, meaning depends on which mode is active — see `motor_comm.h`; `limitRaw` =
   current-limit mA for SPEED/OPEN_LOOP, speed-limit RPM for TORQUE/POSITION). This bit a real bug once already:
   displaying it unconditionally on both the speed slider and the torque slider let one reinterpret the
   other's leftover value in the wrong unit (250 RPM read back as "125%" torque). Every site that reads
@@ -263,7 +263,7 @@ Two secondary parts:
   instead of maintaining its own copy — that duplication (`UI_MAX_RPM`/`SIM_MAX_RPM`) is exactly what let
   the two drift out of sync before. See `UART_PROTOCOL.md` for the full field-mapping table and open gaps
   (config read/write, and `CLEAR_FAULTS`/`RUN_CALIBRATION`/`SAVE_CONFIG`/`LOAD_DEFAULTS` — these 4 actions
-  are TODO stubs in `actions.c` since `motor_comm_protocol.h` has no message for any of them yet).
+  are TODO stubs in `actions.c` since `motor_comm.h` has no message for any of them yet).
 - **`demo_sim.c`** (compiled only with `UI_DEMO_SIM=1`, which sim_pc defines): fabricates
   `motorStatusFast`/`motorStatusSlow` so the HMI looks alive with no hardware. **Runtime on/off via
   `demo_sim_toggle()`, default OFF at boot** — while OFF `sim_step` does nothing so the real UART parser owns
@@ -310,24 +310,11 @@ Two secondary parts:
   all icons are custom images now, see the icon bullet above.) Built-in Montserrat also collapsed to a
   single enabled size, `lv_font_montserrat_20` (see the `LV_SYMBOL_*` gotcha right below) — `lv_conf.h`
   no longer enables 12/14/16 at all, only 20.
-- **The Dashboard "gauge" is now a big-number TILE (Style E2), NOT an arc** — the arc/needle/hub/dot were all
-  removed (user redesign). `gwrap` is a **white card sized to FILL the whole left column (300×344)** holding,
-  absolutely positioned: a **faint BLDC-motor cross-section watermark tucked in the BOTTOM-RIGHT corner** with a
-  small bleed off-edge, E2-style (`ui_img_motor`, **175px** ALPHA_4BIT, recolor ink `img_opa` 34); `SPEED`
-  (top-left) + a **state chip** (`dash_e2_chip`, bg = run-state color, top-right); the big `mono66` RPM number
-  (`dash_lbl_rpm`, ~50% bigger hero) + `RPM` unit **wrapped in one left-aligned flex group `numgrp`, vertically
-  centered in the tile (`LV_ALIGN_LEFT_MID`) with a tight `pad_row 2`** (number's left edge stays pinned so a
-  width change on update doesn't shift it — user: small gap, align left, centered by height); a
-  full-width **12-segment level bar** (`dash_segs[12]`, lit to the speed fraction, colored by state, nudged down); and
-  `dash_e2_dir` — a **CW/CCW rotate icon** (`ui_icon_cw`/`_ccw`, recolored `COLOR_TEXT_L`, swapped by the tick) showing the current direction — bottom-left. The old separate state-pill row is gone (folded into the chip). No
-  FAST-lane work (plain text/segs on SLOW). Asset drawn by **`tools/gen_motor_wm.py`** (175px; used ONLY by
-  Dashboard now — Control dropped its watermark)
-  (→ `ui_img_motor.c` via `png2lvgl --cf alpha_4`); see `build_assets.bat`/`images.h`/`export_mcu.bat`.
-  **GOTCHA: don't `lv_img_set_zoom` an ALPHA image** — the transform path mangles it (only the centre showed);
-  render the asset at final size natively instead (that's why `gen_motor_wm.py` outputs 190px, not zoomed).
-  `band_color()` and the gauge-easing floats were deleted (both gauges gone); `COLOR_GAUGE` azure now appears
-  ONLY on the Graphs VOLTAGE series. The earlier `ui_image_dial.c` (baked ticked face) stays removed. Only the
-  splash logo + this motor watermark are pre-rendered now.
+- **Dashboard gauge**: one 320×320 `ui_img_dashboard_gauge` ALPHA_4BIT face pre-renders the extended/faded
+  reference arc, 0..200 labels, tick lane, inner ring and faint BLDC cutaway. Runtime LVGL widgets overlay only
+  the flat-ended green speed arc, RPM number/unit and one CW/CCW direction icon. The gauge sits in a dedicated
+  hero card above equal Run Time, Iq Current and Faults cards. Do not rebuild the static face from LVGL geometry
+  or zoom the ALPHA image; regenerate it at native size with `tools/gen_dashboard_gauge.py`.
 - **Fonts**: `fonts/ui_font_mono66|44|30|22|20.c` (JetBrains Mono Bold subsets — bold everywhere now, used for
   nearly every label in the app so text reads as clearly weighted rather than thin/faint; `mono44` and
   `mono30` are digits+punct only — `mono66` = Dashboard RPM + Control SPEED/TORQUE heroes, `mono44` = POSITION centre readout, `mono30` = Dashboard card values POWER/MOTOR
@@ -396,9 +383,9 @@ Two secondary parts:
     `COLOR_ACCENT 0x2C2E33`. Keep the 5-level order (H > M > L > VL > DIM) and the separation if you adjust
     further; never move any tier back toward the lighter literal Apple value — that faintness is exactly what
     all three passes fixed.
-  The gauge no longer bakes the background into an image (it's live `lv_arc`), so the old gen_dial palette-
-  drift trap is gone. The splash logo still bakes its background: `tools/prep_logo.py`'s `SPLASH_BG` must
-  match `create_splash()`'s bg color — check it (not `screens.h`/`screens.c` alone) on a palette pass, or a
+  The Dashboard face is an alpha-only image recolored by LVGL, so it does not bake the card background.
+  The splash logo still bakes its background: the canonical prepared source
+  `tools/assets/ui_logo.png` must match `create_splash()`'s bg color — check it on a palette pass, or a
   visible rectangle appears around the logo. `lv_theme_default_init` in `ui.c` passes `COLOR_ACCENT` as the
   theme primary (light flag `false`) so default widget states stay charcoal, not azure. Slider knobs are
   white with a charcoal border (invisible otherwise on light bg).
@@ -406,8 +393,8 @@ Two secondary parts:
   rule (chrome used to equal `COLOR_BG` because flat-white-on-white read as glaring) — the cheap-panel pass
   darkened the page to a clear gray, which makes white chrome crisp rather than glaring, so white chrome is
   now correct. Don't revert it to page-gray. The **splash** background, however, still uses `COLOR_BG` (the
-  gray page color), NOT the white chrome — so `tools/prep_logo.py`'s `SPLASH_BG` must match `create_splash()`
-  (currently `0xE1E4EA`), and `ui_image_logo.c` must be regenerated any time the splash bg changes, or a
+  gray page color), NOT the white chrome — so `tools/assets/ui_logo.png` must be regenerated from the brand artwork and flattened to match
+  `create_splash()` (currently `0xE1E4EA`), and `ui_image_logo.c` must be regenerated any time the splash bg changes, or a
   visible rectangle appears around the logo (its alpha is flattened onto that exact color at asset-build
   time). SPLASH_BG tracks the splash/page color, not the top bar.
 - Corner radius is a deliberate, generous 10px on cards/panels/buttons/rows (Apple's rounded-rect look —
@@ -442,14 +429,12 @@ Two secondary parts:
   fill even though the hex looks like "basically white". Found via the splash screen background. Prefer
   pure `lv_color_white()` or values where channels land on clean quantization steps for large flat fills;
   the effect is imperceptible on small elements (borders, pills) so it's not a concern there.
-- `tools/prep_logo.py`'s `SPLASH_BG` constant must match `create_splash()`'s background color exactly — the
-  logo PNG's alpha channel is flattened onto it at asset-build time (baked into the opaque INDEXED_8BIT
-  image), so a mismatch shows up as a visible rectangle around the logo. Re-run `tools\build_assets.bat`
-  after changing either one.
+- `tools/assets/ui_logo.png` is already flattened onto `create_splash()`'s background
+  color. Regenerate it from the brand artwork against the new color, then run `tools\build_assets.bat`, if the splash background
+  changes; otherwise the opaque INDEXED_8BIT image shows a visible rectangle.
 - Generated font/image files include `"lvgl.h"` only when `LV_LVGL_H_INCLUDE_SIMPLE` is defined —
   sim_pc's CMake does this; firmware projects must too.
-- `sim_pc/CMakeLists.txt` globs `../*.c` and `../fonts/*.c` — new root C files are picked up on
-  reconfigure, but a **new file requires rerunning cmake configure** (CONFIGURE_DEPENDS usually handles it;
-  if a symbol is missing, reconfigure).
+- `sim_pc/CMakeLists.txt` uses an explicit source manifest. Add every new firmware asset/source there and
+  to `tools/export_mcu.bat`; re-run CMake configure after changing the manifest.
 - PowerShell on this machine can't run the exe with `&&` chains; the Bash tool with the exported w64devkit
   PATH is the reliable path.

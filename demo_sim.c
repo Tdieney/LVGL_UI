@@ -101,9 +101,18 @@ static void sim_step(lv_timer_t *timer)
     bool running = s_demo_fast.bits.motorState == MOTOR_STATE_STARTING ||
                    s_demo_fast.bits.motorState == MOTOR_STATE_RUNNING;
 
-    // Mechanical speed eases toward the SPEED-mode setpoint (integer, ~1/16 per
-    // tick). Other opModes have no direct RPM target, so it settles to 0.
-    int32_t target = (motorCmd.bits.opMode == OP_MODE_SPEED) ? (int32_t) motorCmd.bits.ctrlValRaw : 0;
+    // Mechanical speed eases toward the SPEED target. In TORQUE mode, use the
+    // restored speed limit as a demo-only ceiling and scale it by requested Iq
+    // so the mode remains visibly alive without pretending it is position math.
+    int32_t target = 0;
+    if (motorCmd.bits.opMode == OP_MODE_SPEED)
+        target = (int32_t) motorCmd.bits.ctrlValRaw;
+    else if (motorCmd.bits.opMode == OP_MODE_TORQUE)
+    {
+        int32_t iq_ma = (int32_t) motorCmd.bits.ctrlValRaw;
+        if (iq_ma > UI_MAX_CURRENT_MA) iq_ma = UI_MAX_CURRENT_MA;
+        target = (int32_t) motorCmd.bits.limitRaw * iq_ma / UI_MAX_CURRENT_MA;
+    }
     if (running)
     {
         int32_t d = target - s_rpm;
@@ -126,25 +135,27 @@ static void sim_step(lv_timer_t *timer)
     s_vph += 5; // ~10 s period at 100 ms/step
     s_demo_fast.bits.voltage = (uint32_t) (34000 + 22 * sin_lut(s_vph)); // mV, spans [12000,56000]
 
-    // Phase current + torque (fast struct). Current waves ~5.0..18.4 A once running.
-    if (running && s_rpm > 5)
+    // Iq + total phase RMS current. TORQUE mode follows the requested Iq;
+    // SPEED mode retains the smooth load-based demo waveform.
+    int32_t cur_mA = 0;
+    if (running && motorCmd.bits.opMode == OP_MODE_TORQUE)
+    {
+        cur_mA = (int32_t) motorCmd.bits.ctrlValRaw;
+        if (cur_mA > UI_MAX_CURRENT_MA) cur_mA = UI_MAX_CURRENT_MA;
+    }
+    else if (running && s_rpm > 5)
     {
         s_cph += 8; // ~6.4 s period
-        int32_t cur_mA = 11700 + 67 * sin_lut(s_cph) / 10;
+        cur_mA = 11700 + 67 * sin_lut(s_cph) / 10;
         // Ramp electrical load with speed. Previously the very first STARTING
-        // sample jumped from 0 straight to 5..18 A, dirtying CURRENT, POWER and
-        // TORQUE together while the new screen/source was still settling.
+        // sample jumped straight to a large current, dirtying multiple readouts
+        // together while the new screen/source was still settling.
         cur_mA = cur_mA * load_pct / 100;
         if (cur_mA < 0) cur_mA = 0;
-        s_demo_fast.bits.current = (uint32_t) cur_mA;
-        // Kt ≈ 0.47 N.m/A output-referred; wire unit 0.1 N.m/LSB → mA*0.47/100.
-        s_demo_fast.bits.actualTorque = (uint32_t) (cur_mA * 47 / 10000);
     }
-    else
-    {
-        s_demo_fast.bits.current      = 0;
-        s_demo_fast.bits.actualTorque = 0;
-    }
+    if (cur_mA > UI_MAX_CURRENT_MA) cur_mA = UI_MAX_CURRENT_MA;
+    s_demo_fast.bits.phaseCurrentRms = (uint32_t) cur_mA;
+    s_demo_fast.bits.iqCurrent       = (uint32_t) ((cur_mA + 50) / 100); // 0.1 A/LSB
 
     // Slow telemetry (temps / efficiency / PWM) at ~1 Hz — matches the real
     // motorStatusSlow rate and keeps the Monitor temp/eff rows from re-drawing
@@ -172,7 +183,7 @@ static void sim_step(lv_timer_t *timer)
         s_demo_slow.bits.invTemp = (uint16_t) (int16_t) s_inv10;
     }
 
-    s_demo_connected = 1;
+    s_demo_connected = UI_LINK_CONNECTED;
 }
 
 const MotorStatusFast_t *demo_sim_status_fast(void) { return &s_demo_fast; }
@@ -208,7 +219,7 @@ void demo_sim_toggle(void)
         s_demo_slow.bits.invTemp    = (uint16_t) s_inv10;
         s_demo_slow.bits.efficiency = 0;
         s_demo_slow.bits.pwmDuty    = 0;
-        s_demo_connected            = 1;
+        s_demo_connected            = UI_LINK_CONNECTED;
     }
     else
     {
@@ -220,7 +231,7 @@ void demo_sim_toggle(void)
         motorCmd.bits.limitRaw   = 0;
         s_demo_fast.raw          = 0;
         s_demo_slow.raw          = 0;
-        s_demo_connected         = 0;
+        s_demo_connected         = UI_LINK_DISCONNECTED;
         s_rpm                    = 0;
     }
 }

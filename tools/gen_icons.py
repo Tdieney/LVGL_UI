@@ -98,12 +98,13 @@ def i_diag(d):  # warning triangle + exclamation
     dot(d, 12, 17, 1.1)
 
 
-def i_set(d):  # gear: ring + center dot + 4 spokes
-    ring(d, 12, 12, 6)
-    dot(d, 12, 12, 2.0)
-    for a, b in (((12, 2), (12, 5)), ((12, 19), (12, 22)),
-                 ((2, 12), (5, 12)), ((19, 12), (22, 12))):
-        stroke(d, [a, b])
+def i_set(d):  # gear: ring + 8 teeth + hub dot (the old cross-hair read as "target")
+    ring(d, 12, 12, 4.6)
+    dot(d, 12, 12, 1.8)
+    for k in range(8):
+        a = math.radians(k * 45.0)
+        stroke(d, [(12 + 6.7 * math.cos(a), 12 + 6.7 * math.sin(a)),
+                   (12 + 9.2 * math.cos(a), 12 + 9.2 * math.sin(a))])
 
 
 # ---- Monitor / Diagnostics row icons (match the mockup's .micon / .dicon SVGs) ----
@@ -112,36 +113,9 @@ def i_bolt(d):  # lightning bolt outline (CURRENT, over/under-voltage, overcurre
     stroke(d, [(13, 2), (5, 14), (11, 14), (10, 22), (19, 10), (13, 10), (14, 2)], close=True, caps=False)
 
 
-def i_battery(d):  # DC bus: two prongs + rounded body + leg/foot
-    stroke(d, [(8, 2), (8, 8)]); stroke(d, [(16, 2), (16, 8)])
-    rrect(d, 6, 8, 18, 15, 2)
-    stroke(d, [(12, 15), (12, 19)]); stroke(d, [(9, 19), (15, 19)])
-
-
-def i_power(d):  # power symbol: ring + top break line
-    ring(d, 12, 13, 7)
-    stroke(d, [(12, 5), (12, 12)])
-
-
-def i_eff(d):  # efficiency: top-half gauge arc
-    arc(d, 12, 17, 7, 180, 360)
-    cap(d, 5, 17); cap(d, 19, 17)
-
-
 def i_thermo(d):  # thermometer: stem + bulb
     rrect(d, 10, 3, 14, 15, 2)
     ring(d, 12, 18, 3)
-
-
-def i_crosshairs(d):  # hall sensor: ring + 4 ticks
-    ring(d, 12, 12, 6.5)
-    for a in ((12, 2, 12, 6), (12, 18, 12, 22), (2, 12, 6, 12), (18, 12, 22, 12)):
-        stroke(d, [(a[0], a[1]), (a[2], a[3])])
-
-
-def i_encoder(d):  # encoder: dashed ring
-    for k in range(12):
-        arc(d, 12, 12, 7, k * 30, k * 30 + 16)
 
 
 def i_link(d):  # RS-485 link: two nodes + connector
@@ -162,9 +136,8 @@ def i_chevron(d):  # dropdown arrow (replaces the Montserrat LV_SYMBOL_DOWN glyp
 
 
 def _rot_arrow(d, cw):  # "redo/undo" rotate icon: chunky open ring + SOLID triangle head
-    # Matches drafts/cw.png & drafts/ccw.png: a thick near-full circle with a gap
-    # on the right and a big filled triangular arrowhead at the upper end pointing
-    # along the rotation direction. CCW is the exact horizontal mirror of CW.
+    # Thick near-full circle with a gap and a filled triangular arrowhead.
+    # CCW is the exact horizontal mirror of CW.
     # phi: 0=east, CCW positive; screen y is down so a point is (cx+r*cos, cy-r*sin).
     cx = cy = 12.0
     r = 7.8
@@ -198,17 +171,21 @@ def i_ccw(d):  # counter-clockwise rotation
 
 ICONS = {"dash": i_dash, "mon": i_mon, "ctrl": i_ctrl,
          "graph": i_graph, "diag": i_diag, "set": i_set,
-         "bolt": i_bolt, "battery": i_battery, "power": i_power, "eff": i_eff,
-         "thermo": i_thermo, "crosshairs": i_crosshairs, "encoder": i_encoder,
+         "bolt": i_bolt, "thermo": i_thermo,
          "link": i_link, "check": i_check, "xmark": i_xmark, "chevron": i_chevron,
          "cw": i_cw, "ccw": i_ccw}
 
 
-# Per-icon final size override (px). Most icons are 24 (tab/row scale); the
-# direction rotation arrows render bigger so they read well centered on a 52px
+# Per-icon final size override (px). Sidebar navigation icons are native 36px
+# masks so they stay crisp without runtime zooming. Row/status icons remain
+# 24px; direction rotation arrows render bigger on 52px controls.
 # button (alpha images can't be zoomed at runtime — see the CLAUDE.md gotcha —
 # so a larger button icon must be drawn larger natively).
-SIZES = {"cw": 34, "ccw": 34}
+SIZES = {
+    "dash": 44, "mon": 44, "ctrl": 44,
+    "graph": 44, "diag": 44, "set": 44,
+    "cw": 34, "ccw": 34,
+}
 
 
 def main():

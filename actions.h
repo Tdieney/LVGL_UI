@@ -23,11 +23,8 @@ void action_motor_dir_rev(lv_event_t * e);
 void action_motor_speed_change(lv_event_t * e);
 
 // Control screen actions
-void action_mode_select(lv_event_t * e); // user_data = (void*)(uintptr_t) op mode 0..3
 void action_torque_change(lv_event_t * e);
-void action_openloop_change(lv_event_t * e);
 void action_position_change(lv_event_t * e);
-void action_calibrate(lv_event_t * e);
 
 // Diagnostics / Settings actions
 void action_clear_faults(lv_event_t * e);

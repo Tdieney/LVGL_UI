@@ -10,38 +10,46 @@ The old recommendation reserved 64 KB for the LVGL heap and 32 KB for one
 
 | Item | Old | Validated | SRAM released |
 |---|---:|---:|---:|
-| LVGL heap | 65,536 B | 53,248 B | 12,288 B |
+| LVGL heap | 65,536 B | 43,008 B | 22,528 B |
 | One draw buffer | 32,000 B | 16,000 B | 16,000 B |
-| Total | 97,536 B | 69,248 B | **28,288 B** |
+| Total | 97,536 B | 59,008 B | **38,528 B** |
 
 If the reported 98.5% figure came from exactly the old profile on a 128 KB
-device, the same link would fall to roughly 77% before unrelated application
+device, the same link would fall to roughly 69.1% before unrelated application
 changes. Confirm the real result from the target `.map` file because stacks,
 DMA sections and vendor libraries vary.
 
-Flash remains plentiful. Static label captions now point directly at const
-strings in Flash instead of duplicating them in the LVGL heap; const pointer
-tables also remain read-only. Dynamic values use eight reusable fixed buffers,
-so changing digits no longer allocates and frees LVGL strings at 5 Hz.
+Flash remains plentiful. Static label captions point directly at const strings
+in Flash instead of duplicating them in the LVGL heap; const pointer tables also
+remain read-only. Dynamic values use reusable fixed buffers, so changing digits
+does not allocate and free LVGL strings at 5 Hz. Control creates only its active
+LEVEL or POSITION subtree, and the resident navigation rail uses one custom-drawn
+object instead of 18 button/pill/image children. Those changes made it safe to
+reduce the configured heap from 52 KB to 42 KB, returning another 10,240 B of
+real static SRAM to firmware rather than merely showing more free LVGL heap.
 
 ## Measured LVGL heap
 
-Simulator: LVGL v8.4, `LV_MEM_SIZE = 52 KB`, one 800x10 draw buffer, Release
+Simulator: LVGL v8.4, `LV_MEM_SIZE = 42 KB`, one 800x10 draw buffer, Release
 build, Demo enabled, 10 seconds virtual time per screen.
 
 | Screen | Used | Free | Biggest free block | Fragmentation |
 |---|---:|---:|---:|---:|
-| Dashboard | 67% | 17,712 B | 17,512 B | 2% |
-| Monitor | 59% | 22,328 B | 17,512 B | 22% |
-| Control | 79% | 11,712 B | 10,848 B | 8% |
-| Graphs | 66% | 18,352 B | 17,512 B | 5% |
-| Diagnostics | 61% | 20,944 B | 17,512 B | 17% |
-| Settings | 70% | 16,424 B | 15,624 B | 5% |
+| Dashboard | 52% | 20,800 B | 20,640 B | 1% |
+| Monitor | 62% | 16,696 B | 15,904 B | 5% |
+| Control SPEED/TORQUE | 73% | 11,776 B | 9,384 B | 21% |
+| Control POSITION | 58% | 18,464 B | 16,200 B | 13% |
+| Graphs | 66% | 14,880 B | 14,088 B | 6% |
+| Diagnostics | 54% | 20,208 B | 19,184 B | 6% |
+| Settings | 57% | 18,832 B | 16,816 B | 11% |
 
-The 120-second Demo/START/tab-rebuild regression recorded 10,256 B minimum
-free, 10,168 B minimum biggest block, 22% maximum fragmentation, and finished
-at the commanded 320 RPM. This is the guardrail: a future change must not drive
-minimum free below 6 KB or biggest block below 4 KB in `--stress-demo`.
+The 120-second Demo/START/tab-rebuild regression recorded 11,368 B minimum
+free, 10,200 B minimum biggest block and 14% maximum fragmentation while cycling
+the SPEED, TORQUE and POSITION Control layouts. The regression guard is now
+8 KB for both minimum free and minimum biggest block. Control LEVEL at 73% used /
+21% fragmentation is the tight spot; watch it before adding widgets to that
+screen. LEVEL↔POSITION is rebuilt only from `ui_tick()`, so event callbacks never
+tear down live objects; SPEED↔TORQUE reuses the same LEVEL tree in place.
 
 ## Firmware configuration
 

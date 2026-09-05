@@ -2,7 +2,7 @@
 
 This UI is designed for an 80 MHz MCU with 1 MB Flash, 128 KB RAM, driving an 800x480 RGB565 display via xSPI (TR230S module with onboard GRAM — MCU pushes dirty regions over the bus). The primary system bottleneck is **xSPI bus bandwidth**, so every optimization technique below aims to minimize dirty region redraw area and eliminate heap churn.
 
-> **Current Profile (2026-08-05):** LVGL heap **52 KB** + single draw buffer **800×10 RGB565 = 16,000 B**. Validated metrics, root causes of Demo START issues, and exact integration steps are documented in `docs/MCU_MEMORY_PROFILE.md`. `ui_mcu_profile.h` is the single source of truth for definitions.
+> **Current Profile (2026-08-10):** LVGL heap **52 KB** + single draw buffer **800×10 RGB565 = 16,000 B**. Validated metrics, root causes of Demo START issues, and exact integration steps are documented in `docs/MCU_MEMORY_PROFILE.md`. `ui_mcu_profile.h` is the single source of truth for definitions.
 
 ---
 
@@ -10,12 +10,12 @@ This UI is designed for an 80 MHz MCU with 1 MB Flash, 128 KB RAM, driving an 80
 
 | Screen Tab | LVGL Heap Used (`LV_MEM_SIZE = 52 KB`) |
 |---|---|
-| Dashboard | 67% (17,712 B free) |
-| Monitor | 59% (22,328 B free) |
-| Control | 79% (11,712 B free; highest utilization) |
-| Graphs | 66% (18,352 B free) |
-| Diagnostics | 61% (20,944 B free) |
-| Settings | 70% (16,424 B free) |
+| Dashboard | 56% (23,768 B free) |
+| Monitor | 57% (22,992 B free) |
+| Control | 77% (12,528 B free; highest utilization) |
+| Graphs | 65% (18,664 B free) |
+| Diagnostics | 56% (23,480 B free) |
+| Settings | 59% (21,960 B free) |
 
 > **Key Architectural Takeaway:** The initial Monitor implementation (17 dynamic values at 5 Hz with changing decimal precision) pushed heap usage past safe limits and flooded dirty regions across xSPI. The updated design retains 8 essential metrics. Leaving `LV_MEM_SIZE` at default 32 KB causes memory overflow — 52 KB is the minimum stress-tested threshold.
 
@@ -23,7 +23,12 @@ The figures above include top bar and tab bar chrome (permanently resident on `l
 Screen transitions invoke `lv_obj_clean()` on the outgoing screen BEFORE creating the incoming screen, keeping peak heap usage limited to a single screen at a time.
 
 **Flash Asset Footprint (Measured from Object Files):**
-Logo splash ~48 KB + 4 custom mono fonts (44/30/22/20px) + 16 custom icons (alpha 4-bit, ~288 B each ≈ 4.6 KB) ≈ **~80 KB total**. Pre-rendered gauge dial background images (~87 KB) and FontAwesome icon fonts (~6 KB) have been removed. All icons are custom 4-bit alpha arrays (`ui_icon_*`) recolored dynamically at runtime.
+Logo splash ~50 KB + 7 custom mono fonts (120/66/44/38/30/22/20px) ~72 KB +
+custom Alpha-4 icons ~19 KB + the detailed 270x292 motor cutaway ~40 KB =
+**~180 KB total object footprint**. The two large Dashboard fonts contain only
+the required digits/punctuation. The removed gauge dial and FontAwesome font
+remain absent; the motor and icons are const Flash assets and consume no LVGL
+heap pixel buffers.
 
 ---
 
@@ -84,7 +89,7 @@ Declare a single draw buffer `UI_DRAW_BUF_PIXELS` (800×10). In `flush_cb`, tran
    }
    ```
 3. Data Binding & Handoff:
-   - **TX:** Periodically transmit global `motorCmd` (declared in `screens.h`) over UART according to `motor_comm_protocol.h`.
+   - **TX:** Periodically transmit global `motorCmd` (declared in `screens.h`) over UART according to `motor_comm.h`.
    - **RX:** Parse incoming frames and write directly into `motorStatusFast` and `motorStatusSlow` global structs.
    ```c
    void on_uart_rx_frame(uint8_t id, const uint8_t *payload, uint8_t len) {
@@ -94,5 +99,20 @@ Declare a single draw buffer `UI_DRAW_BUF_PIXELS` (800×10). In `flush_cb`, tran
            memcpy(motorStatusSlow.bytes, payload, len);
    }
    ```
-4. Set `motorConnected = 0` if valid `motorStatusFast` frames timeout (> 500 ms). Never invoke LVGL functions directly inside ISRs.
+4. Publish the RS-485 state through `motorConnected`: `UI_LINK_CONNECTED` after
+   valid fast frames, `UI_LINK_NO_RESPONSE` after an enabled link times out
+   (> 500 ms), and `UI_LINK_DISCONNECTED` when the interface is disabled or a
+   physical link-loss signal is available. Never invoke LVGL functions directly
+   inside ISRs.
 5. Compile standalone demonstration builds with `-DUI_DEMO_SIM=1`.
+
+### Persisting Settings
+
+Register `ui_rs485_set_config_hooks(load, commit)` before `ui_init()`. The load
+hook reads a validated record at boot; the commit hook applies the UART settings
+and stores them in Flash/NVS when SAVE is pressed. RESET only edits pending RAM
+values and requires SAVE, which avoids accidental Flash writes and unnecessary
+erase cycles. After `ui_init()`, configure the UART once from `ui_rs485_baud`,
+`ui_rs485_parity` and `ui_rs485_stopbits` so the loaded record becomes active.
+Keep Flash erase/program work out of ISRs; if the vendor driver is slow, have
+the commit hook enqueue the operation in application context.

@@ -1,5 +1,5 @@
 /* ============================================================
- * motor_comm_protocol.h  (bitfield + union version)
+ * motor_comm.h  (bitfield + union version)
  *
  * UART wire protocol between HMI MCU and Motor MCU for a BLDC FOC
  * motor control system (GIM6010-8, 24V).
@@ -25,8 +25,8 @@
  *      MSB-first on the wire again would need manual byte-swap code.
  * ============================================================ */
 
-#ifndef MOTOR_COMM_PROTOCOL_H
-#define MOTOR_COMM_PROTOCOL_H
+#ifndef MOTOR_COMM_H
+#define MOTOR_COMM_H
 
 #include <stdint.h>
 
@@ -61,21 +61,18 @@ typedef enum
  * dir = 0 (FWD) -> value = +ctrlValRaw, dir = 1 (REV) -> value = -ctrlValRaw */
 typedef enum { MOTOR_DIR_FWD = 0, MOTOR_DIR_REV = 1 } MotorDirection_e;
 
-/* ctrlValRaw is the PRIMARY setpoint; limitRaw (added below) is the SECONDARY
+/* ctrlValRaw is the PRIMARY setpoint; limitRaw is the SECONDARY
  * safety limit the FOC cascade always applies underneath the primary command
- * (this controller family is ODrive-derived: Position->Velocity->Torque). Both
+ * (this controller family is ODrive-derived: Position->Velocity->Current). Both
  * fields' meaning depend on opMode: */
 typedef enum
 {
-    OP_MODE_OPEN_LOOP = 0, // ctrlValRaw = PWM duty, 0.1 %/LSB (0..1000);  limitRaw = current limit, 1 mA/LSB
-    OP_MODE_SPEED     = 1, // ctrlValRaw = target speed, 1 RPM/LSB;        limitRaw = current limit, 1 mA/LSB
-    OP_MODE_TORQUE    = 2, // ctrlValRaw = target torque, 1 mN.m/LSB;      limitRaw = speed limit,   1 RPM/LSB
-    OP_MODE_POSITION  = 3  // ctrlValRaw = target angle, 0.1 deg/LSB;      limitRaw = speed limit,   1 RPM/LSB
-    // limitRaw's speed limit (TORQUE/POSITION) is the runaway guard: a torque
-    // command under no load, or a large position step, is bled off as the
-    // shaft speed approaches this ceiling. The current limit (SPEED/OPEN_LOOP)
-    // caps stator current to protect the motor/FETs. limitRaw == 0 means "no
-    // headroom" (motor won't move) — the operator must dial in a limit too.
+    /* Value 0 is intentionally unused. OPEN_LOOP was retired without
+     * renumbering the remaining on-wire values. */
+    OP_MODE_SPEED     = 1, // ctrlValRaw = target speed, 1 RPM/LSB;   limitRaw = current limit, 1 mA/LSB
+    OP_MODE_TORQUE    = 2, // ctrlValRaw = target Iq,    1 mA/LSB;    limitRaw = speed limit,   1 RPM/LSB
+    OP_MODE_POSITION  = 3  // ctrlValRaw = target angle, 0.1 deg/LSB; limitRaw = current limit, 1 mA/LSB
+    // limitRaw == 0 means no headroom; the operator must set a limit too.
 } OpMode_e;
 
 typedef enum
@@ -99,8 +96,8 @@ typedef enum
  *   cmd.bits.cmd        = 1;
  *   cmd.bits.dir        = MOTOR_DIR_FWD;
  *   cmd.bits.opMode     = OP_MODE_SPEED;
- *   cmd.bits.ctrlValRaw = 1500;               // 1500 rpm
- *   cmd.bits.limitRaw   = 12000;              // current limit 12.0 A (12000 mA)
+ *   cmd.bits.ctrlValRaw = 200;                // 200 rpm
+ *   cmd.bits.limitRaw   = 3000;               // current limit 3.0 A (3000 mA)
  *   UART_Send(cmd.bytes, MOTOR_CMD_LEN);
  * ============================================================ */
 typedef union
@@ -131,23 +128,23 @@ static inline int32_t MotorCmd_GetSignedCtrlVal(const MotorCmd_t *cmd)
  * storage unit -- all 8 bytes (bytes[0..7]) are now the wire frame,
  * always send exactly MOTOR_STATUS_FAST_LEN bytes.
  *
- * v3: added `actualTorque` right after `actualRpm` (feedback pair
- * speed+torque for the Control screen). 0.1 N.m/LSB, so 8 bits cover
- * 0..25.5 N.m (110 = 11.0 N.m = the GIM6010-8's peak). This filled the
- * one previously-spare byte, so the frame grew 7 -> 8 bytes.
+ * v4: the former `actualTorque` field keeps the same 8-bit wire position but
+ * now carries q-axis current (`iqCurrent`) at 0.1 A/LSB. The former generic
+ * `current` field is explicitly total phase RMS current in mA. Frame size and
+ * every bit offset remain unchanged.
  * ============================================================ */
 typedef union
 {
     struct
     {
-        uint64_t actualRpm      : 10; // bit9:0,   0..1023, output-shaft speed (rpm)
-        uint64_t actualTorque   : 8;  // bit17:10, output torque magnitude, 0.1 N.m/LSB (0..25.5)
-        uint64_t motorState     : 3;  // bit20:18, MotorState_e
-        uint64_t dir            : 1;  // bit21,    actual direction feedback
-        uint64_t opMode         : 2;  // bit23:22, OpMode_e, echoed back
-        uint64_t current        : 16; // bit39:24, stator current magnitude (mA)
-        uint64_t voltage        : 16; // bit55:40, DC bus voltage magnitude (mV)
-        uint64_t fault          : 8;  // bit63:56, see FaultBit_e
+        uint64_t actualRpm       : 10; // bit9:0,   0..1023, output-shaft speed (rpm)
+        uint64_t iqCurrent       : 8;  // bit17:10, q-axis current magnitude, 0.1 A/LSB (0..25.5 A)
+        uint64_t motorState      : 3;  // bit20:18, MotorState_e
+        uint64_t dir             : 1;  // bit21,    actual direction feedback
+        uint64_t opMode          : 2;  // bit23:22, OpMode_e, echoed back
+        uint64_t phaseCurrentRms : 16; // bit39:24, total phase RMS current magnitude (mA)
+        uint64_t voltage         : 16; // bit55:40, DC bus voltage magnitude (mV)
+        uint64_t fault           : 8;  // bit63:56, see FaultBit_e
     } bits;
     uint64_t raw;
     uint8_t  bytes[8]; // all 8 bytes are the wire frame now
@@ -186,4 +183,4 @@ static inline int16_t MotorStatusSlow_GetInvTemp(const MotorStatusSlow_t *s)
     return (int16_t)s->bits.invTemp;
 }
 
-#endif /* MOTOR_COMM_PROTOCOL_H */
+#endif /* MOTOR_COMM_H */

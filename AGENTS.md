@@ -9,9 +9,10 @@
 - `Industrial HMI for BLDC Motor/` is a visual reference. Do not extend it as
   part of firmware work.
 
-Read `docs/MCU_MEMORY_PROFILE.md` before changing widgets, update `PLAN.md`
-after material work, and treat current source plus this file as authoritative
-when an older note in `CLAUDE.md` or `PERF.md` disagrees.
+Read `docs/README.md` (documentation index) and `docs/MCU_MEMORY_PROFILE.md` before
+changing widgets, update `PLAN.md` after material work, log every material change in
+`DEV_LOG.md` (root), and treat current source plus this file as authoritative when an
+older note in `CLAUDE.md` or `PERF.md` disagrees.
 
 ## Build and regression
 
@@ -31,7 +32,7 @@ tools/run_regression.bat -SkipBuild
 ```
 
 Run headless shots for all six tabs and record `used`, `free`, biggest block and
-fragmentation. The validated 52 KB heap limits are documented in
+fragmentation. The validated 42 KB heap limits are documented in
 `docs/MCU_MEMORY_PROFILE.md`.
 
 Asset generation, MCU export and target size reporting are documented in
@@ -74,7 +75,7 @@ source manifest.
 ## Memory and assets
 
 - Include `ui_mcu_profile.h` from the target configuration. Validated values:
-  52 KB LVGL heap and one 800x10 RGB565 draw buffer (16,000 bytes).
+  42 KB LVGL heap and one 800x10 RGB565 draw buffer (16,000 bytes).
 - Do not allocate a full 800x480 framebuffer on the MCU; the display has GRAM.
 - Keep image maps, image descriptors, font bitmaps/descriptors, lookup tables
   and arrays of pointers to literals `const` so the linker places them in Flash.

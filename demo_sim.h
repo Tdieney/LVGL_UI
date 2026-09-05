@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "motor_comm_protocol.h"
+#include "motor_comm.h"
 
 // Standalone telemetry simulator for demos/exhibitions — fakes the whole
 // motor (RPM ramp, FOC currents, temperatures) so the HMI runs alive with no
