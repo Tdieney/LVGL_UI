@@ -1,9 +1,0 @@
-6-tab headless shots: telemetry=demo, 10000 ms virtual time per tab
-simulator: C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\sim_pc\build\sim_pc.exe
-
-dashboard: lvgl heap: used 52%, free 20800 bytes (biggest block 20640), frag 1%
-monitor: lvgl heap: used 57%, free 18704 bytes (biggest block 17912), frag 5%
-control: lvgl heap: used 73%, free 11808 bytes (biggest block 9416), frag 21%
-graphs: lvgl heap: used 65%, free 15120 bytes (biggest block 14328), frag 6%
-diagnostics: lvgl heap: used 54%, free 20208 bytes (biggest block 19184), frag 6%
-settings: lvgl heap: used 57%, free 18832 bytes (biggest block 16816), frag 11%
