@@ -22,8 +22,24 @@ def main():
         print(f"error: {in_path} is {len(data)} bytes, expected {expected}")
         return 2
 
-    # RGB565 little-endian, red in the high bits -> Pillow raw mode 'BGR;16'
-    img = Image.frombytes("RGB", (w, h), data, "raw", "BGR;16")
+    # Exact RGB565 bit-replication expansion: (v<<3)|(v>>2) for R/B, (v<<2)|(v>>4) for G
+    lut = bytearray(65536 * 3)
+    for v in range(65536):
+        r5 = (v >> 11) & 0x1F
+        g6 = (v >> 5) & 0x3F
+        b5 = v & 0x1F
+        lut[v * 3]     = (r5 << 3) | (r5 >> 2)
+        lut[v * 3 + 1] = (g6 << 2) | (g6 >> 4)
+        lut[v * 3 + 2] = (b5 << 3) | (b5 >> 2)
+
+    import struct
+    vals = struct.unpack(f"<{len(data)//2}H", data)
+    rgb_bytes = bytearray(len(vals) * 3)
+    for i, v in enumerate(vals):
+        idx = v * 3
+        rgb_bytes[i*3 : i*3+3] = lut[idx : idx+3]
+
+    img = Image.frombytes("RGB", (w, h), bytes(rgb_bytes))
     img.save(out_path)
     print(f"wrote {out_path}")
     return 0

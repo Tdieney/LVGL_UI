@@ -44,8 +44,7 @@ Both shields use a `Ra-01H` module with an SMA antenna connector:
 | Reset | PD28 |
 | DIO0 / DIO1 | ADC10 / ADC11 |
 
-The module is powered from `3V3-AUX`. Confirm module RF variant, legal frequency
-plan, antenna, transmit power, and regional settings before radio firmware work.
+The module is powered from `3V3-AUX`. Operating frequency is confirmed as **920 MHz peer-to-peer (1 Hub, 1 Node)**. The application firmware layer handles the radio and Modbus communication, copying wire frames directly into the `extern` variables in `lora_comm.h`.
 
 ## Smart Node — relay and sensor shield
 
@@ -57,6 +56,11 @@ plan, antenna, transmit power, and regional settings before radio firmware work.
   flyback diode plus a blue channel indicator.
 - Safe boot polarity, contact load rating, default states, interlocks, and
   manual-versus-automatic ownership still need product decisions.
+- **Actuation & Polarity Model (Decided 2026-09-09):** The Smart Node is deliberately
+  dumb — it applies received GPIO levels verbatim to pins PD16..PD13 and reports the
+  actual pin states back. It knows nothing about appliances, names, or polarity.
+  The Smart Hub owns all appliance semantics and resolves polarity locally:
+  `gpio_level = desired_on ^ active_low` and `reported_on = reported_gpio ^ active_low`.
 
 ### RS-485 sensor bus
 
@@ -74,9 +78,7 @@ Planned sensors:
   resolution, and configurable baud rates, but published temperature ranges
   conflict; treat all values as provisional.
 
-Obtain the vendor manuals for slave-address setup, baud/parity, function codes,
-register addresses, scaling, invalid/warm-up values, calibration, response time,
-and electrical loading before implementing the bus or UI thresholds.
+Sensor Modbus acquisition on the RS-485 bus is implemented entirely in the Smart Node firmware by the owner, which packs the scaled readings into `lora_node_status` and broadcasts over 920 MHz LoRa. The UI layer does not query Modbus registers or require vendor datasheets.
 
 ### Power
 

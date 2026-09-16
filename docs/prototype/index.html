@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Studio · Smart Hub design preview</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="review-heading"><span>SMART HUB / DESIGN STUDY 11</span><span>800 × 480 · Interactive draft</span></div>
+  <div class="viewport" id="viewport">
+    <div class="display" id="display">
+      <header class="topbar">
+        <button class="room" data-page="home" aria-label="Studio home"><span data-icon="home"></span><strong>Studio</strong></button>
+        <div class="system"><span class="uptime" title="Time since the interface started"><span data-icon="timer"></span><span class="time" id="uptime" role="timer" aria-label="Interface running time">00:00:00</span></span><span class="divider"></span><span class="link-status" id="link-status"></span></div>
+      </header>
+      <main id="content" tabindex="-1"></main>
+      <nav class="navigation" aria-label="Main navigation">
+        <button data-page="home" aria-label="Home"><span data-icon="home"></span></button>
+        <button data-page="trends" aria-label="Trends"><span data-icon="chart"></span></button>
+        <button data-page="devices" aria-label="Devices"><span data-icon="devices"></span></button>
+      </nav>
+      <dialog id="device-dialog" aria-labelledby="dialog-title"></dialog>
+      <div id="toast" class="toast" role="status"></div>
+      <div id="splash" class="splash" hidden><img src="splash-logo.png" alt="Hyphen Deux"></div>
+    </div>
+  </div>
+  <section class="review-controls" aria-label="Prototype review controls">
+    <div class="review-title"><strong>Explore the experience</strong><span>Sample data · no hardware connected</span></div>
+    <div class="review-actions"><label for="scenario">Room scenario</label><select id="scenario"><option value="moderate">VOC advisory</option><option value="good">Good air</option><option value="poor">Poor air</option><option value="offline">Node offline</option><option value="sensor">Air sensor unavailable</option><option value="timeout">Relay command timeout</option></select><label for="link-bars">Signal</label><select id="link-bars"><option value="4" selected>4 bars (Excellent)</option><option value="3">3 bars (Good)</option><option value="2">2 bars (Fair)</option><option value="1">1 bar (Edge)</option><option value="0">Disconnected</option></select><button id="reset-session">Reset session</button><button id="replay-splash">Replay splash</button></div>
+    <p>Switch screens, tap a metric, or try a device. These controls belong to the design preview, outside the device screen.</p>
+  </section>
+</body>
+</html>

@@ -12,6 +12,24 @@ Read `docs/README.md`, `docs/HARDWARE_OVERVIEW.md`, and
 `docs/MCU_BASELINE.md` before changing the UI. Update `PLAN.md` and add a short
 entry to `DEV_LOG.md` after material work.
 
+## Prompt storage and handoff (Owner, 2026-09-14)
+
+- Before writing or updating any implementation/fix prompt, read
+  `docs/prompts/README.md` and follow its lifecycle and naming rules.
+- `docs/prompts/CURRENT.md` is the only active handoff. Update it in place;
+  preserve superseded handoffs in `docs/prompts/archive/` before replacing them.
+- Do not scatter prompts in root, `docs/`, review folders, or design folders.
+  Review reports/screenshots stay under `docs/reviews/`; product decisions stay
+  in `docs/UI_DESIGN_BRIEF.md`. Archived prompts are historical, not authority.
+- A request to organize/write prompts does not authorize implementing their code.
+- **Automatic review handoff (Owner, 2026-09-15):** Whenever a user-facing review
+  finds remaining defects or issues, automatically prepare/update
+  `docs/prompts/CURRENT.md` in the same turn and include its link with the review.
+  Do not wait for the owner to ask for a fix prompt. Follow the archive lifecycle;
+  keep evidence in the review folder. Unresolved decisions must be explicit in a
+  DRAFT prompt, not silently assumed. This authorizes prompt/document updates,
+  not implementing fixes, committing or pushing during a review-only request.
+
 ## Build and checks
 
 From the repository root on Windows:
@@ -39,9 +57,11 @@ under `sim_pc/build/_deps` and stay disconnected from dependency updates.
   `ui_tick()`.
 - Avoid float formatting and trigonometric functions in display/input hot paths.
 
-## Hardware boundaries
+## Hardware boundaries & wire contract
 
-- Smart Hub owns the LCD/touch UI and LoRa link.
-- Smart Node owns the four relays and the shared RS-485 sensor bus.
-- Sensor register maps, LoRa packet format, node count, alarm thresholds, and
-  relay semantics remain open requirements. Do not invent them in production code.
+- Smart Hub owns the LCD/touch UI, LoRa link, appliance semantics, and per-device polarity mapping (`active_low`).
+- Smart Node owns the four relays (PD16..PD13) and the shared RS-485 sensor bus. The Node acts as a dumb actuator applying received GPIO levels verbatim and reporting readback levels.
+- **Architectural Decision (Owner, 2026-09-09):** The UI reads and writes wire state directly via `extern` globals in `lora_comm.h` (`lora_hub_cmd`, `lora_node_status`, `lora_last_rx_tick_ms`, `lora_last_rssi`, `lora_rx_revision`), following the `motor_comm.h` convention.
+  - *Trade-off:* Couples the UI directly to the radio packet layout, eliminating intermediate `ui_snapshot_t` allocation, translation overhead, and remote ACK timeout races, while requiring packet schema changes to be coordinated between Hub and Node firmware.
+- LoRa operates at **920 MHz peer-to-peer (1 Hub, 1 Node)**. The owner's application firmware drives the radio and RS-485 Modbus sensors, populating the `lora_node_status` extern globals directly. The UI project does not require sensor datasheets or RF drivers. Multi-node addressing and general-purpose automation engines remain out of scope.
+- **Auto scope (Owner request, 2026-09-14):** The next implementation handoff includes Hub-side Auto with per-device ON/OFF thresholds editable on the LCD, replacing the earlier fixed-threshold-only proposal. The technical-lead v1 specification covers Ventilation Fan/CO2, Air Purifier/VOC and Humidifier/RH, with validation, hysteresis, manual override and explicit loss/recovery behavior; see `docs/prompts/CURRENT.md`. This does not authorize Node-side automation, radio drivers, Flash persistence drivers or a packet-schema change. The feature is specified, not yet implemented.

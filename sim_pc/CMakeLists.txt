@@ -17,9 +17,39 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 FetchContent_MakeAvailable(lvgl)
 
 get_filename_component(UI_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
-add_executable(sim_pc main.c ${UI_ROOT}/ui.c)
+
+# Simulator with test hooks
+add_executable(sim_pc
+    main.c
+    ui_test_api.c
+    test_restore_integration.c
+    ${UI_ROOT}/ui.c
+    ${UI_ROOT}/ui_auto.c
+    ${UI_ROOT}/ui_theme.c
+    ${UI_ROOT}/ui_icons.c
+    ${UI_ROOT}/ui_fonts.c
+    ${UI_ROOT}/ui_splash_logo.c
+)
+target_compile_definitions(sim_pc PRIVATE UI_TEST_HOOKS)
 target_include_directories(sim_pc PRIVATE ${UI_ROOT} ${lvgl_SOURCE_DIR})
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(sim_pc PRIVATE -Wall -Wextra -Werror)
+    target_compile_options(sim_pc PRIVATE -Wall -Wextra -Werror -g)
 endif()
 target_link_libraries(sim_pc PRIVATE lvgl gdi32 user32)
+
+# Production smoke test (UI_TEST_HOOKS disabled, minimal application stubs)
+add_executable(smoke_production
+    smoke_production.c
+    ${UI_ROOT}/ui.c
+    ${UI_ROOT}/ui_auto.c
+    ${UI_ROOT}/ui_theme.c
+    ${UI_ROOT}/ui_icons.c
+    ${UI_ROOT}/ui_fonts.c
+    ${UI_ROOT}/ui_splash_logo.c
+)
+target_include_directories(smoke_production PRIVATE ${UI_ROOT} ${lvgl_SOURCE_DIR})
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(smoke_production PRIVATE -Wall -Wextra -Werror)
+endif()
+target_link_libraries(smoke_production PRIVATE lvgl)
+

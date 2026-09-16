@@ -41,3 +41,6 @@ desktop.ini
 *.raw
 .codex-tmp/
 sim_pc/build_review*/
+scratch/
+build_shots/
+.temp_tiles_*.png
