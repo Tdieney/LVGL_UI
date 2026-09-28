@@ -1,0 +1,43 @@
+devices_auto_humidifier.raw header_diff=0 body_diff=0
+devices_auto_invalid_draft.raw header_diff=0 body_diff=0
+devices_auto_max_10000.raw header_diff=0 body_diff=0
+devices_auto_purifier.raw header_diff=0 body_diff=0
+devices_auto_thresholds.raw header_diff=0 body_diff=0
+devices_error.raw header_diff=2272 body_diff=0
+devices_grid.raw header_diff=2330 body_diff=0
+devices_no_readback.raw header_diff=2454 body_diff=0
+devices_settings.raw header_diff=2330 body_diff=0
+devices_settings_manual_only.raw header_diff=0 body_diff=0
+dropdown_open_bottom.raw header_diff=0 body_diff=0
+dropdown_open_top.raw header_diff=0 body_diff=0
+home_auto_paused.raw header_diff=0 body_diff=0
+home_auto_paused_switch.raw header_diff=2364 body_diff=0
+home_error.raw header_diff=2272 body_diff=0
+home_good.raw header_diff=2143 body_diff=0
+home_link_degraded.raw header_diff=0 body_diff=0
+home_moderate.raw header_diff=2149 body_diff=0
+home_no_readback.raw header_diff=2454 body_diff=0
+home_offline.raw header_diff=2546 body_diff=1054
+home_poor.raw header_diff=2149 body_diff=0
+home_relay_pending.raw header_diff=2355 body_diff=0
+home_relay_retry.raw header_diff=2389 body_diff=0
+home_sensor_fail.raw header_diff=2355 body_diff=0
+home_temp_humid_invalid.raw header_diff=0 body_diff=0
+probe_bus_fault.raw header_diff=0 body_diff=0
+probe_chart_rebuild.raw header_diff=0 body_diff=0
+probe_duplicate_units.raw header_diff=0 body_diff=0
+probe_isolated_points.raw header_diff=0 body_diff=0
+splash.raw header_diff=0 body_diff=0
+trends_data.raw header_diff=2389 body_diff=0
+trends_empty.raw header_diff=2357 body_diff=0
+trends_humid.raw header_diff=2357 body_diff=0
+trends_temp.raw header_diff=2357 body_diff=0
+trends_voc.raw header_diff=2389 body_diff=0
+uptime_after_reconnect.raw header_diff=2272 body_diff=0
+uptime_proportional.raw header_diff=0 body_diff=0
+CHANGED ui.c
+CHANGED ui_theme.c
+CHANGED ui_theme.h
+CHANGED sim_pc/main.c
+CHANGED sim_pc/build/sim_pc.exe
+

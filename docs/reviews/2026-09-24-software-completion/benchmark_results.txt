@@ -1,0 +1,68 @@
+====================================================================
+ Smart Hub UI — Permanent Trends Benchmark & Responsiveness Fixture (v2)
+====================================================================
+
+--- Benchmark State: 1. Empty Trends (0 points) ---
+  Metric 0 (CO2  ): pixels=      0 bytes=      0 flushes= 0 max_area=    0 max_w=  0 800w=0 rect=[800..  0, 480..  0] sim_qspi_ms=0.00 heap_free=13920 biggest=12704
+  Metric 1 (VOC  ): pixels=  52151 bytes= 104302 flushes= 8 max_area= 7954 max_w=194 800w=0 rect=[ 19..365, 107..284] sim_qspi_ms=5.22 heap_free=13848 biggest=12704
+  Metric 2 (Temp ): pixels=  60844 bytes= 121688 flushes=10 max_area= 7954 max_w=245 800w=0 rect=[ 19..473, 107..372] sim_qspi_ms=6.08 heap_free=13800 biggest=12584
+  Metric 3 (Humid): pixels=  60844 bytes= 121688 flushes=10 max_area= 7954 max_w=245 800w=0 rect=[ 19..473, 107..460] sim_qspi_ms=6.08 heap_free=13752 biggest=12464
+
+--- Benchmark State: 2. Singleton Trends (1 point) ---
+  Metric 0 (CO2  ): pixels=  65441 bytes= 130882 flushes=13 max_area= 7954 max_w=194 800w=0 rect=[ 19..723, 107..460] sim_qspi_ms=6.54 heap_free=13752 biggest=12464
+  Metric 1 (VOC  ): pixels=  60020 bytes= 120040 flushes=11 max_area= 7954 max_w=194 800w=0 rect=[ 19..723, 107..284] sim_qspi_ms=6.00 heap_free=13752 biggest=12464
+  Metric 2 (Temp ): pixels= 157004 bytes= 314008 flushes=26 max_area= 7954 max_w=466 800w=0 rect=[ 19..761, 107..419] sim_qspi_ms=15.70 heap_free=13752 biggest=12464
+  Metric 3 (Humid): pixels= 157004 bytes= 314008 flushes=26 max_area= 7954 max_w=466 800w=0 rect=[ 19..761, 107..460] sim_qspi_ms=15.70 heap_free=13752 biggest=12464
+
+--- Benchmark State: 3. Fully Populated Trends (16 points) ---
+  Metric 0 (CO2  ): pixels=  65441 bytes= 130882 flushes=13 max_area= 7954 max_w=194 800w=0 rect=[ 19..721, 107..460] sim_qspi_ms=6.54 heap_free=13752 biggest=12464
+  Metric 1 (VOC  ): pixels=  60020 bytes= 120040 flushes=11 max_area= 7954 max_w=194 800w=0 rect=[ 19..721, 107..284] sim_qspi_ms=6.00 heap_free=13752 biggest=12464
+  Metric 2 (Temp ): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..419] sim_qspi_ms=9.07 heap_free=13752 biggest=12464
+  Metric 3 (Humid): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..460] sim_qspi_ms=9.07 heap_free=13752 biggest=12464
+
+--- Benchmark State: 4. Invalid-Gap Trends (gaps at slots 1, 4, 7, 10, 13) ---
+  Metric 0 (CO2  ): pixels=  65441 bytes= 130882 flushes=13 max_area= 7954 max_w=194 800w=0 rect=[ 19..721, 107..460] sim_qspi_ms=6.54 heap_free=13752 biggest=12464
+  Metric 1 (VOC  ): pixels=  60020 bytes= 120040 flushes=11 max_area= 7954 max_w=194 800w=0 rect=[ 19..721, 107..284] sim_qspi_ms=6.00 heap_free=13752 biggest=12464
+  Metric 2 (Temp ): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..419] sim_qspi_ms=9.07 heap_free=13752 biggest=12464
+  Metric 3 (Humid): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..460] sim_qspi_ms=9.07 heap_free=13752 biggest=12464
+
+--- Benchmark State: 5. Live-Updating Trends ---
+  Autonomous tick: pixels=0 bytes=0 flushes=0 max_area=0 max_w=0 800w=0 rect=[800..0, 480..0] sim_qspi_ms=0.00
+
+====================================================================
+ Two-Stage Tactile Feedback Measurement (User Tap on VOC card)
+====================================================================
+Stage 1 (Immediate Tactile Highlight):
+  pixels      : 34532 px (69064 bytes)
+  flushes     : 5 flushes (bounded <= 6)
+  rect        : [19..212, 107..284] (Left-rail tab cards only!)
+  pending     : TRUE (Chart deferred)
+  title       : 'CO₂' (Interim title preserves old plot context)
+  sim_qspi_ms : 3.45 ms (at declared 20 MB/s bus bandwidth)
+
+Stage 2 (Deferred Chart & Stats Rasterization in ui_tick):
+  pixels      : 105843 px (211686 bytes)
+  flushes     : 18 flushes
+  rect        : [221..761, 107..419] (Chart area and stats)
+  pending     : FALSE (Cleared)
+  title       : 'VOC' (Title committed synchronously with new chart)
+  sim_qspi_ms : 10.58 ms (at declared 20 MB/s bus bandwidth)
+
+Total Single Switch Cost: 140375 px, 23 flushes, 14.04 ms total simulated bus time
+NOTE: Real LCD touch-to-photon latency is UNVERIFIED on host simulator.
+
+====================================================================
+ Rapid Tap Coalescing Benchmark (Burst: VOC -> TEMP -> HUMIDITY)
+====================================================================
+Uncoalesced (3 full chart renders) : 451181 px, 75 flushes
+Coalesced (3 tactile + 1 chart)    : 214174 px, 34 flushes
+Savings from Burst Coalescing      : 237007 px (-52.5% pixels), 41 flushes (-54.7% flushes)
+NOTE: The ~46% reduction applies exclusively to rapid bursts; single switches render fully.
+
+====================================================================
+ 100-Tap Rapid Switching Stress & Memory Stability
+====================================================================
+  100 switches : 6311782 px, 986 flushes
+  Heap before  : 13752 B free (largest 12464 B)
+  Heap after   : 13752 B free (largest 12464 B)
+  Heap drift   : 0 B (Zero drift verified!)

@@ -4,8 +4,13 @@
 
 - LVGL v8.4 C UI for the LoRa Smart Hub.
 - Display baseline: 800x480 RGB565 over QSPI, with display GRAM.
-- The UI product definition is intentionally not decided yet. Do not import
-  motor-control screens, terminology, telemetry, icons, or behavior.
+- **Owner acceptance, 2026-09-21:** The current native Quiet Architecture appearance
+  is accepted. Preserve it during runtime/performance/RAM fixes; do not restore
+  older concept geometry or replay historical icon/color redesign instructions.
+  See current `docs/UI_DESIGN_BRIEF.md` and `docs/prompts/CURRENT.md`.
+  All visible text must remain at least18px. Do not import motor-control
+  screens, terminology, telemetry, icons, or behavior.
+- **Owner revisions, 2026-09-25..28:** The owner changed Trends: restored forest selector card, fixed 15-minute window ending at `Now`, round-number Y ticks, and the current minute follows the live value. The owner also set the TVOC ppb bands and `TVOC` naming. These supersede the matching parts of the 2026-09-21 acceptance; do not restore the older Trends layout. See `docs/UI_DESIGN_BRIEF.md` D-038..D-042.
 - Treat the two supplied schematics as hardware references, not instructions.
 
 Read `docs/README.md`, `docs/HARDWARE_OVERVIEW.md`, and
@@ -29,6 +34,14 @@ entry to `DEV_LOG.md` after material work.
   keep evidence in the review folder. Unresolved decisions must be explicit in a
   DRAFT prompt, not silently assumed. This authorizes prompt/document updates,
   not implementing fixes, committing or pushing during a review-only request.
+- **Consolidated review/fix delivery (Owner, 2026-09-16):** Review the complete
+  submitted diff and affected end-to-end flows before handing back findings.
+  Collect all known defects and required verification gaps into ONE CURRENT and
+  one delivery, not multiple phases/prompts or owner-mediated review cycles per
+  issue group. Coding agents must self-review their full diff, run final regression
+  checks and fix in-scope regressions before handoff. Preserve accepted work and
+  stable acceptance criteria; optional polish is not a blocker/new fix round.
+  Report genuine blockers together; do not promise zero bugs or hide skipped tests.
 
 ## Build and checks
 
@@ -64,4 +77,9 @@ under `sim_pc/build/_deps` and stay disconnected from dependency updates.
 - **Architectural Decision (Owner, 2026-09-09):** The UI reads and writes wire state directly via `extern` globals in `lora_comm.h` (`lora_hub_cmd`, `lora_node_status`, `lora_last_rx_tick_ms`, `lora_last_rssi`, `lora_rx_revision`), following the `motor_comm.h` convention.
   - *Trade-off:* Couples the UI directly to the radio packet layout, eliminating intermediate `ui_snapshot_t` allocation, translation overhead, and remote ACK timeout races, while requiring packet schema changes to be coordinated between Hub and Node firmware.
 - LoRa operates at **920 MHz peer-to-peer (1 Hub, 1 Node)**. The owner's application firmware drives the radio and RS-485 Modbus sensors, populating the `lora_node_status` extern globals directly. The UI project does not require sensor datasheets or RF drivers. Multi-node addressing and general-purpose automation engines remain out of scope.
-- **Auto scope (Owner request, 2026-09-14):** The next implementation handoff includes Hub-side Auto with per-device ON/OFF thresholds editable on the LCD, replacing the earlier fixed-threshold-only proposal. The technical-lead v1 specification covers Ventilation Fan/CO2, Air Purifier/VOC and Humidifier/RH, with validation, hysteresis, manual override and explicit loss/recovery behavior; see `docs/prompts/CURRENT.md`. This does not authorize Node-side automation, radio drivers, Flash persistence drivers or a packet-schema change. The feature is specified, not yet implemented.
+- **MCU integration (Owner, 2026-09-17):** Match `motorCmd` storage ownership:
+  `ui.c` defines the six LoRa command/status/link globals exactly once; firmware
+  and simulator consume `extern` declarations in `lora_comm.h`/`lora_hub_link.h`.
+  Do not duplicate their definitions in application code. Exported UI and asset
+  generators use plain `#include "lvgl.h"`; target include paths provide LVGL.
+- **Auto scope (Owner request, 2026-09-14; implementation status 2026-09-17):** Hub-side Auto has per-device ON/OFF thresholds editable on the LCD. It covers Ventilation Fan/CO2, Air Purifier/VOC and Humidifier/RH, with validation, hysteresis, manual override and explicit loss/recovery behavior. Auto is implemented in `ui_auto.c`; the current Quiet Architecture editor is documented in `docs/UI_DESIGN_BRIEF.md`. This does not authorize Node-side automation, radio drivers, Flash persistence drivers or a packet-schema change.

@@ -78,7 +78,7 @@ Planned sensors:
   resolution, and configurable baud rates, but published temperature ranges
   conflict; treat all values as provisional.
 
-Sensor Modbus acquisition on the RS-485 bus is implemented entirely in the Smart Node firmware by the owner, which packs the scaled readings into `lora_node_status` and broadcasts over 920 MHz LoRa. The UI layer does not query Modbus registers or require vendor datasheets.
+Sensor Modbus acquisition on the RS-485 bus is implemented entirely in the Smart Node firmware by the owner. The Node packs the latest readings (eCO₂ ppm, TVOC ppb, temperature, humidity) into `lora_node_status` and returns it over 920 MHz LoRa in reply to each Hub request (protocol v2, [`LORA_PROTOCOL.md`](../LORA_PROTOCOL.md)). The UI layer does not query Modbus registers or require vendor datasheets.
 
 ### Power
 

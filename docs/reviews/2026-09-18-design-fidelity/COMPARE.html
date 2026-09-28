@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiet Architecture — design fidelity review</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;background:#eee;color:#17251f;font:18px/1.5 system-ui,sans-serif}
+main{max-width:1640px;margin:auto}h1{font-size:30px}h2{font-size:24px;margin:28px 0 8px}
+p{max-width:1100px}a{color:#164c38}figure{margin:0}figcaption{padding:8px 0;font-weight:600}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+img{display:block;width:100%;height:auto;aspect-ratio:5/3;object-fit:contain;background:white;border:1px solid #bbb}
+.note{margin:6px 0 12px;color:#3d4e45}@media(max-width:900px){.pair{grid-template-columns:1fr}}
+</style><main><h1>Quiet Architecture: reference versus submitted LVGL</h1>
+<p>2026-09-18 — changes required. <a href="REVIEW.md">Review</a> ·
+<a href="../../prompts/CURRENT.md">Single fix handoff</a>.
+Concepts are normalized to the same 5:3 frame as native800×480 output. At a narrow
+viewport the reference appears above the actual render. Do not mistake illustrative
+values, different modes or smaller generated text for product requirements.</p>
+<section><h2>Overview</h2><p class="note">Different fixture modes are intentional; compare structure, hierarchy and alignment.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/dashboard-quiet-architecture.png" alt="Accepted Overview concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="home_good.png" alt="Current native Overview render"></figure></div></section>
+<section><h2>Trends</h2><p class="note">History values differ. Compare composition, not illustrative data.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/trends-quiet-architecture.png" alt="Accepted Trends concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="trends_data.png" alt="Current native Trends render"></figure></div></section>
+<section><h2>Devices</h2><p class="note">Reference Auto versus current Manual is a fixture difference, not a required startup change.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/devices-quiet-architecture.png" alt="Accepted Devices concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="devices_grid.png" alt="Current native Devices render"></figure></div></section>
+<section><h2>Settings</h2><p class="note">Compare control anatomy; selected mode differs between fixtures.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/settings-quiet-architecture.png" alt="Accepted Settings concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="devices_settings.png" alt="Current native Settings render"></figure></div></section>
+<section><h2>Auto CO2</h2><p class="note">Live sensor values differ; thresholds are the same.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/auto-co2-quiet-architecture.png" alt="Accepted Auto CO2 concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="devices_auto_thresholds.png" alt="Current native Auto CO2 render"></figure></div></section>
+<section><h2>Auto humidity</h2><p class="note">Compare the inverse-rule layout and live-reading strip.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/auto-humidity-quiet-architecture.png" alt="Accepted Auto humidity concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="devices_auto_humidifier.png" alt="Current native Auto humidity render"></figure></div></section>
+<section><h2>Invalid Auto draft</h2><p class="note">NOT matching sensor state: reference VOC150/150; actual CO2 500/800. A VOC invalid capture is required in the fix.</p><div class="pair"><figure>
+<figcaption>Accepted concept — normalized to800×480</figcaption>
+<img src="../../drafts/2026-09-17-pro-max/auto-voc-invalid-quiet-architecture.png" alt="Accepted Invalid Auto draft concept">
+</figure><figure><figcaption>Submitted LVGL — native800×480</figcaption>
+<img src="devices_auto_invalid_draft.png" alt="Current native Invalid Auto draft render"></figure></div></section>
+</main></html>
+

@@ -1,11 +1,49 @@
-# Technical-lead review · Smart Hub study 12
+# Technical-lead review · Smart Hub Quiet Architecture
+
+> Latest owner-reported live-path investigation:
+> [Trends/Auto](reviews/2026-09-23-trends-auto-investigation/REVIEW.md).
+> Current is live while history is never fed by production UI; Manual→Auto
+> restarts a10s hold and needs three fresh reports. One CURRENT covers these
+> paths plus previously open RAM/fault evidence. Earlier banners below are
+> historical; preserve accepted visual design.
+
+> Latest independent disposition: [G1–G4 review](reviews/2026-09-21-g1-g4-independent/REVIEW.md).
+> Functional repairs accepted; no new reproduced production UI bug. One CURRENT
+> completes E1 RAM evidence/report corrections and E2 fault-matrix assertions.
+> Default/40KiB34/34, isolated production and full assert-enabled smoke PASS.
+> Keep accepted appearance and42KiB/10lines; target memory sign-off remains open.
+> Earlier status banners below are historical, not additional active scope.
+
+> Latest independent disposition:
+> [const-style review](reviews/2026-09-21-const-style-review/REVIEW.md).
+> Missing-data copy and old uptime fix accepted. Remaining G1–G4 cover new link
+> clipping, constant-style config portability, RAM placement/candidate proof and
+> durable tests. Default and reviewer40KiB suites both34/34 PASS; MCU sign-off pending.
+
+> Latest independent disposition,2026-09-21:
+> [implementation follow-up](reviews/2026-09-21-runtime-followup/REVIEW.md).
+> R1–R7 repairs verified; R8 partial. ONE CURRENT covers remaining header overlap,
+> owner-approved unavailable copy simplification, regression gaps and RAM evidence.
+> All34 existing checks and isolated production verification pass; target sign-off
+> remains pending real MCU artifacts. Earlier review criteria/status below are historical.
+
+> Owner update,2026-09-21: current native appearance is accepted; older fidelity
+> criteria below are historical where they conflict. The latest disposition is
+> [runtime/RAM review](reviews/2026-09-21-runtime-ram-review/REVIEW.md), with one
+> [active handoff](prompts/CURRENT.md). Freeze accepted pixels while correcting
+> demonstrated runtime states and optimizing RAM/redraw.42KiB/10lines remain the
+> reference profile; smaller candidates require evidence, not weakened tests.
 
 The owner assigns implementation to a separate coding AI and independent review
 to this assistant. Use [current implementation/fix prompt](prompts/CURRENT.md)
 for the implementation handoff. The current simulator implementation exists;
 the latest independent disposition is in
-[the W1–W4 result review](reviews/2026-09-16-auto-w1-w4-independent/REVIEW.md),
-with X1–X4 requiring correction; Retry/heap improvements and visual direction retained.
+[the reconstruction review](reviews/2026-09-18-reconstruction-review/REVIEW.md).
+MCU include/global ownership and core Auto behavior remain accepted, as do
+restored major proportions and specific fixes recorded there. Remaining Q1–Q5
+cover reproduced boundary/recovery overlap, history coverage, already-requested
+reference fidelity, verification assertions and inaccurate reporting.
+This is completion of the approved design, not a new design direction.
 Older review-round notes are historical context;
 the current prompt governs changed requirements and acceptance tests.
 
@@ -32,21 +70,17 @@ items when the review has passed.
 
 ## Independent review priorities
 
-1. **Match the latest design.** Study 12: separate CO₂/VOC cards, no Room Air overview,
-   no visible Index; equal 62 px main readings, stacked comfort cards, balanced
-   grid and flat tonal surfaces. Every surface fill is one flat, RGB565-exact
-   color: reject any `bg_grad_dir`/`bg_grad_color` and any fill outside the
-   study 12 table. Metric colors must not imply quality. Keep
-   readable text, zero borders, exactly three tabs, uptime and Connected/Disconnected. No Details,
-   bell, notification panel or redundant normal On/Off captions. Splash-only brand.
-   Bottom navigation has only 32 px icons, no visible captions; preserve accessible
-   names, equal-width 48 px-high targets and white-on-blue selected state.
-   Cards alone receive the approved faint soft shadow (CSS reference: 0/2/10/0,
-   #182B4D at 6%); verify the LVGL rendering, clipping and redraw cost. Bars stay
-   shadow-free; no new borders or heavy halos. Confirm each declared fill equals
-   what the RGB565 framebuffer contains (sample the shot, do not trust the CSS),
-   that no two surfaces share a fill they should not, and check 98 px comfort-card
-   clipping with missing data; no overlap into the device row.
+1. **Match the latest design.** The seven Quiet Architecture concepts under
+   `drafts/2026-09-17-pro-max/` and CURRENT govern visual acceptance; Study12's
+   bottom icon navigation, separate metric cards and permanently flat palette
+   are historical, not current constraints. Preserve the two-row shell,
+   asymmetric Overview, focused editors and minimum18px text; restore the
+   reference hierarchy, coherent icon roles and subordinate units. Restrained
+   tonal depth must respect measured MCU cost, not use a full-screen bitmap.
+   Test actual glyph/control lanes in boundary/recovery states, not only
+   nominal captures. No Details, bell/notification panel, visible VOC Index
+   suffix or redundant normal On/Off captions. Uptime and Connected/Disconnected
+   remain. Native captures are evidence, not replacement approved concepts.
 2. **Correct state handling.** Verify the `lora_comm.h` wire globals contract and
    the desired versus reported state model: settled when equal, `Sending…` while
    younger than 3000 ms, and `Unknown` + `Retry` past timeout. Verify Hub-local

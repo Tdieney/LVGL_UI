@@ -1,0 +1,47 @@
+========================================================
+ Phase 1: Verifying MCU Export Manifest & Exporting Bundle
+========================================================
+MCU export manifest: PASS
+
+Testing X1/Y2 export collision safety and artifact ownership...
+X1/Y2/R3 collision safety & failure paths: PASS (explicit refusal, secondary destination protection, valid timestamp fallback, atomic suffixing, concurrent isolation, explicit race, controlled failure & watchdog verified)
+
+Exporting MCU bundle to staging directory...
+
+========================================================
+ Phase 2: Isolated Host Build from Exported Artifacts
+========================================================
+  Exported Staging: C:\Users\vanth\AppData\Local\Temp\smart_hub_ui_isolated_verify_832807ee74df47a98604c9ccd322ea4e\export_dest\smart_hub_ui
+  LVGL Source:      C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\sim_pc\build\_deps\lvgl-src
+  Compiler:         C:\Toolchains\w64devkit\bin\gcc.exe
+Export artifact membership: PASS (16 verified files)
+
+Configuring isolated build with CMake (watchdog: 60s)...
+
+Compiling isolated smoke_production (Release, -Wall -Wextra -Werror, watchdog: 60s)...
+
+========================================================
+ Phase 3: Running Production Smoke Test (Clean Run, watchdog: 30s)
+========================================================
+[SMOKE] Starting production UI smoke test (UI_TEST_HOOKS disabled)...
+[SMOKE] Production UI smoke test PASSED successfully.
+
+Clean run: PASS (exit code 0)
+
+========================================================
+ Phase 4: Running Negative Control (--fail-check, watchdog: 30s)
+========================================================
+Process exit code: 1
+stdout:
+[SMOKE] Running negative test (deliberate failure detection)...
+
+stderr:
+[SMOKE ERROR] Check failed: 1 == 2 (C:/Users/vanth/AppData/Local/Temp/smart_hub_ui_isolated_verify_832807ee74df47a98604c9ccd322ea4e/export_dest/smart_hub_ui/smoke_production.c:39)
+
+Negative control: PASS (strictly exit code 1 with verified error message)
+
+========================================================
+ Production verification & Release checks: ALL PASSED 
+========================================================
+
+Cleaning up isolated staging directory: C:\Users\vanth\AppData\Local\Temp\smart_hub_ui_isolated_verify_832807ee74df47a98604c9ccd322ea4e

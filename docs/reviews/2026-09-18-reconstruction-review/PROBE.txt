@@ -1,0 +1,17 @@
+probe_home_limits: submitted containment audit = PASS
+probe_trends_10000: submitted containment audit = PASS
+probe_trends_two_samples: submitted containment audit = PASS
+probe_trends_negative: submitted containment audit = PASS
+probe_auto_live_max: submitted containment audit = PASS
+probe_devices_auto: submitted containment audit = PASS
+probe_home_auto: submitted containment audit = PASS
+probe_settings_max_summary: submitted containment audit = PASS
+probe_settings_invalid_back: submitted containment audit = PASS
+recovery setup phase=0 latch=0
+after timeout phase=2 latch=1
+probe_home_latched_recovery: submitted containment audit = PASS
+after late ACK phase=0 latch=1
+probe_devices_latched_recovery: submitted containment audit = PASS
+probe_uptime_1000h_offline: submitted containment audit = PASS
+pending settings setup phase=1
+probe_settings_pending_rejection: submitted containment audit = PASS

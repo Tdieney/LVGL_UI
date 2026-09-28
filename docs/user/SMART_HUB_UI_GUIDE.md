@@ -1,5 +1,23 @@
 # Smart Hub UI — Integration and Operation Guide
 
+## Current interface (Quiet Architecture, 2026-09-17)
+
+Use the native simulator and [current captures](../reviews/2026-09-17-quiet-implementation/REPORT.md).
+All visible text is at least18px. Overview/Trends/Devices are top tabs; Settings
+and Auto limits are focused full-width editors, not small modal dialogs.
+Back from Auto retains edits, Back from Settings/Cancel discards, Save commits
+the whole draft. Auto limits are editable even in Manual mode. UI configuration
+stays in RAM unless application firmware explicitly implements persistence.
+The redesign does not require Flash.
+
+**2026-09-25 owner changes:** LoRa protocol v2 (`LORA_PROTO_VERSION 0x02`)
+is request/response. The Hub polls with `GET_STATUS` and sends `HUB_CMD` only
+for pending commands. Telemetry is eCO₂ in ppm and TVOC in ppb, and the device
+configuration schema is v3. The Trends page was simplified: no Current/Min/Max
+row and no point tooltip. Sections 4, 7, 8 and 9 below describe the current
+behavior. The host simulator and regression tests are implemented and host-verified
+(42/42 checks pass; see [PLAN.md](../../PLAN.md) and [delivery report](../reviews/2026-09-25-lora-v2-trends-delivery/REPORT.md)).
+
 This document is intended for engineers **porting this UI to actual STM32 firmware**. Upon reading, you should understand: which functions to call, where to inject data, where to retrieve output data, what the UI handles, what firmware handles, and what remains to be done.
 
 Related documents:
@@ -50,7 +68,7 @@ Device names, icon presets, Auto/Manual mode, and `active_low` polarity mapping 
 | `ui_auto.c` / `ui_auto.h` | Hub-side Auto v1 automation module (pure C, zero-LVGL) |
 | `ui_internal.h` | Internal UI state structures (shared with test APIs) |
 | `ui_types.h` | Enums and Hub-local device configuration definitions |
-| `ui_theme.c` / `.h` | Study 12 color palette, shared static styles |
+| `ui_theme.c` / `.h` | Quiet Architecture palette, shared static styles |
 | `ui_icons.c` / `.h` | 4bpp alpha icons |
 | `ui_fonts.c` / `.h` | Pre-rendered font tables (see Section 9) |
 | `ui_splash_logo.c` | Splash screen logo bitmap |
@@ -69,9 +87,9 @@ Device names, icon presets, Auto/Manual mode, and `active_low` polarity mapping 
 |---|---|
 | QSPI LCD driver + `flush_cb` | Complete rendering, layouts, animations |
 | Touch driver + `lv_indev` `read_cb` | Touch interaction, navigation, dialogs |
-| `lv_tick_inc()` from 1 ms timer | Uptime counters, command timeouts, auto timing |
+| LVGL tick source (same clock as `lora_last_rx_tick_ms`) | Uptime counters, command timeouts, auto timing |
 | Radio driver, populating status globals | Telemetry parsing, quality badges, visual status |
-| Periodic transmission of `lora_hub_cmd` | Determining contents of `lora_hub_cmd` |
+| `GET_STATUS` polling; sending `lora_hub_cmd` while a command is pending | Determining contents of `lora_hub_cmd`; `ui_has_pending_command()` |
 | Flash/NVS persistence | Managing RAM configuration + change callbacks |
 | Sensor polling (on Node side) | Display formatting, metric validity masking |
 | Long-term history logging (if required) | Displaying 16-point sliding trend graphs |
@@ -109,8 +127,6 @@ int main(void)
     ui_init();               /* Builds shell + initial page, calls lv_scr_load */
     ui_replay_splash();      /* Optional: runs 2.5 s splash screen */
 
-    uint32_t last_tx = 0;
-
     for (;;) {
         /* 1) Inbound radio frames */
         lora_service_rx();               /* Section 7.1 */
@@ -119,12 +135,9 @@ int main(void)
         ui_tick();                       /* Polls global variables, updates widgets */
         lv_timer_handler();              /* LVGL render pass */
 
-        /* 3) Outbound radio frames (gated TX): only transmits once boot state settles */
-        uint32_t now = lv_tick_get();
-        if (ui_is_tx_ready() && (now - last_tx >= 1000u)) {
-            last_tx = now;
-            lora_send(lora_hub_cmd.bytes, LORA_HUB_CMD_LEN);
-        }
+        /* 3) Outbound radio frames: GET_STATUS poll (always, incl. boot), or
+         *    HUB_CMD when ui_is_tx_ready() && ui_has_pending_command() */
+        lora_service_tx();               /* LORA_GUIDE.md section 9.2 */
     }
 }
 ```
@@ -141,11 +154,15 @@ int main(void)
 
 `ui_tick()` is **computationally lightweight when nothing changes** — see Section 10.
 
-**`ui_is_tx_ready()`** — Returns `true` once UI initialization is complete and boot staging has stabilized. **Mandatory guard condition** before calling `lora_send()`, preventing spurious transmissions before Node initial state is recognized.
+**`ui_is_tx_ready()`** — Returns `true` once the first fresh Node report has been reconciled. It becomes `false` again on link loss or when a Node reboot is detected (`uptime_sec` decreased). **Mandatory guard** before sending `HUB_CMD`. Do not use it to gate `GET_STATUS`: the Node replies only to requests, so boot synchronization depends on polling.
 
-### `lv_tick_inc()`
+**`ui_has_pending_command()`** — Returns `true` while at least one relay command is waiting for Node confirmation (before `UI_CMD_TIMEOUT_MS`). Firmware sends `HUB_CMD` only while this is `true`, with at most three attempts per `seq`. Otherwise it sends `GET_STATUS`.
 
-LVGL requires elapsed time tracking. Call `lv_tick_inc(1)` from a 1 ms timer interrupt:
+### LVGL tick source
+
+`ui.c` compares `lora_last_rx_tick_ms` with `lv_tick_get()`, so both must come from one clock. `lora_hub_link.h` documents the RX timestamp as `HAL_GetTick()`. The simplest consistent setup is therefore `LV_TICK_CUSTOM 1` with `LV_TICK_CUSTOM_SYS_TIME_EXPR (HAL_GetTick())`, with no `lv_tick_inc()` call. If you keep a separate 1 ms timer instead, write `lora_last_rx_tick_ms = lv_tick_get()`. Otherwise the link-age subtraction can wrap and show `Disconnected` permanently.
+
+Timer-driven alternative: call `lv_tick_inc(1)` from a 1 ms timer interrupt:
 
 ```c
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -240,33 +257,44 @@ Minimum touch target sizes: **44x44 px** (Retry, Close buttons) and **54x30 px**
 
 ### 7.1 Status & Telemetry from Node
 
-Firmware defines the extern globals declared in `lora_comm.h` and `lora_hub_link.h`:
+The UI component defines all six shared globals **once in `ui.c`**, matching
+the `motorCmd` storage convention on `ui/motor-control`. Firmware includes the
+headers and accesses the existing storage; **do not define these variables again**.
+If an older integration added definitions in `main.c` or a radio module, remove
+those duplicate definitions when upgrading, while retaining the RX/TX code.
 
 ```c
-lora_hub_cmd_t     lora_hub_cmd;              /* UI writes, firmware sends */
-lora_node_status_t lora_node_status;          /* Firmware writes, UI reads */
-volatile uint32_t  lora_last_rx_tick_ms;      /* Firmware writes */
-volatile uint32_t  lora_rx_revision;          /* Firmware writes */
-volatile int8_t    lora_last_snr;             /* Firmware writes */
-volatile int8_t    lora_last_rssi;            /* Firmware writes */
+#include "ui.h"
+#include "lora_comm.h"       /* extern command and status */
+#include "lora_hub_link.h"   /* extern RX tick, revision, SNR and RSSI */
 ```
+
+`ui.c` must be compiled/linked once alongside the other exported UI sources.
+The UI uses `#include "lvgl.h"` directly: put the directory containing `lvgl.h`
+on the target compiler's include path, with the target's own `lv_conf.h`
+configuration. No `LV_LVGL_H_INCLUDE_SIMPLE` define is needed by exported UI code.
+The application still owns radio I/O and valid-report publication; storage in
+`ui.c` does not implement a radio driver. Call `ui_tick()` before considering TX
+and respect `ui_is_tx_ready()` and `ui_has_pending_command()` for `HUB_CMD`;
+poll with `GET_STATUS` otherwise. Publish RX in application context, never call
+LVGL from an ISR.
 
 Upon receiving a valid status frame:
 
 ```c
 void lora_service_rx(void)
 {
-    uint8_t buf[64], len; int8_t snr, rssi;
+    uint8_t buf[64], len; int8_t snr; int16_t rssi;
     if (!lora_read_packet(buf, &len, &snr, &rssi)) return;
 
     if (len != LORA_NODE_STATUS_LEN)          return;   /* Frame size validation */
-    if (buf[0] != LORA_PROTO_VERSION)         return;
+    if (buf[0] != LORA_PROTO_VERSION)         return;   /* 0x02: rejects v1 Nodes */
     if (buf[1] != LORA_MSG_NODE_STATUS)       return;
 
     memcpy(lora_node_status.bytes, buf, LORA_NODE_STATUS_LEN);
     lora_last_snr        = snr;
-    lora_last_rssi       = rssi;
-    lora_last_rx_tick_ms = lv_tick_get();
+    lora_last_rssi       = rssi;               /* int16_t: may be below -128 dBm */
+    lora_last_rx_tick_ms = lv_tick_get();      /* Same clock as LVGL (Section 4) */
     lora_rx_revision++;                        /* MANDATORY TRIGGER */
 }
 ```
@@ -277,76 +305,96 @@ void lora_service_rx(void)
 
 | Field | Units | UI Application |
 |---|---|---|
-| `co2_ppm` + `co2_valid` | ppm | CO₂ hero card & trends |
-| `voc_index` + `voc_valid` | Unitless index | VOC hero card & trends |
+| `co2_ppm` + `co2_valid` | eCO₂ ppm (valid `400..60000`) | eCO₂ hero card, trends, Fan Auto |
+| `tvoc_ppb` + `voc_valid` | TVOC ppb (valid `0..60000`) | TVOC hero card, trends, Purifier Auto |
 | `temp_deci_c` + `temp_valid` | 0.1 °C, **signed** | Temperature comfort card & trends |
-| `humidity_pct` + `humid_valid` | Integer % | Humidity comfort card & trends |
+| `humidity_pct` + `humid_valid` | Integer % | Humidity comfort card, trends, Humidifier Auto |
 | `relay1..4_gpio` | Raw GPIO 0/1 | Physical relay readback state |
 | `seq_echo` | Counter | Confirmation that Node executed current command |
+| `uptime_sec` | Seconds | A decrease is treated as a Node reboot (re-sync) |
+| `sample_seq` | Counter | New sensor sample; only new samples advance Auto qualification |
 | `rs485_fault`, `co2_timeout`, `th_timeout` | Flags | Fault masking and Auto suspension |
+
+Values outside the valid range are treated like `valid = 0` for that metric.
 
 **The `*_valid` bits are essential.** If a sensor fails, set `valid = 0`. The UI will render an em-dash `—` and `Unknown` status **exclusively for that metric**, while other metrics continue updating normally. Do not transmit a value of 0 to represent invalid data.
 
 ### 7.3 Inferred Connection State
 
 Link status is inferred: `lv_tick_get() - lora_last_rx_tick_ms < LORA_LINK_TIMEOUT_MS` (5000 ms).
-There is no manual connection flag. Updating `lora_last_rx_tick_ms` on valid packets handles link status automatically.
+There is no manual connection flag. Updating `lora_last_rx_tick_ms` on valid packets handles link status automatically. In v2 packets arrive only as replies, so the link stays `Connected` only while the Hub keeps polling with `GET_STATUS`.
 
 Upon link loss, the UI automatically hides telemetry values, displays `Unknown`, and **inhibits manual switch toggles**.
 
-### 7.4 Historical Trends Data
+### 7.4 Historical Trends Data & Autonomous Sampling
 
-```c
-void ui_feed_history(ui_metric_id_t metric,
-                     const int32_t *values, const bool *valid,
-                     uint16_t count, uint16_t start_minute);
-```
+The Trends screen displays a 16-point time series for each of the 4 air metrics (eCO₂, TVOC, Temperature, Humidity).
 
-- Capacity: **16 points** per metric (`UI_HISTORY_CAPACITY`).
-- If `count` > 16, the UI keeps the **16 most recent points**.
-- `start_minute`: Minute of day for the first point (`14*60+17` = 14:17), auto-wrapped modulo 1440.
-- `valid[i] = false` produces a **gap** in the line chart, rather than zero.
-- Units follow Section 7.2 (temperature in 0.1 °C).
+**Page layout (2026-09-25):**
+- The left rail has four selector cards. Each shows the metric's live value and unit, or an em dash when unavailable. The selected card is highlighted in solid forest green (`UI_COLOR_FOREST`) with white text/icons and a celadon indicator dot at (160, 14); unselected cards use porcelain styling with ink text.
+- Selection happens on touch-down (`LV_EVENT_PRESSED`). The selector card changes state immediately. The chart card is redrawn once, after taps have been quiet for `UI_TRENDS_SETTLE_MS` (150 ms, overridable at compile time), so rapid taps do not render every intermediate metric.
+- The chart card shows the metric title at (20, 14) and, in a fixed top-right slot (-20, 23), a `Data unavailable` badge when the live value is missing. Below them are the unit at (12, 96), three right-aligned round-number Y-axis labels at y 136/191/246, the line chart at (72, 136) and four time labels at y 276. There is no Current/Min/Max row, no coverage/span label and no point-inspection tooltip; the live value appears only on the selector card.
+- The chart uses LVGL's native line and 4 px markers, with no custom area shading. Values are normalized to a 0..1000 plot range using 64-bit arithmetic, so large eCO₂/TVOC values cannot overflow the 16-bit `lv_coord_t`. The Y-axis labels use round numbers (`lo`, `lo+s`, `lo+2s` with $s \in \{1, 2, 2.5, 5\} \times 10^k$) matching the 3 grid lines.
+- With no valid samples the card shows `No readings yet`. With exactly one it shows `Collecting readings…` and the hint `The trend appears after the next reading`, instead of a lone point.
 
-The UI **does not accumulate historical buffers internally**. Firmware maintains its own ring buffer (e.g. 1-minute samples) and feeds this API. Unpopulated metrics display an empty state.
+1. **Autonomous Session History (Default):**
+   - The UI automatically accumulates session history within `ui.c` (16 points $\times$ 4 metrics) without requiring external firmware feeds or Flash persistence.
+   - On the first accepted valid report after boot, the UI captures one reading (`count = 1`). The chart appears from the second valid reading.
+   - On subsequent minutes, the UI advances to the next slot (1 slot per elapsed session minute). Within the current minute the newest slot follows the latest valid reading, so the rightmost `Now` point and the Y range track the live value within about one report (owner decision 2026-09-26). When the minute ends, the slot keeps its last valid reading. An unavailable reading never erases a minute that already has data, and an unchanged value does not trigger a redraw. If packets are dropped or link drops, elapsed minutes are retained as gaps (`valid = false`), avoiding synthetic interpolation.
+   - Time labels for autonomous history format across a fixed 15-minute right-aligned window ending at `Now` (`-15 min`, `-10 min`, `-5 min`, `Now`) using fonts $\ge 18\text{px}$, with newest sample mapped to slot 15.
+   - Min/max of the retained valid points are used only to scale the plot and calculate round-number Y-axis labels; they are no longer shown as statistics.
+
+2. **External History Feed (`ui_feed_history`):**
+   ```c
+   void ui_feed_history(ui_metric_id_t metric,
+                        const int32_t *values, const bool *valid,
+                        uint16_t count, uint16_t start_minute);
+   ```
+   - If application firmware maintains an external ring buffer (e.g., from an RTC or host synchronized database), calling `ui_feed_history()` takes exclusive precedence for that metric.
+   - Capacity: **16 points** per metric (`UI_HISTORY_CAPACITY`). If `count > 16`, newest window is retained.
+   - `start_minute`: Minute of day (`14*60+17` = 14:17). External history displays wall-clock timestamps (`%02u:%02u`).
+   - `valid[i] = false` produces a gap in the line chart.
 
 ---
 
 ## 8. Hub-local Configuration & Automation (Auto v1)
 
 ```c
-#define UI_CONFIG_SCHEMA_VERSION 0x02u
+#define UI_CONFIG_SCHEMA_VERSION 0x03u
 
 typedef struct {
     char name[24];
     uint8_t preset;            /* 0..7, see ui_preset_id_t */
     ui_device_mode_t mode;     /* UI_MODE_AUTO (0) / UI_MODE_MANUAL (1) */
     uint8_t active_low;        /* 0 = Active High (GPIO 1 is ON), 1 = Active Low (GPIO 0 is ON) */
-    int32_t auto_on_thresh;    /* Turn-on threshold (ppm, VOC index, %RH) */
-    int32_t auto_off_thresh;   /* Turn-off threshold (ppm, VOC index, %RH) */
-    uint8_t schema_version;    /* UI_CONFIG_SCHEMA_VERSION = 0x02 */
+    uint8_t schema_version;    /* UI_CONFIG_SCHEMA_VERSION = 0x03 */
+    int32_t auto_on_thresh;    /* Turn-on threshold (eCO2 ppm, TVOC ppb, %RH) */
+    int32_t auto_off_thresh;   /* Turn-off threshold */
 } ui_hub_device_config_t;
 
 const ui_hub_device_config_t *ui_get_device_config(uint8_t idx);
 bool ui_set_device_config(uint8_t idx, const ui_hub_device_config_t *cfg);
 void ui_set_config_changed_cb(ui_config_changed_cb_t cb);
 bool ui_is_tx_ready(void);
+bool ui_has_pending_command(void);
 ```
+
+The v3 layout is byte-identical to v2; only the purifier threshold unit changed (VOC index → TVOC ppb). `ui_set_device_config()` accepts a v2 record, sets `schema_version` to `0x03` and, for an Air Purifier, replaces its thresholds with the ppb defaults (150/100). There is no valid index-to-ppb conversion. Other presets keep their values. A restore at boot does not fire `ui_config_changed_cb`. To avoid repeating the migration on every boot, firmware should rewrite the record from `ui_get_device_config(i)` when the stored schema was `0x02`.
 
 ### 8.1 Auto v1 Automation Rules (Hub-side)
 
-`ui_auto.c` executes in pure C on the Hub, evaluated whenever a new status frame arrives via LoRa:
+`ui_auto.c` executes in pure C on the Hub. It is evaluated when a status report carries a new sensor sample (`sample_seq` changed, or the first sample after boot, reconnect or Node reboot):
 
 1. **Supported Appliances:**
-   - **Ventilation Fan:** Evaluates CO₂ (ppm). Turns ON when >= `auto_on_thresh` (default 1000), turns OFF when <= `auto_off_thresh` (default 800). Bounds: 0..10000 ppm, step 50 ppm, minimum ON - OFF gap: 50 ppm.
-   - **Air Purifier:** Evaluates VOC (unitless, 1..500). Turns ON when >= `auto_on_thresh` (default 150), turns OFF when <= `auto_off_thresh` (default 100). Bounds: 1..500, step 5, minimum ON - OFF gap: 5.
-   - **Humidifier:** Evaluates Humidity %RH (inverted logic: activates when dry, turns off when moist). Turns ON when <= `auto_on_thresh` (default 40%), turns OFF when >= `auto_off_thresh` (default 50%). Bounds: 0%..100%, step 1%, minimum OFF - ON gap: 5% RH.
+   - **Ventilation Fan:** Evaluates eCO₂ (ppm). Turns ON when >= `auto_on_thresh` (default 1000), turns OFF when <= `auto_off_thresh` (default 800). Bounds: 0..60000 ppm, step 50 ppm, minimum ON - OFF gap: 50 ppm. Readings below 400 ppm are treated as invalid.
+   - **Air Purifier:** Evaluates TVOC (ppb; 0 is a valid reading). Turns ON when >= `auto_on_thresh` (default 150 ppb), turns OFF when <= `auto_off_thresh` (default 100 ppb). Bounds: 1..60000 ppb, step 5 ppb, minimum ON - OFF gap: 5 ppb.
+   - **Humidifier:** Evaluates Humidity %RH (inverted logic: activates when dry, turns off when moist). Turns ON when <= `auto_on_thresh` (default 40%), turns OFF when >= `auto_off_thresh` (default 50%). Bounds: 0%..100%, step 1%, minimum OFF - ON gap: 5% RH. If current humidity is above 50% while OFF, it correctly remains OFF.
    - **Other Presets (Dehumidifier, Heater, Light, Smart Socket, Generic):** Manual mode only. Auto selection is disabled with caption `"Manual only for this device type"`.
 
-2. **Hysteresis & Hunting Protection:**
-   - **3 Consecutive Qualifying Frames:** Requires 3 consecutive valid status frames meeting threshold conditions before triggering a relay state change. Faults or values entering the deadband reset the qualification counter.
-   - **10-Second Post-Switch Hold:** Once a relay switches state, opposing automated transitions are held off for 10 seconds to prevent motor/compressor short cycling.
-   - **Sensor Fault Masking:** When the associated sensor reports invalid telemetry (`valid = false`, RS-485 bus fault, or timeout), Auto suspends transitions and maintains current relay state.
+2. **Hysteresis & Anti-Hunting Protection:**
+   - **3 Consecutive Qualifying Samples:** Requires 3 consecutive new sensor samples (distinct `sample_seq`) meeting threshold conditions before triggering a relay state change. Repeated replies with the same `sample_seq` do not count. Faults or values entering the deadband reset the qualification counter.
+   - **Confirmed Transition Hold:** The 10-second anti-hunting hold begins ONLY upon actual confirmed physical relay transitions (echo sequence and reported GPIO match), link reconnection, or sensor recovery. Switching from Manual to Auto in settings arms immediately without an artificial 10s wait, evaluating on the next 3 qualifying frames.
+   - **Sensor Fault Masking:** When the associated sensor reports invalid telemetry (`valid = false`, RS-485 bus fault, or timeout), Auto suspends transitions and maintains current relay state. Recovery from suspension executes a single 10-second hold before re-evaluating.
 
 3. **Manual Override:**
    - Toggling a device switch on Home or Devices instantly switches that device to `Manual` mode, updates the snapshot, and cancels pending Auto timers. Auto remains disarmed until explicitly re-enabled in settings.
@@ -360,7 +408,7 @@ bool ui_is_tx_ready(void);
 - On the Devices tab, tapping the gear icon opens the **Device settings** modal (440x368).
 - If the preset supports Auto, a `"Set limits..."` button appears below the mode selector.
 - Tapping `"Set limits..."` opens the **Auto thresholds** subview within the same modal bounds (440x368, zero additional heap allocation):
-  - Metric name and units (`ppm`, unitless VOC, `%RH`).
+  - Metric name and units (`eCO₂` ppm, `TVOC` ppb, `Humidity` %RH).
   - ON and OFF threshold values in 24px bold font, with `+` / `—` stepper buttons (48x48px touch targets).
   - `"Reset limits"` button restoring preset defaults.
   - Red inline validation warning if threshold gap rules are violated (e.g. ON must exceed OFF by >= 50 ppm). Save is disabled during validation errors.
@@ -394,7 +442,7 @@ static void on_cfg(uint8_t idx, const ui_hub_device_config_t *cfg)
 
 typedef enum {
     NVS_RECORD_KIND_UNKNOWN    = 0,
-    NVS_RECORD_KIND_CURRENT_V2 = 1,
+    NVS_RECORD_KIND_CURRENT    = 1,   /* v2 or v3 layout (identical size) */
     NVS_RECORD_KIND_LEGACY_V1  = 2
 } nvs_record_kind_t;
 
@@ -428,8 +476,9 @@ static void config_load_from_flash(void)
         ui_hub_device_config_t cand;
         bool candidate_ready = false;
 
-        if (kind == NVS_RECORD_KIND_CURRENT_V2 && rec_len == sizeof(ui_hub_device_config_t)) {
-            if (raw_buf[offsetof(ui_hub_device_config_t, schema_version)] == UI_CONFIG_SCHEMA_VERSION) {
+        if (kind == NVS_RECORD_KIND_CURRENT && rec_len == sizeof(ui_hub_device_config_t)) {
+            uint8_t ver = raw_buf[offsetof(ui_hub_device_config_t, schema_version)];
+            if (ver == UI_CONFIG_SCHEMA_VERSION || ver == 0x02u) {  /* v2 migrated by UI */
                 memcpy(&cand, raw_buf, sizeof(ui_hub_device_config_t));
                 candidate_ready = true;
             }
@@ -454,7 +503,7 @@ static void config_load_from_flash(void)
 > **Callback Policy:** Flash restore operations do not trigger callbacks; rejected edits, no-ops, drafts, and cancellations trigger 0 callbacks; only successful user Save actions invoke the callback.
 
 Invoke `config_load_from_flash()` **before** `ui_init()` (supports pre-init staging).
-Firmware starts periodic transmissions only after `ui_is_tx_ready()` returns `true`.
+Firmware may poll with `GET_STATUS` from boot. It sends `HUB_CMD` only after `ui_is_tx_ready()` returns `true`, and only while `ui_has_pending_command()` is `true`.
 
 ---
 
@@ -466,8 +515,9 @@ The UI writes directly into `lora_hub_cmd` upon switch toggles or automated tran
 - Sets corresponding GPIO bit (mapped through `active_low`),
 - Increments `lora_hub_cmd.bits.seq`.
 
-Firmware transmits when `ui_is_tx_ready() == true`, **every ~1000 ms or immediately upon `seq` changes**.
-No transmit history buffer is required — this follows a **level-triggered** architecture where dropped packets resolve on subsequent periodic transmissions.
+Firmware sends `lora_hub_cmd` as `HUB_CMD` when `ui_is_tx_ready() && ui_has_pending_command()`. It sends immediately on a new `seq`, then retries up to three attempts in total within `UI_CMD_TIMEOUT_MS`. At all other times, including boot and after a timeout, it sends the read-only `GET_STATUS` request at about 1 Hz. No transmit history buffer is required, because `lora_hub_cmd` always holds the complete desired level set. See [`LORA_GUIDE.md`](LORA_GUIDE.md) section 9.2 for a reference loop.
+
+On timeout (`Unknown` + `Retry`) the UI writes the reported GPIO level back into `lora_hub_cmd`, so the failed level is not re-sent by accident.
 
 ### 9.2 Desired vs Reported State Machine
 
@@ -480,7 +530,7 @@ No transmit history buffer is required — this follows a **level-triggered** ar
 
 `UI_CMD_TIMEOUT_MS` = 3000 ms in `lora_comm.h` (configured for SF7–SF10 airtime). **If using SF11/SF12, increase this timeout** to prevent premature command timeout errors.
 
-If the Node reports a state change without a Hub command (local physical override, reboot), the UI **adopts** that reported state and synchronizes `lora_hub_cmd` — the Node is the authoritative source of hardware state.
+If the Node reports a state change without a Hub command (local physical override, reboot), the UI **adopts** that reported state and synchronizes `lora_hub_cmd` — the Node is the authoritative source of hardware state. A decrease in `uptime_sec` is treated as a Node reboot: TX readiness is dropped and all four reported levels are adopted together before commands resume.
 
 ### 9.3 Status Getters (Optional)
 
@@ -582,6 +632,8 @@ Review these items when planning deployment:
 | Power-on / link-loss relay default policy | Open (safety considerations) |
 | Frame encryption & authentication | Plaintext (demo baseline) |
 | Hardware acceptance testing | Pending target bench deployment |
+| TVOC ppb quality bands | **Decided (2026-09-28)** — Good ≤ 220, Moderate ≤ 660, Poor > 660 ppb (UBA levels); eCO₂ ≤ 800 / ≤ 1200 ppm. Purifier Auto defaults (150/100 ppb) not yet aligned |
+| Host simulator & regression for LoRa v2 / Trends 2026-09-25 | **Implemented** — Simulator and 42/40 KiB regression suites pass 42/42 checks |
 
 ---
 
@@ -596,12 +648,12 @@ Execute bring-up sequentially:
 5. [ ] Verify touch coordinates with a simple LVGL test button.
 6. [ ] Call `ui_init()`. Verify Home screen displays with `—` metrics and `Disconnected` status.
 7. [ ] **Measure heap headroom** using `lv_mem_monitor()`. Compare against Section 10.
-8. [ ] Establish bidirectional LoRa communication (see `LORA_GUIDE.md`).
-9. [ ] Populate `lora_node_status` and increment `lora_rx_revision`. Verify live telemetry appears on Home.
-10. [ ] Enable periodic `lora_hub_cmd` transmission. Verify switch toggles actuate relays on Node.
+8. [ ] Establish bidirectional LoRa communication (see `LORA_GUIDE.md`); both boards on protocol `0x02`.
+9. [ ] Poll with `GET_STATUS`; populate `lora_node_status` and increment `lora_rx_revision` on each reply. Verify live telemetry appears on Home and `ui_is_tx_ready()` becomes `true`.
+10. [ ] Send `HUB_CMD` only while `ui_has_pending_command()` is `true`. Verify switch toggles actuate relays on Node and idle polling does not change outputs.
 11. [ ] Disconnect Node antenna → verify `Disconnected` status appears after 5s; reconnect → verify automatic recovery.
-12. [ ] Implement flash persistence and verify configuration retention across power cycles.
-13. [ ] Connect `ui_feed_history()` to populate Trends graphs.
+12. [ ] Optional: Implement target Flash persistence driver (Section 8) to retain edited device configurations across cold reboots (demo runs out-of-the-box with in-memory persistence).
+13. [ ] Trends history: verify autonomous session history populates built-in Trends graphs automatically (optional: connect `ui_feed_history()` if external RTC/time-series database is preferred).
 14. [ ] Execute 24-hour continuous stress run; log heap stability and fragmentation.
 
 ---
@@ -614,7 +666,11 @@ Execute bring-up sequentially:
 | Red and blue color channels swapped | Incorrect `LV_COLOR_16_SWAP` in `lv_conf.h` |
 | Hard CPU freeze without crash log | `LV_ASSERT_MALLOC` triggered — heap exhausted. Check `lv_mem_monitor()` |
 | Touch coordinates offset or inverted | Touch calibration or display rotation mismatch |
-| Top bar clock remains static | `lv_tick_inc()` not being called |
+| Top bar clock remains static | LVGL tick not advancing (`lv_tick_inc()` not called, or `LV_TICK_CUSTOM` expression wrong) |
+| Always `Disconnected` although Node replies arrive | `lora_last_rx_tick_ms` written from a different clock than `lv_tick_get()` (e.g. `HAL_GetTick()` with a separate `lv_tick_inc()` counter) |
+| Hub never becomes TX-ready after boot | `GET_STATUS` polling gated by `ui_is_tx_ready()`; a v2 Node replies only to requests |
+| All frames rejected after an upgrade | One board still on protocol `0x01`; update Hub and Node together |
+| Purifier Auto limits reset to 150/100 after upgrade | Expected v2→v3 migration (VOC index → TVOC ppb); rewrite the record to stop repeating it |
 | Switch remains stuck on `Sending…` | Node readback missing, mismatched `active_low`, or `UI_CMD_TIMEOUT_MS` too short for SF airtime |
 | Inverted relay state on initial boot | `active_low` polarity configuration needed for that output |
 | Device names revert to default on reboot | Flash storage driver not yet implemented (Section 8) |

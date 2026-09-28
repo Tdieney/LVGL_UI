@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Quiet Architecture independent review</title>
+<style>body{margin:24px;background:#eeeae4;color:#17251f;font:18px system-ui}h1{font-size:28px}section{margin:24px 0;padding:16px;background:white;border-radius:12px}.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}figure{margin:0}img{width:100%;max-width:800px;aspect-ratio:5/3;object-fit:contain}figcaption{margin:8px 0;color:#526158}a{color:#175e42}@media(max-width:900px){.pair{grid-template-columns:1fr}}</style>
+<h1>Independent review — CHANGES REQUIRED</h1>
+<p><a href="REVIEW.md">Findings</a> · <a href="../../prompts/CURRENT.md">One active handoff</a>.
+Original concepts are authority. Native output is not approval.</p>
+<p>27 freshly generated standard captures match the submitted RAW hashes.
+Additional boundary/recovery probes below reproduce overlaps despite the submitted audit returning PASS.
+The normal seven fixtures below are the submission's unmatched Manual/1200 states; this is disclosed, not silently corrected.</p>
+<section><h2>Overview</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/dashboard-quiet-architecture.png" alt="Approved Overview"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="home_good.png" alt="Native Overview"></figure></div></section>
+<section><h2>Trends</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/trends-quiet-architecture.png" alt="Approved Trends"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="trends_data.png" alt="Native Trends"></figure></div></section>
+<section><h2>Devices</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/devices-quiet-architecture.png" alt="Approved Devices"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="devices_grid.png" alt="Native Devices"></figure></div></section>
+<section><h2>Settings</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/settings-quiet-architecture.png" alt="Approved Settings"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="devices_settings.png" alt="Native Settings"></figure></div></section>
+<section><h2>Auto CO2</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/auto-co2-quiet-architecture.png" alt="Approved Auto CO2"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="devices_auto_thresholds.png" alt="Native Auto CO2"></figure></div></section>
+<section><h2>Auto RH</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/auto-humidity-quiet-architecture.png" alt="Approved Auto RH"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="devices_auto_humidifier.png" alt="Native Auto RH"></figure></div></section>
+<section><h2>Invalid VOC</h2><div class="pair"><figure><figcaption>Approved original, normalized to 800×480</figcaption><img src="../../drafts/2026-09-17-pro-max/auto-voc-invalid-quiet-architecture.png" alt="Approved Invalid VOC"></figure><figure><figcaption>Rebuilt native submission</figcaption><img src="devices_auto_invalid_draft.png" alt="Native Invalid VOC"></figure></div></section>
+<h2>Additional native evidence</h2>
+<section><h3>Trends: 10000 ppm overlaps</h3><img src="probe_trends_10000.png" alt="Trends: 10000 ppm overlaps"></section>
+<section><h3>Two samples, wrong Last5min</h3><img src="probe_trends_two_samples.png" alt="Two samples, wrong Last5min"></section>
+<section><h3>Signed extreme crowds Y axis</h3><img src="probe_trends_negative.png" alt="Signed extreme crowds Y axis"></section>
+<section><h3>Recovered latch covers Home name</h3><img src="probe_home_latched_recovery.png" alt="Recovered latch covers Home name"></section>
+<section><h3>Recovered latch covers Devices name</h3><img src="probe_devices_latched_recovery.png" alt="Recovered latch covers Devices name"></section>
+<section><h3>Threshold summary under chevron</h3><img src="probe_settings_max_summary.png" alt="Threshold summary under chevron"></section>
+<section><h3>Rejected Save error over polarity</h3><img src="probe_settings_pending_rejection.png" alt="Rejected Save error over polarity"></section>
+<section><h3>Accepted: 1000h Disconnected</h3><img src="probe_uptime_1000h_offline.png" alt="Accepted: 1000h Disconnected"></section>
+<section><h3>Accepted: invalid Back retained</h3><img src="probe_settings_invalid_back.png" alt="Accepted: invalid Back retained"></section>
+<section><h3>Accepted: max live Auto</h3><img src="probe_auto_live_max.png" alt="Accepted: max live Auto"></section>
+</html>

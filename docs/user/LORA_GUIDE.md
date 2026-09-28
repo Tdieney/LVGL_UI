@@ -212,9 +212,12 @@ Transmitting at +20 dBm draws transient current peaks of **~120 mA**. Inadequate
 Communication sequence from [`LORA_PROTOCOL.md`](../../LORA_PROTOCOL.md):
 
 ```
-Hub  ──[ lora_hub_cmd_t, 8B ]──▶  Node     Sent on command update + periodic 1000 ms
-Hub  ◀─[ lora_node_status_t, 20B ]── Node  Sent periodically every 1000 ms
+Hub  ──[ GET_STATUS, 8B ]────────▶  Node   ~1 Hz when idle, at boot, after a command timeout
+Hub  ──[ HUB_CMD, 8B ]───────────▶  Node   Only while a UI command is pending, up to 3 attempts
+Hub  ◀─[ lora_node_status_t, 20B ]── Node  Reply to either request; never unsolicited
 ```
+
+Protocol v2 (`LORA_PROTO_VERSION 0x02`) is request/response: the Hub decides when the air is used and the Node only answers. v1 builds, which broadcast periodically in both directions, reject v2 frames, so update both boards together.
 
 ### 7.1 Continuous RX Mode
 
@@ -222,15 +225,13 @@ Both nodes operate in **continuous receive (RX Continuous)** mode, entering TX m
 
 ### 7.2 Collision Avoidance Strategies
 
-Because both transceivers broadcast at ~1000 ms intervals, simultaneous packet transmissions could collide if clocks drift into phase synchronization.
-
-Mitigations:
-1. **Randomized Jitter**: Inject a pseudo-random delay (0–100 ms) into the transmission interval to prevent persistent phase lock.
-2. **Phase Offset**: Schedule Node transmissions at offset 0 ms and Hub transmissions at offset ~500 ms relative to the reporting window.
+In v2 the Node transmits only in reply to a Hub request. With one Hub and one Node, the two sides cannot drift into simultaneous periodic transmissions. The remaining risks are:
+1. **Hub sends again before the reply arrives:** Keep the request interval (~1000 ms) longer than request airtime + Node processing + reply airtime at the chosen SF. Increase it for SF11/SF12.
+2. **Node replies too early:** Let the Node return to RX-ready handling, then reply after its own TX turnaround. It must not answer while the Hub is still transmitting.
 
 ### 7.3 Implicit State Acknowledgment
 
-The Hub transmits desired GPIO states. The Node applies them to physical pins and **reports back actual physical states** in its periodic status frame. The UI compares *desired* vs *reported*:
+The Hub transmits desired GPIO states in `HUB_CMD`. The Node applies them to physical pins and **reports back actual physical states** in its status reply. `GET_STATUS` replies carry the same readback without changing outputs. The UI compares *desired* vs *reported*:
 - Match -> Command confirmed; idle switch rendering.
 - Mismatch, < 3000 ms (`UI_CMD_TIMEOUT_MS`) -> `Sending…` pending state.
 - Mismatch, >= 3000 ms -> `Unknown` error state with accessible `Retry` action.
@@ -406,7 +407,7 @@ void lora_start_rx(void)
     sx_write_reg(0x01, 0x85);           /* Enter RXCONTINUOUS mode */
 }
 
-bool lora_read_packet(uint8_t *buf, uint8_t *len, int8_t *snr_db, int8_t *rssi_dbm)
+bool lora_read_packet(uint8_t *buf, uint8_t *len, int8_t *snr_db, int16_t *rssi_dbm)
 {
     uint8_t flags = sx_read_reg(0x12);
     sx_write_reg(0x12, 0xFF);                   /* Clear IRQ flags */
@@ -427,7 +428,7 @@ bool lora_read_packet(uint8_t *buf, uint8_t *len, int8_t *snr_db, int8_t *rssi_d
     /* High band (> 779 MHz): RSSI = -157 + raw_rssi + (snr < 0 ? snr : 0) */
     int16_t rssi = -157 + (int16_t)raw_rssi;
     if (*snr_db < 0) rssi += *snr_db;
-    *rssi_dbm = (int8_t)rssi;
+    *rssi_dbm = rssi;                           /* Can be below -128 dBm: keep int16_t */
 
     return true;
 }
@@ -440,7 +441,7 @@ bool lora_read_packet(uint8_t *buf, uint8_t *len, int8_t *snr_db, int8_t *rssi_d
 ### 9.1 Handling Received Frames
 
 ```c
-uint8_t buf[64]; uint8_t len; int8_t snr, rssi;
+uint8_t buf[64]; uint8_t len; int8_t snr; int16_t rssi;
 
 if (lora_read_packet(buf, &len, &snr, &rssi)) {
     if (len == LORA_NODE_STATUS_LEN &&
@@ -450,31 +451,64 @@ if (lora_read_packet(buf, &len, &snr, &rssi)) {
         memcpy(lora_node_status.bytes, buf, LORA_NODE_STATUS_LEN);
 
         lora_last_snr        = snr;
-        lora_last_rssi       = rssi;
-        lora_last_rx_tick_ms = lv_tick_get();
+        lora_last_rssi       = rssi;               /* int16_t since v2 */
+        lora_last_rx_tick_ms = lv_tick_get();      /* Same clock as LVGL; see note */
         lora_rx_revision++;          /* Triggers UI refresh */
     }
 }
 ```
 
-### 9.2 Outbound Transmission Loop (Gated TX)
+> **Time base:** `ui.c` computes link age as `lv_tick_get() - lora_last_rx_tick_ms`. Writing `HAL_GetTick()` is correct only when LVGL's tick is also `HAL_GetTick()` (`LV_TICK_CUSTOM 1`, `LV_TICK_CUSTOM_SYS_TIME_EXPR (HAL_GetTick())`). Do not mix `HAL_GetTick()` timestamps with a separate `lv_tick_inc()` counter.
 
-All transmission branches (periodic 1000 ms heartbeat and instant dispatch upon sequence changes) must be gated by `ui_is_tx_ready()`:
+### 9.2 Outbound Transmission Loop (Request/Response)
+
+The Hub always polls with read-only `GET_STATUS`. It sends `HUB_CMD` only for a pending UI command, and only after `ui_is_tx_ready()`. `GET_STATUS` must **not** be gated by `ui_is_tx_ready()`: the Node answers only requests, so the first report after boot depends on this poll.
+
+Reference sketch. Firmware owns the exact timing; keep all command attempts inside `UI_CMD_TIMEOUT_MS` (3000 ms):
 
 ```c
-static uint16_t s_last_sent_seq = 0;
+#define LORA_POLL_INTERVAL_MS   1000u
+#define LORA_CMD_MAX_ATTEMPTS   3u
+
 static uint32_t s_last_tx_ms = 0;
+static uint16_t s_cmd_seq = 0;
+static uint8_t  s_cmd_attempts = LORA_CMD_MAX_ATTEMPTS;
 
-uint32_t now = lv_tick_get();
-bool seq_changed = (lora_hub_cmd.bits.seq != s_last_sent_seq);
-bool periodic_due = (now - s_last_tx_ms >= 1000u);
+void lora_service_tx(void)      /* Call after ui_tick() in the main loop */
+{
+    uint32_t now = lv_tick_get();
+    bool cmd_wanted = ui_is_tx_ready() && ui_has_pending_command();
+    bool new_cmd = cmd_wanted && (lora_hub_cmd.bits.seq != s_cmd_seq);
 
-if (ui_is_tx_ready() && (seq_changed || periodic_due)) {
-    lora_send(lora_hub_cmd.bytes, LORA_HUB_CMD_LEN);
-    s_last_sent_seq = lora_hub_cmd.bits.seq;
+    if (new_cmd) {                              /* New desired state: send at once */
+        s_cmd_seq = lora_hub_cmd.bits.seq;
+        s_cmd_attempts = 0;
+    } else if (now - s_last_tx_ms < LORA_POLL_INTERVAL_MS) {
+        return;
+    }
+
+    if (cmd_wanted && s_cmd_attempts < LORA_CMD_MAX_ATTEMPTS) {
+        s_cmd_attempts++;
+        lora_send(lora_hub_cmd.bytes, LORA_HUB_CMD_LEN);       /* msg_id = HUB_CMD */
+    } else {
+        lora_hub_cmd_t req;
+        memset(&req, 0, sizeof(req));                          /* seq/relay bits ignored */
+        lora_hub_cmd_init_header(&req);                        /* version, node_addr */
+        req.bits.msg_id = LORA_MSG_GET_STATUS;                 /* Node leaves relays unchanged */
+        lora_send(req.bytes, LORA_HUB_CMD_LEN);
+    }
     s_last_tx_ms = now;
 }
 ```
+
+Never change `msg_id` inside the UI-owned `lora_hub_cmd`; build the `GET_STATUS` request in a local frame. After a timeout, `ui_has_pending_command()` returns `false` and the loop falls back to polling.
+
+### 9.3 Node-Side Obligations
+
+- Reply to every valid `HUB_CMD` and `GET_STATUS` with one `lora_node_status_t`. Apply relay bits and update `seq_echo` only for `HUB_CMD`.
+- Increment `sample_seq` once per completed RS-485 poll of both sensors. Do not increment it just because a reply is sent.
+- Report `uptime_sec` from Node boot; the Hub uses a decrease to detect a Node reboot.
+- Send eCO₂ in ppm and TVOC in ppb as read, without index conversion or clamping; clear `co2_valid`/`voc_valid` on warm-up or fault.
 
 ---
 

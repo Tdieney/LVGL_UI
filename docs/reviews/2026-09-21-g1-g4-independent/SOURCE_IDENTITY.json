@@ -1,0 +1,62 @@
+[
+    {
+        "file":  "ui.c",
+        "sha256":  "1708cfc9382879eb83f07e6cfcce9c8adf8999e0410edfc88c8a4a3c543afdbc"
+    },
+    {
+        "file":  "ui.h",
+        "sha256":  "d1130a23484a2e00462755bcd5b7a007c958cb1a3b1a51392e918cf00574b6e2"
+    },
+    {
+        "file":  "ui_auto.c",
+        "sha256":  "efc85f4d54b433f67f21ec7b822ee74182ad83f9d45c35e9a490f6bb60ba2b74"
+    },
+    {
+        "file":  "ui_theme.c",
+        "sha256":  "1d34f1805151e52c0e75160fe20c253afa28cd067ffbab94cd0f52dd45de75c4"
+    },
+    {
+        "file":  "ui_theme.h",
+        "sha256":  "36e744a5876e2f8d25d1a1c134d767fe0027fa12908b94a1e2e86a3f77f614df"
+    },
+    {
+        "file":  "ui_icons.c",
+        "sha256":  "a03035b9494a047cf40928bc74a3a09c4e49505a00b5d6d4588eea3fffd159d1"
+    },
+    {
+        "file":  "ui_fonts.c",
+        "sha256":  "d13965717edece44a5c834bc8745a4d17a30b22ba24790e255108d88ceaaa9ca"
+    },
+    {
+        "file":  "ui_splash_logo.c",
+        "sha256":  "d1b934c8a31907ed14a0865e1f674f456630fa37c57c452ce3dc895eb0b65ebd"
+    },
+    {
+        "file":  "ui_mcu_profile.h",
+        "sha256":  "cbf5b1b8afd4984b04a51a0f1b19353bc3e4648afa2e5faa0dc784cc8980364c"
+    },
+    {
+        "file":  "sim_pc/main.c",
+        "sha256":  "910350291d614ed283ad456a8815ea634f02a6fb099b21dc14c63a7915141a9b"
+    },
+    {
+        "file":  "sim_pc/lv_conf.h",
+        "sha256":  "c861d936c91cc6960d4186c43be0b130954cd4e0bb5cfbab5af542b70a22f4d3"
+    },
+    {
+        "file":  "sim_pc/build/sim_pc.exe",
+        "sha256":  "a7717fad3f541afa3116d110d29880209b27b269eb6d7bf8d131a238ce16a02d"
+    },
+    {
+        "file":  "build-40k/sim_pc.exe",
+        "sha256":  "f36e7556b884df4e48a6791436b31ad8b732aa5c40cd9c882964a6cfee13361e"
+    },
+    {
+        "file":  "docs/reviews/2026-09-21-g1-g4-independent/probe.c",
+        "sha256":  "f83ba8029e27cb47a2f67d90a2c1fe6c1d84f461e2648e5d42740680a4b37f7e"
+    },
+    {
+        "file":  "docs/reviews/2026-09-21-g1-g4-independent/build-assert/smoke_production.exe",
+        "sha256":  "7191ffcbb6c150ac1f4abce3bfd5ca5ff72897bd3339a8e7a1eba3755438108d"
+    }
+]

@@ -1,0 +1,10 @@
+# Independent review of software-completion correction — 2026-09-24
+
+Disposition: **two narrow verification-claim gaps remain**. The accepted native Quiet Architecture appearance is unchanged; no new UI runtime defect was reproduced. One final bounded handoff is [CURRENT](../../prompts/CURRENT.md).
+
+Independently reran `tools/build_sim.bat`, `tools/run_regression.bat` (40/40 and 28 exact scenario files), `build-40k/sim_pc.exe --regression` (40/40), `python tools/generate_assets.py --check`, `tools/export_mcu.bat --verify`, and `tools/verify_production.bat` (with required managed-sandbox escalation); all exited 0. Direct `sim_pc/build/sim_pc.exe --shots NUL` now exits 1. Current native capture hashes match previous accepted captures where both exist. One upstream LVGL CMake CMP0177 developer warning remains; no reported compiler warning.
+
+1. **N1 — negative-control proof is fail-open.** `tools/run_regression.ps1:75–85` sets `$negPassed = $true` for *any* exception from `Invoke-SimulatorWithTimeout`. That helper calls `Write-Error` on stderr before it checks `ExitCode`; because `$ErrorActionPreference='Stop'`, the observed “expected failure” is triggered by the FATAL stderr text, not proof of exit code 1. Timeout or unrelated failure would also count as pass. Require exact code and diagnostic, with other failures red.
+2. **N2 — “zero survivors” exceeds Fixture 6c.** `tools/verify_production.ps1:661–697` confirms the directly owned root is killed and unrelated process survives under simulated CIM denial. The end-to-end launch uses `cmd.exe /c ping`, but on immediate discovery denial it does not have a verified child identity and cannot check whether that child survives root termination. `REPORT.md:25` claims “zero survivors.” Scope the claim to known verified processes and disclose the unobserved-descendant limitation, or add a safe known-descendant check. Do not replace safe PID+StartTime guards with broad kills.
+
+These are verification and reporting issues, not reasons to reopen UI design or optimize runtime again. Physical MCU RAM map, target touch-to-photon latency and LoRa behavior still require owner hardware evidence.

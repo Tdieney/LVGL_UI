@@ -1,0 +1,13 @@
+========================================================
+ Phase 1: Verifying MCU Export Manifest & Exporting Bundle
+========================================================
+MCU export manifest: PASS
+
+Testing X1/Y2 export collision safety and artifact ownership...
+Diagnostic evidence retained at: C:\Users\vanth\AppData\Local\Temp\smart_hub_ui_x1_fixture_b955bd454b9b4af88ba1f7d9b1058150
+Failed to terminate watchdog process tree (PID 41204 still running)
+At C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\tools\verify_production.ps1:69 char:13
++             throw "Failed to terminate watchdog process tree (PID $ch ...
++             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Failed to termi... still running):String) [], RuntimeException
+    + FullyQualifiedErrorId : Failed to terminate watchdog process tree (PID 41204 still running)

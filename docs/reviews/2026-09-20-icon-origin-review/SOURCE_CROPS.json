@@ -1,0 +1,532 @@
+{
+  "method": "Dark reference bbox: max(R,G,B)<120; current A4 bbox: alpha>=8/15. Approximate edge alignment, not identical thresholds.",
+  "sources": {
+    "devices-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "62b5011a2783219a00f482a6c1a6bd6011c49a1f03928de9c60843cd69462ea8"
+    },
+    "dashboard-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "a990b5747a9b4bddbae2151c7fe062463ca4951c86919e95c6f089aae84f4bd4"
+    },
+    "settings-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "4645b359d2aba3c21af33361ad5a873c47faa2599d652e525c1881797a20a0b1"
+    },
+    "auto-co2-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "09f0a227f2dab6f0324fdb7c9eb7bdbde64dc49e2a1916d449e19db2bcbc7fbe"
+    },
+    "auto-voc-invalid-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "756b0c0cca236c5c7d606cb43c32ff8afeb9beb1dba1b91e706719246342c3f5"
+    }
+  },
+  "icons": [
+    {
+      "icon": "purifier",
+      "source": "devices-quiet-architecture.png",
+      "roi": [
+        100,
+        255,
+        190,
+        377
+      ],
+      "reference_dark_bbox": [
+        109,
+        265,
+        182,
+        369
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_purifier_44",
+      "current_canvas": [
+        44,
+        56
+      ],
+      "current_ink_bbox": [
+        1,
+        0,
+        43,
+        55
+      ],
+      "sidewall_probe": {
+        "reference_y": 312,
+        "reference_runs_px": [
+          5,
+          5
+        ],
+        "reference_height": 104,
+        "current_y": 25,
+        "current_runs_px": [
+          4,
+          4
+        ],
+        "current_height": 55
+      }
+    },
+    {
+      "icon": "fan",
+      "source": "devices-quiet-architecture.png",
+      "roi": [
+        852,
+        252,
+        957,
+        374
+      ],
+      "reference_dark_bbox": [
+        863,
+        262,
+        947,
+        362
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_fan_44",
+      "current_canvas": [
+        44,
+        52
+      ],
+      "current_ink_bbox": [
+        2,
+        3,
+        42,
+        50
+      ]
+    },
+    {
+      "icon": "drop",
+      "source": "devices-quiet-architecture.png",
+      "roi": [
+        102,
+        606,
+        186,
+        716
+      ],
+      "reference_dark_bbox": [
+        111,
+        616,
+        176,
+        708
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_drop_44",
+      "current_canvas": [
+        44,
+        56
+      ],
+      "current_ink_bbox": [
+        1,
+        2,
+        43,
+        55
+      ]
+    },
+    {
+      "icon": "light",
+      "source": "devices-quiet-architecture.png",
+      "roi": [
+        855,
+        601,
+        944,
+        723
+      ],
+      "reference_dark_bbox": [
+        865,
+        612,
+        937,
+        714
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_light_44",
+      "current_canvas": [
+        44,
+        56
+      ],
+      "current_ink_bbox": [
+        0,
+        0,
+        42,
+        56
+      ]
+    },
+    {
+      "icon": "home",
+      "source": "dashboard-quiet-architecture.png",
+      "roi": [
+        55,
+        34,
+        120,
+        99
+      ],
+      "reference_dark_bbox": [
+        62,
+        41,
+        112,
+        91
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_home_32",
+      "current_canvas": [
+        32,
+        32
+      ],
+      "current_ink_bbox": [
+        3,
+        2,
+        29,
+        30
+      ]
+    },
+    {
+      "icon": "timer",
+      "source": "dashboard-quiet-architecture.png",
+      "roi": [
+        1115,
+        50,
+        1157,
+        95
+      ],
+      "reference_dark_bbox": [
+        1123,
+        58,
+        1150,
+        89
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_timer_20",
+      "current_canvas": [
+        20,
+        20
+      ],
+      "current_ink_bbox": [
+        3,
+        2,
+        18,
+        18
+      ]
+    },
+    {
+      "icon": "thermometer",
+      "source": "dashboard-quiet-architecture.png",
+      "roi": [
+        104,
+        717,
+        151,
+        799
+      ],
+      "reference_dark_bbox": [
+        113,
+        727,
+        144,
+        792
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_thermometer_32",
+      "current_canvas": [
+        32,
+        32
+      ],
+      "current_ink_bbox": [
+        10,
+        4,
+        22,
+        29
+      ]
+    },
+    {
+      "icon": "sliders",
+      "source": "settings-quiet-architecture.png",
+      "roi": [
+        102,
+        405,
+        180,
+        487
+      ],
+      "reference_dark_bbox": [
+        111,
+        414,
+        171,
+        481
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_sliders_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        3,
+        3,
+        21,
+        21
+      ]
+    },
+    {
+      "icon": "leaf",
+      "source": "settings-quiet-architecture.png",
+      "roi": [
+        102,
+        549,
+        177,
+        624
+      ],
+      "reference_dark_bbox": [
+        111,
+        554,
+        168,
+        617
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_leaf_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        3,
+        4,
+        20,
+        21
+      ]
+    },
+    {
+      "icon": "gear",
+      "source": "settings-quiet-architecture.png",
+      "roi": [
+        98,
+        685,
+        180,
+        766
+      ],
+      "reference_dark_bbox": [
+        106,
+        693,
+        172,
+        760
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_gear_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        1,
+        2,
+        23,
+        24
+      ]
+    },
+    {
+      "icon": "chevron_left",
+      "source": "settings-quiet-architecture.png",
+      "roi": [
+        63,
+        139,
+        103,
+        197
+      ],
+      "reference_dark_bbox": [
+        71,
+        147,
+        95,
+        191
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_chevron_left_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        8,
+        5,
+        16,
+        19
+      ]
+    },
+    {
+      "icon": "chevron_right",
+      "source": "settings-quiet-architecture.png",
+      "roi": [
+        1483,
+        558,
+        1520,
+        610
+      ],
+      "reference_dark_bbox": [
+        1492,
+        567,
+        1512,
+        602
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_chevron_right_20",
+      "current_canvas": [
+        20,
+        20
+      ],
+      "current_ink_bbox": [
+        7,
+        4,
+        13,
+        16
+      ]
+    },
+    {
+      "icon": "chevron_down",
+      "source": "settings-quiet-architecture.png",
+      "roi": [
+        1456,
+        282,
+        1505,
+        322
+      ],
+      "reference_dark_bbox": [
+        1463,
+        293,
+        1496,
+        312
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_chevron_down_18",
+      "current_canvas": [
+        18,
+        18
+      ],
+      "current_ink_bbox": [
+        4,
+        6,
+        14,
+        12
+      ]
+    },
+    {
+      "icon": "minus",
+      "source": "auto-co2-quiet-architecture.png",
+      "roi": [
+        128,
+        626,
+        184,
+        653
+      ],
+      "reference_dark_bbox": [
+        137,
+        636,
+        176,
+        643
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_minus_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        4,
+        11,
+        20,
+        13
+      ]
+    },
+    {
+      "icon": "plus",
+      "source": "auto-co2-quiet-architecture.png",
+      "roi": [
+        671,
+        611,
+        729,
+        669
+      ],
+      "reference_dark_bbox": [
+        679,
+        619,
+        719,
+        660
+      ],
+      "reference_selector": "max(R,G,B)<120",
+      "asset": "ui_icon_plus_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        4,
+        4,
+        20,
+        20
+      ]
+    },
+    {
+      "icon": "warning",
+      "source": "auto-voc-invalid-quiet-architecture.png",
+      "roi": [
+        48,
+        746,
+        111,
+        807
+      ],
+      "reference_dark_bbox": [
+        56,
+        755,
+        103,
+        799
+      ],
+      "reference_selector": "G<120 and R>G+20",
+      "asset": "ui_icon_warning_24",
+      "current_canvas": [
+        24,
+        24
+      ],
+      "current_ink_bbox": [
+        1,
+        2,
+        23,
+        22
+      ]
+    },
+    {
+      "icon": "air",
+      "source": "dashboard-quiet-architecture.png",
+      "roi": [
+        760,
+        251,
+        858,
+        342
+      ],
+      "note": "Light-on-dark source; do not use dark-pixel segmentation. Use foreground/background matting or contour trace."
+    },
+    {
+      "icon": "check_circle",
+      "source": "dashboard-quiet-architecture.png",
+      "roi": [
+        399,
+        331,
+        486,
+        415
+      ],
+      "note": "Light-on-dark source; do not use dark-pixel segmentation. Use foreground/background matting or contour trace."
+    }
+  ],
+  "implementation_sha256": {
+    "ui_icons.c": "f56eb391e60dc0571ed20c3cedf3855fabf81c7cf5c0f04282cfdc05cfc815a3",
+    "tools/generate_assets.py": "6c4510acdc837e34a41706133e0d0b6cb21a4e8823e3a904c2d615ddaa93aca4",
+    "tools/create_icon_manifest.py": "902a7fe4933b6d70d37346d89318ab8d8b08066d280695c7eacf3ea1656ca033",
+    "assets/icons/quiet-architecture/manifest.json": "718d8c7cc851df2adfa0051d33aee3f7191d1e29107a826eb2fdb42cc6c9a0e6"
+  }
+}

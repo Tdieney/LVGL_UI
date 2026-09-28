@@ -1,0 +1,24 @@
+MEM lv_init                  free=40408 largest=40384 used=7% frag=1% max_used=104
+MEM display/default theme    free=34744 largest=34744 used=20% frag=0% max_used=3204
+MEM home rendered            free=5648 largest=5648 used=87% frag=0% max_used=17590
+IDENTICAL HOME flushes=20 pixels=108630
+IDLE NO RX flushes=0 pixels=0
+UPTIME '99:59:59' separator gap=26
+UPTIME '100:00:00' separator gap=7
+BUS FAULT Home air='Good' co2='420' voc='80' temp='23.5' humidity='45'
+BUS FAULT Auto editor live='420'
+IDENTICAL AUTO EDITOR flushes=10 pixels=26230
+NO-OP SAVE name='Ventilation Fan' callbacks=1
+REOPEN DROPDOWN 8x free=14328->13552 delta=-776 list_styles=16->56
+TRENDS CO2 cur='100' min='100' max='100' unit='ppm'
+TRENDS RH cur='100%' min='100%' max='100%' unit='%'
+TRENDS RH next cur='99'
+CHART first ymin=96 ymax=104 cache=96..104
+CHART rebuilt ymin=0 ymax=100 cache=96..104
+ISOLATED point=0 xy=312,379 forest_pixels_9x9=0
+ISOLATED point=2 xy=529,339 forest_pixels_9x9=0
+ISOLATED point=4 xy=746,300 forest_pixels_9x9=29
+RESELECT SAME METRIC 20x free=10088->8792 delta=-1296 selected_style_count=4->24
+MEM before unused reset      free=5552 largest=5552 used=88% frag=0% max_used=17590
+MEM after unused reset       free=6760 largest=5552 used=85% frag=18% max_used=17590
+UNUSED STYLE HEAP RECLAIM=1208 bytes; descriptor bytes=16 (host)

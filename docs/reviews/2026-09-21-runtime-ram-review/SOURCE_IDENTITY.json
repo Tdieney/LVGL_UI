@@ -1,0 +1,46 @@
+[
+    {
+        "file":  "ui.c",
+        "sha256":  "1688beced700b5c428371a8cbbf47b9254f32a5ce6721efff74c6b08e1216731"
+    },
+    {
+        "file":  "ui_auto.c",
+        "sha256":  "efc85f4d54b433f67f21ec7b822ee74182ad83f9d45c35e9a490f6bb60ba2b74"
+    },
+    {
+        "file":  "ui_theme.c",
+        "sha256":  "ebebb30c88c8b2c51fd63a00a500e1e1fce0e732142f78b8905b3572909f0645"
+    },
+    {
+        "file":  "ui_icons.c",
+        "sha256":  "a03035b9494a047cf40928bc74a3a09c4e49505a00b5d6d4588eea3fffd159d1"
+    },
+    {
+        "file":  "ui_fonts.c",
+        "sha256":  "d13965717edece44a5c834bc8745a4d17a30b22ba24790e255108d88ceaaa9ca"
+    },
+    {
+        "file":  "ui_splash_logo.c",
+        "sha256":  "d1b934c8a31907ed14a0865e1f674f456630fa37c57c452ce3dc895eb0b65ebd"
+    },
+    {
+        "file":  "ui_mcu_profile.h",
+        "sha256":  "b7f08c0341e6b8176fb3a7168b770af2e37a24bc6000869f9e921368b13bc706"
+    },
+    {
+        "file":  "sim_pc/lv_conf.h",
+        "sha256":  "c861d936c91cc6960d4186c43be0b130954cd4e0bb5cfbab5af542b70a22f4d3"
+    },
+    {
+        "file":  "sim_pc/main.c",
+        "sha256":  "a9ad4e2e4d8a32c5e76985e89ba52349b27af2696065d16c0437f2373c4910fd"
+    },
+    {
+        "file":  "sim_pc/build/sim_pc.exe",
+        "sha256":  "961611bac703deadbcf25910393b7670e5b99f02eb86a6346b6a658a553d2150"
+    },
+    {
+        "file":  "assets/icons/quiet-architecture/manifest.json",
+        "sha256":  "b73119501ae4ed8fe21112cc3619e5e3d65ed3f0301b4eed1e5ccf3021a17d59"
+    }
+]

@@ -1,5 +1,16 @@
 # Smart Hub interactive design study 12
 
+**Historical prototype.** Quiet Architecture is the accepted replacement design,
+but its submitted native implementation still needs fidelity corrections.
+See the [latest review](../reviews/2026-09-18-design-fidelity/REVIEW.md) and
+[design authority](../UI_DESIGN_BRIEF.md). The study notes below must not override
+the accepted seven concepts or current handoff.
+
+Since 2026-09-25 the native UI labels telemetry `eCO₂` (ppm) and `TVOC` (ppb)
+and uses a simplified Trends page without Current/Min/Max or point tooltips.
+This prototype's unitless VOC Index, CO₂ label and chart tooltip are historical
+and were not updated.
+
 Open [index.html](index.html) directly in Edge, Chrome or Firefox. No install,
 build, server, external fonts, API key or internet connection is needed.
 
@@ -100,9 +111,9 @@ to fit; this does not redefine the embedded layout or validate physical touch ta
   canvas #EFEFEF, device cards #F7F7F7 regardless of output state, chart/dialog
   #FFFFFF. Header/navigation are transparent over the canvas; the lightness order
   canvas < device < chart is deliberate.
-- Metric hues carry the only surface color: CO₂ #D6E7FF; VOC #E7DBFF;
-  temperature #FFEBCE; humidity #CEEFE7. Selected nav/metric and primary button
-  #215DDE with white text; inactive metric selector #DEEBF7.
+- LCD-strengthened metric hues: CO₂ #ADCEFF; VOC #CEB5F7;
+  temperature #FFD394; humidity #94D7C6. Selected nav/metric and primary button
+  #215DDE with white text; inactive metric selector #BDD3EF.
 - Every fill is an exact RGB565 value (red/blue `(v<<3)|(v>>2)`, green
   `(v<<2)|(v>>4)`), so the declared color is what a 16-bit panel shows. The old
   near-white stops such as #F8FAFF rounded red up to 255 and green down, tinting
@@ -119,7 +130,7 @@ to fit; this does not redefine the embedded layout or validate physical touch ta
   modal/knob shadows remain unchanged. Card radius 20 px, small tiles 18 px.
 - Switch/chart #1865E7; off switch #BDC7D6, white knob. Selected mode fill #EFF3FF. Blue text has its own
   token; icon/plot stroke weights are unchanged.
-- Device/home icons #2470F0; Devices icon plates #DEEBFF.
+- Device/home icons #2470F0; Devices icon plates #B5CEF7.
   Settings/inactive navigation/timer icons use #42546B. Connected text,
   Comfortable and the moderate advisory use dark secondary text.
 - Good #197047 on #E7F7EF; Moderate #8A5000 on #FFF3DE; Poor #A12B25 on #FFEFEF.
@@ -127,8 +138,8 @@ to fit; this does not redefine the embedded layout or validate physical touch ta
   color, and actual faults stay explicit. Unknown uses neutral #EFF3F7.
 - Card, selector, settings-control and dialog borders are zero. Subtle existing
   internal separators use #DEE7F7; keyboard focus can show a temporary outline.
-- Splash alone keeps #E9ECF1 to match its unchanged original logo asset; it is a
-  flat fill already and is deliberately left at its original value.
+- Splash background and embedded logo asset are synchronized with Warm Stone Canvas #F4F1EC,
+  eliminating bounding seams and matching Quiet Architecture.
 - Study 12 supersedes study 10/11's gradient surfaces; study 09's shadow scope,
   borderless frames and removed features are unchanged. Readable text still applies.
   Desktop color contrast is not proof of physical-LCD readability.
@@ -156,8 +167,7 @@ Re-rendered `home.png`, `trends.png`, `devices.png`, `device-settings.png` and
 `offline.png` at native 800×480 from the updated prototype with headless Edge and
 inspected them. Confirmed no `linear-gradient` remains in `styles.css`, that each
 flat fill is an exact RGB565 value, and that the canvas < device < chart lightness
-order holds. `splash.png` is unchanged because the splash background and logo asset
-were not touched. The interaction sweep below was run against study 11 and was
+order holds. `splash.png` background is synchronized to Warm Stone Canvas #F4F1EC. The interaction sweep below was run against study 11 and was
 **not** re-run for study 12; this revision changed only fill colors, but that is a
 reasoning argument, not a fresh test result.
 

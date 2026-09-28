@@ -1,232 +1,125 @@
-# CURRENT — close remaining X1–X4 after independent W1–W4 review
+# CURRENT — LoRa v2 simulator/test update and Trends axis/selector refinement
 
-Date: 2026-09-16. Status: **READY FOR HANDOFF**.
-Scope: bounded export safety, switch touch targets and missing acceptance proof.
-Owner requires automatic corrective prompts after reviews with issues.
-Technical-lead directions below implement existing W1–W4 requirements; no new
-product decision, automation rule or visual redesign is introduced.
-READY means ready to implement, not independently accepted.
+Date: 2026-09-25
+Status: **REVIEWED — accepted on the host 2026-09-25** ([technical-lead review](../reviews/2026-09-25-lora-v2-trends-review/REVIEW.md); one fix round F1–F3). The assignment text below is retained for traceability.
+Worker: Gemini (via Antigravity CLI), one consolidated delivery. The technical lead reviews the complete delta once.
+Previous handoff: [archived](archive/2026-09-25-01-fix-final-verification-claim-closure.md) (REVIEWED, complete).
 
-## 1. Read first and respect scope
+Decisions: **Owner** decided on 2026-09-25: restore the old Trends selector indicator; move the chart title down, and the chart with it; raise the Y-axis unit; use a fixed 15-minute window ending at "Now" for the X axis; use round-number Y ticks. **TL-proposed** (technical lead) items are marked below. They are implementation defaults; report any you could not meet.
 
-Read AGENTS.md, docs/prompts/README.md, this file,
-docs/reviews/2026-09-16-auto-w1-w4-independent/REVIEW.md, check.c and check-export.ps1,
-docs/README.md, docs/HARDWARE_OVERVIEW.md, docs/MCU_BASELINE.md,
-docs/UI_DESIGN_BRIEF.md, docs/user/SMART_HUB_UI_GUIDE.md,
-docs/user/LORA_GUIDE.md and LORA_PROTOCOL.md, then current implementation/tests.
-Inspect Git status and preserve all unrelated work and historical review evidence.
-Previous W1–W4 requirements are incorporated here; archives are historical only.
+## 1. Read first
 
-Implement, test and document X1–X4 when the owner hands you this implementation
-task. No commit/push, branch changes, stash/reset/clean, unrelated refactors,
-driver work, Flash persistence implementation or packet changes.
-A review-only request does not authorize production fixes.
+`AGENTS.md`, `docs/prompts/README.md`, this file, `LORA_PROTOCOL.md`, `docs/UI_DESIGN_BRIEF.md` (section "2026-09-25 — owner changes"), `docs/user/SMART_HUB_UI_GUIDE.md` §4, §7.4, §8 and §9, and `docs/user/LORA_GUIDE.md` §9. Read only the code sections you change. Do not re-audit the whole repository.
 
-Accepted: Retry now survives reconnect/late ACK, shared styles improve heap,
-popup pointer/cancel tests improved, export verification stages its own ZIP and
-builds actual exported sources with separately built cached LVGL.
-Do not revert those changes or claim these fixed symptoms still fail.
-Build/regression31/31 and approved outside-sandbox production verification pass.
-Remaining issues include actual export overwrite and touch geometry plus
-specific missing proof, not a demonstrated failure of every Auto behavior.
+## 2. Existing state (keep it)
 
-## 2. Freeze product and architecture
+- The worktree has many uncommitted owner changes; keep all of them. On 2026-09-25 the owner changed `ui.c`, `ui.h`, `ui_auto.c/.h`, `ui_types.h`, `lora_comm.h` and `lora_hub_link.h` to LoRa protocol v2. That means `GET_STATUS` request/response, `tvoc_ppb`, `sample_seq`-gated Auto, `int16_t` RSSI, `ui_has_pending_command()`, Node-reboot re-sync and config schema v3. The owner also simplified the Trends page. Build on these edits; do not revert the v2 logic.
+- Pre-change reference: `smart_hub_ui_20260925_0852.zip` in the repo root holds `ui.c` from 08:52, before the Trends change. Read it read-only (for example `unzip -p smart_hub_ui_20260925_0852.zip ui.c`). Do not extract it into the repo.
+- **Known failures now:**
+  - `tools/build_sim.bat` fails with 12 × `no member named 'voc_index'`: `sim_pc/main.c` (10), `sim_pc/ui_test_api.c:63`, `sim_pc/test_restore_integration.c:235`. `ui.c` itself compiles.
+  - With only that rename applied in a scratch copy, `--shots` still stops at `FATAL: Stage 1 desynchronized title: 'eCO₂' (expected 'CO₂')`.
+  - After relaxing that too, it stops at `FATAL: home_auto_paused did not reach ERROR phase / paused_error`. Likely cause: the fake Node never advances `sample_seq`, so Auto never qualifies.
+- `tools/export_mcu.bat --verify` passes (file-manifest check only).
 
-- LVGL8.4,800x480 RGB565, one800x10 draw buffer, unchanged42KiB heap.
-  No full MCU framebuffer, per-tick allocation, float/trig in hot paths or ISR LVGL.
-  Static captions in lifetime storage and lv_label_set_text_static; fixed value
-  buffers, change guards, zero-redraw/idempotence behavior.
-- Preserve light flat Study12 palette, borderless surfaces, current shadows/fonts/
-  icons, main card geometry, Temperature/Humidity composition and native modal
-  (180,56,440,368). Visible text>=18; no global recolor, gradient or new page.
-  Keep uptime, Connected/Disconnected, signal bars, splash and icon-only tabs.
-- Keep44px modal controls,48px steppers, fixed validation slot, five-digit value
-  width, shared Save, popup font18/44px pitch and working scrim/X lifecycle.
-- Hub owns semantics/polarity/Auto; Node applies received GPIOs verbatim.
-  Preserve direct lora_comm.h/lora_hub_link.h globals,8-byte command/20-byte status.
-  No snapshot layer, Node automation/watchdog, multi-node, schedules or RF/Modbus.
-- Keep16-sample session-RAM Trends and real readback. No stale-value or fake safe/OFF
-  presentation; no forced-off guarantee during link loss.
+## 3. Part A — simulator and tests for protocol v2
 
-## 3. X1 [P2] Make export genuinely non-clobbering
+A1. Replace every `voc_index` use in `sim_pc/` with `tvoc_ppb`, treating values as ppb. Update title/label expectations to `eCO₂` / `TVOC`.
 
-Evidence: tools/export_mcu.bat explicit destination still uses Compress-Archive
--Force. check-export.ps1 replaces a review-owned existing sentinel and returns0.
-Normal export with TS unset produces smart_hub_ui_.zip because %TS% is expanded
-before assignment inside the parenthesized block. Sequential suffixing works but
-does not provide atomic concurrency safety;999-name exhaustion can fall through.
+A2. Make the simulator's Hub/Node emulation follow `LORA_PROTOCOL.md` §3.3, in interactive mode and wherever tests emulate the radio:
+- The Hub polls with `GET_STATUS` about once per second, including before `ui_is_tx_ready()`.
+- The Hub sends `HUB_CMD` only while `ui_is_tx_ready() && ui_has_pending_command()`, with at most 3 attempts per `seq`.
+- The fake Node replies to both message types and applies relays only for `HUB_CMD`.
+- The fake Node advances `sample_seq` once per simulated sensor poll and reports an increasing `uptime_sec`.
+- Keep the documented interactive behaviour: 700 ms acknowledgement delay and the `F`/`T`/`S`/`1-3`/`Esc` keys in `README.md`.
 
-Requirements:
-- Both default and explicit output must never replace an existing ZIP by default.
-  Explicit existing destination: return a clear nonzero collision result and
-  leave original bytes intact. No implicit overwrite feature is needed.
-- Default export must include a valid date/time and choose a unique destination.
-  Make ownership/collision handling atomic (e.g. exclusive reservation or unique
-  staging plus atomic non-replacing publication); a Test-Path check followed by
-  forced overwrite is insufficient. Handle exhaustion without fall-through.
-- Return/report the exact created path. Preserve normal destination extraction
-  workflow, documented arguments and --verify manifest behavior. Propagate errors.
-- Preserve verifier's unique task-owned staging and actual artifact build.
-  Only clean owned exact paths after canonical directory-boundary checks.
-  Preserve diagnostics on failure, including collision fixture diagnostics.
-- Do not infer ownership from before/after root filename lists.
-- Test ONLY disposable fixtures: same exact existing explicit ZIP, two overlapping
-  invocations competing for one explicit destination, concurrent normal exports,
-  inherited/unset TS, and failure/timeout cleanup preserving unrelated sentinels.
-  Concurrent explicit collision may reject one writer; it must not replace the
-  winner. Default exports must produce distinct valid complete archives.
-- The current verifier's different-name sentinel and sequential different-path
-  exports are not collision tests; retain them if useful but rename accurately.
+A3. Wherever a test expects Auto to qualify, advance `sample_seq` per new sample. This fixes `home_auto_paused`.
 
-No destructive experiment against the owner's real exports.
+A4. Remove the tests and hook fields for widgets the owner deleted: Trends Current/Min/Max buffers and labels, the span label and the chart tooltip. That covers `ui_test_hooks.h`, `ui_test_api.*`, the `UI_TEST_HOOKS` block in `ui.c` and `main.c` checks such as CHECK 37/39/40 sections. Replace them with assertions for the current design in Part B; do not delete coverage without a replacement.
 
-## 4. X2 [P2] Complete recovered-state touch targets
+A5. Add durable regression checks for the owner's v2 behaviour:
+- (a) Repeated reports with the same `sample_seq` do not advance Auto qualification; 3 distinct samples do.
+- (b) A lower `uptime_sec` drops TX readiness, then all four reported GPIO levels are adopted and not replayed.
+- (c) After a command timeout, `lora_hub_cmd` carries the reported level for that channel; a late matching report returns it to IDLE.
+- (d) `ui_has_pending_command()` is true only while a command is PENDING.
+- (e) Validity: eCO₂ 399 and 60001 are unavailable, while 400 and 60000 are valid; TVOC 0 and 60000 are valid, while 60001 is unavailable.
+- (f) Schema: a 0x02 config for Air Purifier comes back as 0x03 with 150/100, other presets keep their thresholds, and boot staging fires no callback.
+- (g) `lora_last_rssi = -140` round-trips as `int16_t`.
+- (h) Auto max: 60000 ppm and 60000 ppb render in the Auto editor without clipping. Rename the `devices_auto_max_10000` capture to match, consistently in `main.c` and `tools/run_regression.ps1`.
 
-Evidence: ui.c Home and Devices switches are54x30 with effective click area54x30.
-Retry visibility is fixed and Retry height already meets the contract.
+## 4. Part B — Trends page (owner decisions; pixel values TL-proposed)
 
-Keep the visual switch/card layout and extend switch hit areas to>=44px height,
-with no overlap with Retry, settings or other actions and no escape from the
-owning card/tile. Verify the real LVGL effective target, not a nominal constant.
-If a minimal local placement adjustment is needed to separate targets, document
-its coordinates; do not redesign ordinary cards.
+Card-relative coordinates in the 552×344 chart card; the left rail is unchanged.
 
-For both Home/Devices, active_high/active_low, reconnect/late ACK:
-- Reach an actual Auto-generated pending command, real timeout and asserted latch.
-- Reconcile a fresh report; assert IDLE, latch retained, actual readback switch
-  and visible Retry. Keep Unknown+Retry only for unresolved command ERROR.
-- Check bounds and send pointer press/release at centres and extended target edges.
-  Exactly the intended action must execute: switch commits Manual, Retry re-arms
-  Auto. No click-through, duplicate callback or obsolete command replay.
-- Retry clears latch and restarts hold/qualification; no immediate new sequence/
-  output change solely from re-arm. Qualify fresh frames before a later decision.
-- Offline cannot re-arm; navigation/no-op/ordinary threshold edits cannot clear
-  the latch. Use fresh state for each branch and assert its preconditions.
-Do not substitute ui_trigger_device_retry/toggle helpers for pointer acceptance.
+B1. **Restore the selector indicator** exactly as in the 08:52 `ui.c` (`build_trends_page()` selector loop and `update_trends_tabs()`):
+- The selected card uses `ui_style_card_hero` on `LV_STATE_CHECKED`.
+- The selected card's icon, name, value and unit are white. Unselected cards have an ink icon/name/value and a muted unit.
+- The selected card shows a celadon 8×8 dot (radius 4) at (160, 14); it is hidden on the other cards.
+- Remove the 6×48 forest bar.
 
-## 5. X3 [P2] Finish real boot, TX and sensor recovery verification
+Keep the owner's touch-down selection (`LV_EVENT_PRESSED`) and the 150 ms `UI_TRENDS_SETTLE_MS` coalescing. TL-proposed: do not re-add `ui_style_pressed` to the selectors, because with touch-down selection it would add a second repaint per tap.
 
-These are missing tests, not an instruction to rewrite correct control logic.
+B2. **Title and chart lower** (TL values):
 
-### Boot/restore
+| Element | Position |
+|---|---|
+| Title | (20, 14), was (20, 2) |
+| `Data unavailable` badge | top-right, `LV_ALIGN_TOP_RIGHT, -20, 23`, was 11 |
+| Y unit label | y 96, was 92; the axis block moves +16, the unit is raised 12 relative to it |
+| Y tick labels | y 136 / 191 / 246 |
+| Chart | (72, 136), size and padding unchanged |
+| Time labels | y 276 |
+| Empty-state box | (20, 108), 512×191 |
 
-The new pre-init fixture resets all configs before ui_init, so it never observes
-restored state surviving initialization. Add isolated process fixtures that:
-1. Register callback counter, load through the actual documented adapter BEFORE
-   ui_init without forcing a staging flag in an already running UI.
-2. Call ui_init WITHOUT resetting restored state; assert every channel's config,
-   zero restore/init callbacks, initial TX blocked and proper Auto hold.
-3. Publish first eligible report; reconcile then record permitted TX, asserting
-   adopted GPIOs before sends (no boot zero/stale-intent pulse).
-4. Include valid explicit current Auto, legacy->Manual, missing and invalid records.
-   Test EVERY length0..sizeof(record)-1 for both formats, wrong kind/version,
-   empty/unterminated name, invalid preset/mode/polarity and invalid threshold pairs.
-   Preserve known-provenance policy; never infer record version from size alone.
-Use separate fresh processes/default fixtures to protect existing regression
-assumptions. Keep earlier helper tests as additional coverage.
-Do not claim CRC validation unless a real existing adapter contract implements it;
-no new CRC/storage driver requirement is introduced.
+The unit label must end at least 16 px above the top tick label box.
 
-### Recording TX
+B3. **X axis: fixed 15-minute window.**
+- The chart always has `UI_HISTORY_CAPACITY` (16) points. The newest history sample is slot 15 (right edge). With `count < 16`, history index `i` maps to slot `16 - count + i`, and leading slots are `LV_CHART_POINT_NONE`.
+- Autonomous history labels are the static strings `-15 min`, `-10 min`, `-5 min`, `Now`, at slots 0/5/10/15. Use the ASCII hyphen, because the fonts contain ASCII 32..126 and no U+2212; do not regenerate fonts.
+- External feed (`ui_feed_history`) uses the same right-aligned window. Its labels are `HH:MM` of `newest_minute - (15 - slot)` with midnight wrap, and the right label is also `HH:MM`, not `Now`.
+- Label boxes are about 80 px wide and centred on slot x 83 / 229 / 375. The last label is right-aligned to x 532.
+- Labels never duplicate. This fixes the current 3-sample `+0m +0m +1m +2m` bug.
+- Empty states stay: 0 samples → `No readings yet`; 1 → `Collecting readings…` plus the hint.
 
-CHECK29 now records bytes/time, but only asserts mask/sequence and >=3 periodic
-sends. Its fake node also consumes shared command globals independently.
+B4. **Y axis: round-number ticks.**
+- Exactly three labels `lo`, `lo+s`, `lo+2s`, where `s ∈ {1, 2, 2.5, 5}×10^k` in display units and is an integer in raw units (temperature raw = 0.1 °C).
+- The chart range is `[lo, lo+2s]`, so the three grid lines coincide with the labels.
+- TL algorithm: expand spans below the existing minimum (10 raw for temperature, 20 otherwise) symmetrically. Pad by `max(1, 5% of span)` on each side. Choose the smallest `s` with `lo = floor(pmin/s)*s` and `lo+2s ≥ pmax`, using floor for negatives and 64-bit math.
+- Required examples:
+  - eCO₂ 410..440 → `400 / 425 / 450`.
+  - Temperature 22.8..23.6 °C → `22.0 / 23.0 / 24.0`.
+  - Temperature −2.5..−0.5 °C has correct negative labels.
+  - TVOC 59000..60000 fits right-aligned in the 56 px column.
+- Labels keep real units and use the existing integer formatters; no float formatting.
 
-Exercise a shared/compiled documented application-loop implementation with the
-recording send stub on its actual TX path: RX publication -> ui_tick/reconciliation
--> LVGL input -> gated sequence/periodic sends. A fake node must consume recorded
-packets rather than a second unrecorded parallel transmit path for this test.
+B5. Keep everything else the owner set: native 2 px line and 4 px markers, normalized 0..1000 plotting, surface fill, non-clickable chart, the title/badge row, and ≥ 18 px text. Keep static captions in const storage via `lv_label_set_text_static()`, fixed buffers, and no per-tick allocation.
 
-Assert exact expected packet bytes, timestamps/counts/order at known boundaries:
-zero before first eligible report, zero while stale and before reconnect
-reconciliation, first eligible reconnect TX adopts all16 masks/both polarities,
-immediate new-sequence send and unchanged-sequence periodic send at1000ms.
-Assert no sends before due; tolerate only the stated loop scheduling quantum.
-Include negative test doubles that bypass gating, send too often, omit periodic
-TX or corrupt bytes; the harness must fail those deliberate faults in Release.
-No radio driver is required.
+## 5. Out of scope
 
-### Sensor recovery
+Packet layout/schema, `ui_auto` thresholds and rules, Home/Devices/Settings visuals, fonts/icons regeneration, and firmware/radio drivers. Two items stay owner-open and must not be decided by the worker: the TVOC ppb quality bands (100/250), and the remaining `VOC` copy (`Based on eCO₂ and VOC`, `Auto · VOC`). No commit, push, branch, stage, stash, reset, checkout or clean. Do not delete user files.
 
-CO2 recovery has been added; relevant VOC and RH invalid->valid paths are absent.
-For EACH Fan/CO2, Purifier/VOC, Humidifier/RH:
-- Start healthy/settled, invalidate the relevant sensor/fault and assert suspension.
-- Recover, assert the full10s hold starts once from recovery; repeated good frames
-  must not perpetually restart it.
-- With deterministic RX and fake periodic updates disabled, assert time alone and
-  unchanged revision do not satisfy3 eligible fresh frames. Exercise the threshold
-  with controlled frame arrivals after hold; check no premature decision.
-- Assert unrelated faults leave healthy rules operational.
-- Keep timeout, late ACK, link loss/reconnect and explicit re-arm distinct; do not
-  call incremented revisions "duplicate frames".
-Retain improved dropdown drag/first-last selection and draft cancel tests.
+## 6. Acceptance
 
-## 6. X4 [P2] Make heap stress actually cover invalid state and transitions
+1. `python tools/generate_assets.py --check` exits 0.
+2. `tools/build_sim.bat` exits 0 with `-Wall -Wextra -Werror`.
+3. `tools/run_regression.bat` (42 KiB) passes all checks, including A5 and B1–B4 assertions, the exact capture manifest and the `--shots NUL` negative control.
+4. `cmake --build build-40k --target sim_pc` then `build-40k\sim_pc.exe --regression` passes all checks.
+5. `tools/export_mcu.bat --verify` and `tools/verify_production.bat` exit 0. If the sandbox blocks the verifier's CIM calls, say so; do not weaken it.
+6. Captures include every Trends state as PNG:
+   - `eCO₂`, `TVOC`, temperature and humidity with 16 external samples.
+   - Autonomous history with fewer than 16 samples (right-aligned, `-15 min … Now`).
+   - The empty state and the one-sample state.
+   - A Stage-1 interim frame (restored forest card, old chart still showing).
+7. Benchmark rerun reports Stage 1 and Stage 2 flush pixels, compared with the accepted 2026-09-24 values (Stage 1 5 flushes / 34,532 px). Also rerun heap figures (42/40 KiB), and 0 B drift over 100 switches.
+8. `git diff --check` is clean.
 
-CHECK31 labels150/110 Purifier limits as invalid; they are valid and Save is enabled.
-Create a genuinely invalid pair via pointer steppers, assert validation visible
-and Save disabled BEFORE measuring. Assert Back/cancel discard and successful
-reopen; never silently skip a missing widget/subview.
+## 7. Deliverables
 
-Retain50 complete cycles, include the previously requested Auto/recovery activity,
-and record:
-- immediate post-build/event-boundary and first-rendered memory before settling;
-- Device modal, dropdown/scrim, selection/dismiss, Auto subview, true invalid draft,
-  Back and cancellation, with named state/tick for each minimum;
-- minimum total free, largest block, peak usage, fragmentation, stable drift
-  separately. Keep meaningful deterministic warm-up/drift limits; do not loosen
-  existing thresholds or add a delay to hide a peak.
+- Code and test changes.
+- `docs/reviews/2026-09-25-lora-v2-trends-delivery/REPORT.md` with captures, command results (exact exit codes; list upstream CMake dev warnings separately from compiler warnings) and SHA-256 of the captures.
+- Update `docs/UI_DESIGN_BRIEF.md`: in the 2026-09-25 Trends subsection record the restored indicator and new axes, and amend D-040.
+- Update `docs/user/SMART_HUB_UI_GUIDE.md` §7.4.
+- Update `docs/MCU_BASELINE.md`: replace the "pre-change" note with re-measured figures.
+- Update the status lines in `README.md`/`docs/README.md`, `PLAN.md`, `DEV_LOG.md` and `docs/prompts/README.md`.
+- Set this file's status to `IMPLEMENTED — awaiting review`.
 
-Existing independent numbers:4104 free at first settings frame (largest3912),
-4936 settled,4544 dropdown,4256 Auto limits/true invalid. All pass the existing
->4096 total-free contract. No new higher reserve/largest-block requirement.
-These measurements supersede treating4296 as a universal minimum.
-If corrected coverage exposes a dip, optimize within42KiB without shrinking fonts,
-hiding controls or unsafe deletion; otherwise retain the working implementation.
-
-## 7. Preserve established Auto/data contract
-
-| Rule | ON / OFF defaults | Bounds | Step | Inclusive gap |
-|---|---|---|---|---|
-| Fan / CO2 ppm | >=1000 / <=800 | 0..10000 | 50 | ON>=OFF+50 |
-| Purifier / unitless VOC | >=150 / <=100 | 1..500 | 5 | ON>=OFF+5 |
-| Humidifier / %RH | <=40 / >=50 | 0..100 | 1 | OFF>=ON+5 |
-
-Per-device LCD limits; imported valid integers need not be step multiples.
-Clamp only edited value; invalid gap disables Save without moving its partner.
-Preset change loads defaults; unsupported presets Manual-only.
-Missing/invalid/legacy config defaults Manual; only complete valid current explicit
-Auto opts in. Demo thresholds are not health/appliance-protection standards.
-No ppb conversion/new sensor algorithm.
-
-Preserve3 eligible fresh frames plus10-second hold after enable, committed limit
-change, confirmed transition, boot/reconnect and sensor recovery; wrap-safe ticks/
-revisions, relevant fault masking, pending arbitration and per-channel isolation.
-No decision offline/invalid/pending/latched. Switch is explicit Manual override,
-no timed return. No-op Save resets nothing and emits no callback.
-Latch clears only explicit Retry or deliberate committed Manual->Auto.
-
-## 8. Delivery and honest evidence
-
-Run tools/build_sim.bat, tools/run_regression.bat, tools/export_mcu.bat --verify
-and tools/verify_production.bat with cached dependencies disconnected.
-Retain process watchdogs and strict production negative control: successful launch,
-exact exit1 and expected message; crash/timeout/launch failure is not a pass.
-
-Put NEW evidence in docs/reviews/2026-09-16-auto-x1-x4-fixes/:
-- X1–X4 mapping to changed code, named tests, preconditions and actual results;
-- actual stdout/stderr/exit codes, reproducible commands and negative-test outcomes;
-- native800x480 unmasked late-ACK/reconnect captures on both pages, touch bounds;
-- per-state heap table, valid vs invalid preconditions, stable drift;
-- boot config and TX trace, all-rule recovery boundaries;
-- true collision/concurrency/cleanup fixture outcomes.
-Label summaries as summaries. Do not invent console transcripts or claim
-CRC/multi-rule recovery/concurrency coverage that did not execute.
-
-Preserve historical probes/reports/raw captures; adaptation writes only new paths.
-Mark omissions OPEN, not ALL COMPLETE. Host pass is not real MCU/LCD/touch/radio/
-relay acceptance. Distinguish sandbox failures from approved outside-sandbox runs.
-Update PLAN, DEV_LOG and relevant docs/indexes with current evidence. Preserve
-CURRENT as the specification; status may become IMPLEMENTED — awaiting review,
-but do not replace requirements with an execution report or weaken them.
-No commit/push.
+Physical MCU/LCD/touch/LoRa behaviour remains **UNVERIFIED** (host only).

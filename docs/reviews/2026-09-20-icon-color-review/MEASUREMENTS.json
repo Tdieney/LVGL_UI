@@ -1,0 +1,1052 @@
+{
+  "tokens": {
+    "CANVAS": {
+      "input": "#EEEAE1",
+      "decoded_565": "#EFEBE7"
+    },
+    "SURFACE": {
+      "input": "#F7F5EE",
+      "decoded_565": "#F7F7EF"
+    },
+    "FOREST": {
+      "input": "#1D3B2E",
+      "decoded_565": "#183829"
+    },
+    "CELADON": {
+      "input": "#D5DFB8",
+      "decoded_565": "#D6DFBD"
+    },
+    "CELADON_STRIP": {
+      "input": "#DFE7CB",
+      "decoded_565": "#DEE7CE"
+    },
+    "INK": {
+      "input": "#17251F",
+      "decoded_565": "#102418"
+    },
+    "MUTED": {
+      "input": "#59665A",
+      "decoded_565": "#5A655A"
+    },
+    "DIVIDER": {
+      "input": "#E5E0D5",
+      "decoded_565": "#E7E3D6"
+    },
+    "OUTLINE": {
+      "input": "#D8D1C2",
+      "decoded_565": "#DED3C6"
+    },
+    "ERROR": {
+      "input": "#C93B2B",
+      "decoded_565": "#CE3829"
+    },
+    "ERROR_SOFT": {
+      "input": "#FDE8E8",
+      "decoded_565": "#FFEBEF"
+    },
+    "GREEN": {
+      "input": "#1E7E34",
+      "decoded_565": "#187D31"
+    },
+    "AMBER": {
+      "input": "#8A5000",
+      "decoded_565": "#8C5100"
+    },
+    "SWITCH_OFF": {
+      "input": "#939E94",
+      "decoded_565": "#949E94"
+    },
+    "AMBER_SOFT": {
+      "input": "#FFF3DE",
+      "decoded_565": "#FFF3DE"
+    }
+  },
+  "patches": {
+    "canvas": {
+      "reference_box": [
+        345,
+        10,
+        515,
+        80
+      ],
+      "native_box": [
+        345,
+        10,
+        480,
+        50
+      ],
+      "reference": {
+        "median": "#EEECE7",
+        "mean": [
+          237.67,
+          236.13,
+          230.8
+        ],
+        "stddev": [
+          0.53,
+          0.6,
+          0.59
+        ]
+      },
+      "native": {
+        "median": "#EFEBE7",
+        "mean": [
+          239.0,
+          235.0,
+          231.0
+        ],
+        "stddev": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "surface": {
+      "reference_box": [
+        610,
+        435,
+        735,
+        448
+      ],
+      "native_box": [
+        610,
+        435,
+        735,
+        448
+      ],
+      "reference": {
+        "median": "#F3F1EC",
+        "mean": [
+          242.7,
+          240.83,
+          235.98
+        ],
+        "stddev": [
+          0.56,
+          0.59,
+          0.73
+        ]
+      },
+      "native": {
+        "median": "#F7F7EF",
+        "mean": [
+          247.0,
+          247.0,
+          239.0
+        ],
+        "stddev": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "forest_top": {
+      "reference_box": [
+        235,
+        115,
+        365,
+        135
+      ],
+      "native_box": [
+        235,
+        120,
+        365,
+        138
+      ],
+      "reference": {
+        "median": "#23443B",
+        "mean": [
+          34.66,
+          67.99,
+          59.25
+        ],
+        "stddev": [
+          1.48,
+          1.42,
+          1.25
+        ]
+      },
+      "native": {
+        "median": "#183829",
+        "mean": [
+          24.0,
+          56.0,
+          41.0
+        ],
+        "stddev": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "forest_bottom": {
+      "reference_box": [
+        55,
+        318,
+        210,
+        326
+      ],
+      "native_box": [
+        55,
+        316,
+        210,
+        324
+      ],
+      "reference": {
+        "median": "#19372F",
+        "mean": [
+          25.02,
+          55.49,
+          47.11
+        ],
+        "stddev": [
+          0.69,
+          0.63,
+          0.66
+        ]
+      },
+      "native": {
+        "median": "#183829",
+        "mean": [
+          24.34,
+          56.32,
+          41.26
+        ],
+        "stddev": [
+          5.5,
+          5.09,
+          4.27
+        ]
+      }
+    },
+    "celadon": {
+      "reference_box": [
+        55,
+        65,
+        110,
+        70
+      ],
+      "native_box": [
+        50,
+        65,
+        100,
+        68
+      ],
+      "reference": {
+        "median": "#D7E0BC",
+        "mean": [
+          215.48,
+          224.25,
+          188.34
+        ],
+        "stddev": [
+          0.69,
+          0.68,
+          1.15
+        ]
+      },
+      "native": {
+        "median": "#D6DFBD",
+        "mean": [
+          214.0,
+          223.0,
+          189.0
+        ],
+        "stddev": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "quantization_only": {
+    "auto-co2-quiet-architecture.png": {
+      "source_size": [
+        1619,
+        971
+      ],
+      "channel_MAE_8bit": [
+        3.802,
+        1.272,
+        4.758
+      ]
+    },
+    "auto-humidity-quiet-architecture.png": {
+      "source_size": [
+        1620,
+        971
+      ],
+      "channel_MAE_8bit": [
+        3.823,
+        1.902,
+        3.834
+      ]
+    },
+    "auto-voc-invalid-quiet-architecture.png": {
+      "source_size": [
+        1619,
+        971
+      ],
+      "channel_MAE_8bit": [
+        3.19,
+        1.51,
+        3.384
+      ]
+    },
+    "dashboard-quiet-architecture.png": {
+      "source_size": [
+        1619,
+        971
+      ],
+      "channel_MAE_8bit": [
+        2.456,
+        1.694,
+        2.123
+      ]
+    },
+    "devices-quiet-architecture.png": {
+      "source_size": [
+        1619,
+        971
+      ],
+      "channel_MAE_8bit": [
+        1.975,
+        1.839,
+        4.387
+      ]
+    },
+    "settings-quiet-architecture.png": {
+      "source_size": [
+        1619,
+        971
+      ],
+      "channel_MAE_8bit": [
+        4.029,
+        1.506,
+        4.151
+      ]
+    },
+    "trends-quiet-architecture.png": {
+      "source_size": [
+        1619,
+        971
+      ],
+      "channel_MAE_8bit": [
+        3.791,
+        1.448,
+        4.198
+      ]
+    }
+  },
+  "contrast": {
+    "INK/SURFACE": 15.15,
+    "MUTED/SURFACE": 5.66,
+    "MUTED/FOREST": 2.1,
+    "CELADON/FOREST": 9.26,
+    "WHITE/SURFACE": 1.08
+  },
+  "icons": {
+    "ui_icon_home_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        4,
+        4,
+        28,
+        29
+      ],
+      "ink_size": [
+        24,
+        25
+      ]
+    },
+    "ui_icon_home_30": {
+      "canvas": 30,
+      "bytes": 450,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        27,
+        27
+      ],
+      "ink_size": [
+        24,
+        24
+      ]
+    },
+    "ui_icon_chart_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        29,
+        29
+      ],
+      "ink_size": [
+        26,
+        26
+      ]
+    },
+    "ui_icon_devices_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        4,
+        3,
+        28,
+        29
+      ],
+      "ink_size": [
+        24,
+        26
+      ]
+    },
+    "ui_icon_home_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        21,
+        21
+      ],
+      "ink_size": [
+        18,
+        18
+      ]
+    },
+    "ui_icon_chart_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        2,
+        3,
+        22,
+        22
+      ],
+      "ink_size": [
+        20,
+        19
+      ]
+    },
+    "ui_icon_devices_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        3,
+        2,
+        21,
+        22
+      ],
+      "ink_size": [
+        18,
+        20
+      ]
+    },
+    "ui_icon_sliders_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        3,
+        4,
+        21,
+        20
+      ],
+      "ink_size": [
+        18,
+        16
+      ]
+    },
+    "ui_icon_radio_20": {
+      "canvas": 20,
+      "bytes": 200,
+      "ink_box_alpha_ge_8": [
+        3,
+        4,
+        18,
+        17
+      ],
+      "ink_size": [
+        15,
+        13
+      ]
+    },
+    "ui_icon_timer_20": {
+      "canvas": 20,
+      "bytes": 200,
+      "ink_box_alpha_ge_8": [
+        3,
+        2,
+        18,
+        18
+      ],
+      "ink_size": [
+        15,
+        16
+      ]
+    },
+    "ui_icon_air_28": {
+      "canvas": 28,
+      "bytes": 392,
+      "ink_box_alpha_ge_8": [
+        3,
+        1,
+        26,
+        27
+      ],
+      "ink_size": [
+        23,
+        26
+      ]
+    },
+    "ui_icon_air_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        4,
+        1,
+        29,
+        31
+      ],
+      "ink_size": [
+        25,
+        30
+      ]
+    },
+    "ui_icon_thermometer_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        7,
+        3,
+        17,
+        22
+      ],
+      "ink_size": [
+        10,
+        19
+      ]
+    },
+    "ui_icon_thermometer_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        10,
+        4,
+        22,
+        29
+      ],
+      "ink_size": [
+        12,
+        25
+      ]
+    },
+    "ui_icon_drop_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        5,
+        2,
+        19,
+        22
+      ],
+      "ink_size": [
+        14,
+        20
+      ]
+    },
+    "ui_icon_drop_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        6,
+        3,
+        26,
+        30
+      ],
+      "ink_size": [
+        20,
+        27
+      ]
+    },
+    "ui_icon_drop_44": {
+      "canvas": 44,
+      "bytes": 968,
+      "ink_box_alpha_ge_8": [
+        9,
+        4,
+        35,
+        41
+      ],
+      "ink_size": [
+        26,
+        37
+      ]
+    },
+    "ui_icon_purifier_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        5,
+        2,
+        19,
+        21
+      ],
+      "ink_size": [
+        14,
+        19
+      ]
+    },
+    "ui_icon_purifier_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        7,
+        3,
+        25,
+        28
+      ],
+      "ink_size": [
+        18,
+        25
+      ]
+    },
+    "ui_icon_purifier_44": {
+      "canvas": 44,
+      "bytes": 968,
+      "ink_box_alpha_ge_8": [
+        10,
+        5,
+        34,
+        39
+      ],
+      "ink_size": [
+        24,
+        34
+      ]
+    },
+    "ui_icon_fan_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        21,
+        21
+      ],
+      "ink_size": [
+        18,
+        18
+      ]
+    },
+    "ui_icon_fan_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        4,
+        4,
+        28,
+        28
+      ],
+      "ink_size": [
+        24,
+        24
+      ]
+    },
+    "ui_icon_fan_44": {
+      "canvas": 44,
+      "bytes": 968,
+      "ink_box_alpha_ge_8": [
+        5,
+        5,
+        39,
+        39
+      ],
+      "ink_size": [
+        34,
+        34
+      ]
+    },
+    "ui_icon_light_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        21,
+        22
+      ],
+      "ink_size": [
+        18,
+        19
+      ]
+    },
+    "ui_icon_light_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        4,
+        4,
+        28,
+        30
+      ],
+      "ink_size": [
+        24,
+        26
+      ]
+    },
+    "ui_icon_light_44": {
+      "canvas": 44,
+      "bytes": 968,
+      "ink_box_alpha_ge_8": [
+        5,
+        6,
+        39,
+        41
+      ],
+      "ink_size": [
+        34,
+        35
+      ]
+    },
+    "ui_icon_plug_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        6,
+        2,
+        18,
+        23
+      ],
+      "ink_size": [
+        12,
+        21
+      ]
+    },
+    "ui_icon_plug_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        8,
+        2,
+        24,
+        30
+      ],
+      "ink_size": [
+        16,
+        28
+      ]
+    },
+    "ui_icon_plug_44": {
+      "canvas": 44,
+      "bytes": 968,
+      "ink_box_alpha_ge_8": [
+        11,
+        2,
+        33,
+        42
+      ],
+      "ink_size": [
+        22,
+        40
+      ]
+    },
+    "ui_icon_heat_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        2,
+        0,
+        22,
+        20
+      ],
+      "ink_size": [
+        20,
+        20
+      ]
+    },
+    "ui_icon_heat_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        3,
+        0,
+        29,
+        27
+      ],
+      "ink_size": [
+        26,
+        27
+      ]
+    },
+    "ui_icon_heat_44": {
+      "canvas": 44,
+      "bytes": 968,
+      "ink_box_alpha_ge_8": [
+        4,
+        0,
+        40,
+        36
+      ],
+      "ink_size": [
+        36,
+        36
+      ]
+    },
+    "ui_icon_close_20": {
+      "canvas": 20,
+      "bytes": 200,
+      "ink_box_alpha_ge_8": [
+        5,
+        5,
+        15,
+        15
+      ],
+      "ink_size": [
+        10,
+        10
+      ]
+    },
+    "ui_icon_check_20": {
+      "canvas": 20,
+      "bytes": 200,
+      "ink_box_alpha_ge_8": [
+        2,
+        2,
+        18,
+        18
+      ],
+      "ink_size": [
+        16,
+        16
+      ]
+    },
+    "ui_icon_check_circle_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        29,
+        29
+      ],
+      "ink_size": [
+        26,
+        26
+      ]
+    },
+    "ui_icon_warning_20": {
+      "canvas": 20,
+      "bytes": 200,
+      "ink_box_alpha_ge_8": [
+        1,
+        2,
+        19,
+        18
+      ],
+      "ink_size": [
+        18,
+        16
+      ]
+    },
+    "ui_icon_warning_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        1,
+        2,
+        23,
+        22
+      ],
+      "ink_size": [
+        22,
+        20
+      ]
+    },
+    "ui_icon_leaf_18": {
+      "canvas": 18,
+      "bytes": 162,
+      "ink_box_alpha_ge_8": [
+        3,
+        3,
+        15,
+        15
+      ],
+      "ink_size": [
+        12,
+        12
+      ]
+    },
+    "ui_icon_leaf_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        3,
+        4,
+        20,
+        21
+      ],
+      "ink_size": [
+        17,
+        17
+      ]
+    },
+    "ui_icon_leaf_32": {
+      "canvas": 32,
+      "bytes": 512,
+      "ink_box_alpha_ge_8": [
+        4,
+        5,
+        27,
+        28
+      ],
+      "ink_size": [
+        23,
+        23
+      ]
+    },
+    "ui_icon_gear_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        1,
+        2,
+        23,
+        24
+      ],
+      "ink_size": [
+        22,
+        22
+      ]
+    },
+    "ui_icon_chevron_right_20": {
+      "canvas": 20,
+      "bytes": 200,
+      "ink_box_alpha_ge_8": [
+        7,
+        4,
+        13,
+        16
+      ],
+      "ink_size": [
+        6,
+        12
+      ]
+    },
+    "ui_icon_chevron_left_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        8,
+        5,
+        16,
+        19
+      ],
+      "ink_size": [
+        8,
+        14
+      ]
+    },
+    "ui_icon_chevron_down_18": {
+      "canvas": 18,
+      "bytes": 162,
+      "ink_box_alpha_ge_8": [
+        4,
+        6,
+        14,
+        12
+      ],
+      "ink_size": [
+        10,
+        6
+      ]
+    },
+    "ui_icon_plus_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        4,
+        4,
+        20,
+        20
+      ],
+      "ink_size": [
+        16,
+        16
+      ]
+    },
+    "ui_icon_minus_24": {
+      "canvas": 24,
+      "bytes": 288,
+      "ink_box_alpha_ge_8": [
+        4,
+        11,
+        20,
+        13
+      ],
+      "ink_size": [
+        16,
+        2
+      ]
+    }
+  },
+  "icon_count": 46,
+  "reference_icon_ink": {
+  "purifier": {
+    "logical_crop": [
+      46,
+      124,
+      98,
+      187
+    ],
+    "threshold": "all RGB channels <120",
+    "ink_size_at_800": [
+      36.1,
+      51.4
+    ]
+  },
+  "fan": {
+    "logical_crop": [
+      422,
+      124,
+      476,
+      183
+    ],
+    "threshold": "all RGB channels <120",
+    "ink_size_at_800": [
+      41.5,
+      49.4
+    ]
+  },
+  "light": {
+    "logical_crop": [
+      420,
+      296,
+      474,
+      359
+    ],
+    "threshold": "all RGB channels <120",
+    "ink_size_at_800": [
+      35.6,
+      50.4
+    ]
+  }
+},
+  "source_sha256": {
+    "ui.c": "D95D2DC3097D055FB25D07E2823F3D92AD546B007336CB53956F8568A1345B0F",
+    "ui_theme.h": "B7730389514D133A24D40BE0EA7190CD73A996F7F93A8B302D071521BA6F2B5A",
+    "ui_theme.c": "6CA0EF8F55F51245800FD6375DD20DD5DA27185D7F911715E561A4F468687557",
+    "ui_fonts.c": "D13965717EDECE44A5C834BC8745A4D17A30B22BA24790E255108D88CEAAA9CA",
+    "ui_icons.c": "0DE2913614569C58509EDEDD5AA18B1BECBABA2AD4FA4C03A8DC8BEA8BE5C616",
+    "tools/generate_assets.py": "FF5EBF8922F61D504739AF288227DA402F5B1CF592975254F271197D4023CA8A",
+    "tools/PlusJakartaSans.ttf": "89B3FB38AA0D275D7A731D0D817A4F1622B316B4D7FBDEDCF02EE9099FF68BC8",
+    "sim_pc/main.c": "333554DA21A29607CA0F131AE1F6FF6C79229B1B0C595C3580412DD0320AB32C",
+    "tools/verify_production.ps1": "35A8DF0027045E1298521D4A6DD0E210FB9AB13108B4D01F1269EA0410B254CC",
+    "sim_pc/build/sim_pc.exe": "113F324454366485A45CF2A8FE487C02C6CD00FD7CB275E3F1C1BA7294C9CD8E"
+  }
+}

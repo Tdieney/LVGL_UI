@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiet Architecture — Implementation Fidelity Comparison</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #F4F1EC;
+      color: #17251F;
+      font: 18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 1640px; margin: auto; }
+    h1 { font-size: 32px; margin-bottom: 8px; color: #1D3B2E; }
+    h2 { font-size: 24px; margin: 32px 0 8px; color: #1D3B2E; }
+    p { max-width: 1100px; line-height: 1.6; }
+    a { color: #1D3B2E; font-weight: 600; text-decoration: underline; }
+    figure { margin: 0; }
+    figcaption { padding: 8px 0; font-weight: 600; font-size: 16px; color: #596A61; }
+    .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 5/3;
+      object-fit: contain;
+      background: #FCFBF9;
+      border: 1px solid #D8D3C8;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .note { margin: 6px 0 14px; color: #596A61; font-size: 16px; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      background: #DCE7DD;
+      color: #1D3B2E;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 900px) { .pair { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="badge">CONSOLIDATED IMPLEMENTATION DELIVERY (F1–F6 + V1)</div>
+  <h1>Quiet Architecture: Approved Concepts vs Native LVGL v8.4 Renders</h1>
+  <p>2026-09-18 — Final Fidelity &amp; Verification Closure. <a href="REPORT.md">Read Final Report</a> · <a href="../../prompts/CURRENT.md">Active Spec</a>.<br>
+  All native renders are captured directly from 800×480 RGB565 framebuffers in the LVGL simulator, running under the strict 42 KiB heap budget and single 800×10 partial draw buffer. All visible fonts strictly obey the &ge; 18px contract.</p>
+
+  <!-- 1. Overview -->
+  <section>
+    <h2>1. Overview (Dashboard)</h2>
+    <p class="note">Forest hero card (#1D3B2E) with large "Good" verdict (48px) and dual CO₂/VOC columns; lower porcelain tiles (176×152) for Temperature and Humidity; right porcelain card (368×404) with outline appliance icons (44px), aligned name/mode, and switches.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/dashboard-quiet-architecture.png" alt="Accepted Overview Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (home_good.png, 800×480)</figcaption>
+        <img src="home_good.png" alt="Native LVGL Overview Render">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. Trends -->
+  <section>
+    <h2>2. Trends</h2>
+    <p class="note">Four selectable metric cards on the left (240×92 each) with live readings and active forest card indicator; right porcelain chart card (496×400) with Current/Min/Max prominent metrics, 18px axes, and single clean data series line.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/trends-quiet-architecture.png" alt="Accepted Trends Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (trends_data.png, 800×480)</figcaption>
+        <img src="trends_data.png" alt="Native LVGL Trends Render">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 3. Devices -->
+  <section>
+    <h2>3. Devices (2×2 Grid)</h2>
+    <p class="note">Four porcelain cards (368×192) with 44px outline appliance icons, aligned title and mode column, switch at top-right, fine separator, and full-width Settings row with sliders icon and chevron.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/devices-quiet-architecture.png" alt="Accepted Devices Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (devices_grid.png, 800×480)</figcaption>
+        <img src="devices_grid.png" alt="Native LVGL Devices Render">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 4. Settings -->
+  <section>
+    <h2>4. Device Settings</h2>
+    <p class="note">Contextual header with unboxed back chevron; four clean form rows with leading outline icons and fine separators; visible outlined dropdown, segmented Manual/Auto selector, threshold summary with chevron, and segmented Active high / Active low polarity; symmetrical Cancel and Save actions.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/settings-quiet-architecture.png" alt="Accepted Settings Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (devices_settings.png, 800×480)</figcaption>
+        <img src="devices_settings.png" alt="Native LVGL Settings Render">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 5. Auto CO2 -->
+  <section>
+    <h2>5. Auto Thresholds — CO₂ (Ventilation Fan)</h2>
+    <p class="note">Contextual title with unboxed back chevron; celadon strip with fan icon, sensor title, vertical divider, and live reading; two equal limit cards with outlined value boxes and 48px stepper buttons; symmetrical Cancel, Reset limits, and Save settings footer.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/auto-co2-quiet-architecture.png" alt="Accepted Auto CO2 Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (devices_auto_thresholds.png, 800×480)</figcaption>
+        <img src="devices_auto_thresholds.png" alt="Native LVGL Auto CO2 Render">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 6. Auto Humidity -->
+  <section>
+    <h2>6. Auto Thresholds — Humidity (Humidifier)</h2>
+    <p class="note">Reversed comparison rules (Turn ON at or below, Turn OFF at or above); consistent % unit notation; stable layout matching the Quiet Architecture composition.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/auto-humidity-quiet-architecture.png" alt="Accepted Auto Humidity Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (devices_auto_humidifier.png, 800×480)</figcaption>
+        <img src="devices_auto_humidifier.png" alt="Native LVGL Auto Humidity Render">
+      </figure>
+    </div>
+  </section>
+
+  <!-- 7. Auto VOC Invalid Draft -->
+  <section>
+    <h2>7. Auto Thresholds — Invalid Draft State (Air Purifier VOC ON=OFF=150)</h2>
+    <p class="note">Exact matched-state capture: Air Purifier (VOC) with draft ON=150 and OFF=150 violating the minimum gap (&ge; 5). Outlined value fields switch to error outline (#C93B2B) with zero card-border reflow; warning icon with cause and repair instructions; noninteractive disabled Save button.</p>
+    <div class="pair">
+      <figure>
+        <figcaption>Accepted Concept (800×480 normalized)</figcaption>
+        <img src="../../drafts/2026-09-17-pro-max/auto-voc-invalid-quiet-architecture.png" alt="Accepted Auto VOC Invalid Concept">
+      </figure>
+      <figure>
+        <figcaption>Native LVGL Capture (devices_auto_invalid_draft.png, 800×480)</figcaption>
+        <img src="devices_auto_invalid_draft.png" alt="Native LVGL Auto VOC Invalid Render">
+      </figure>
+    </div>
+  </section>
+</main>
+</body>
+</html>

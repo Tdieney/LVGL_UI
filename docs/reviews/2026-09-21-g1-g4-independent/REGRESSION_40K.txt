@@ -1,0 +1,197 @@
+====================================================
+ Smart Hub UI - Comprehensive Regression Test Suite 
+====================================================
+
+[CHECK 1] Uptime calculation, formatting & 32-bit rollover...
+  PASS: Uptime boundaries, production wrap link & Auto hold verified.
+
+[CHECK 2] Signed fixed-point temperature formatting...
+  PASS: Signed temperature formatting verified (-2.5, -0.5, 0.0, 23.5, -12.0).
+
+[CHECK 3] Desired versus reported relay state & remote flips...
+  PASS: Desired vs reported relay state, timeout, late report & unprompted node report verified.
+
+[CHECK 4] Hub-local device settings immediate persistence (Defect fix)...
+  PASS: Hub-local device configuration immediate persistence verified (observed 5.0s, no reversion).
+
+[CHECK 5] Font glyph coverage (62px digits, unicode fallbacks)...
+  PASS: Font glyph coverage verified.
+
+[CHECK 6] Trends sliding history window & midnight clock wrap...
+  PASS: Trends sliding history window & midnight clock wrap verified.
+
+[CHECK 7] Chart point inspection returning tooltip...
+  Synthetic indev touch tooltip: '14:21 · 425 ppm'
+  Inspected point 6 tooltip: '14:23 · 430 ppm'
+  PASS: Chart point inspection returning tooltip (both synthetic touch & direct API) verified.
+
+[CHECK 8] Heap headroom assertion across all screens (> 4 KiB free)...
+  Home page:    used=88% free=5080 biggest=3280 frag=36%
+  Trends (data):used=74% free=10776 biggest=5640 frag=48%
+  Trends (empty):used=74% free=10776 biggest=5640 frag=48%
+  Devices page: used=78% free=9024 biggest=5640 frag=38%
+  Dialog open:  used=63% free=15344 biggest=8624 frag=44%
+  Splash screen:used=78% free=9360 biggest=7760 frag=18%
+  Splash->Home: used=76% free=9992 biggest=7888 frag=22%
+  PASS: Heap headroom verified with > 4 KiB free across all views.
+
+[CHECK 9] Memory stability across 50 page navigation cycles...
+  Start: used=88% free=5088 biggest=3288 frag=36%
+  End:   used=88% free=5088 biggest=3288 frag=36%
+  PASS: Measured heap drift: 0 bytes (threshold: 64 bytes) & stable fragmentation: +0% (threshold: +5%).
+
+[CHECK 10] Trends in-place metric switching, units & empty state...
+  PASS: Trends metric switching (CO2, VOC, Temp, Humid), units, empty state & 0-byte drift verified.
+
+[CHECK 11] Home tab telemetry, quality badges, offline states & card navigation...
+  PASS: Home tab telemetry, quality badges, offline states & card navigation verified.
+
+[CHECK 12] Devices grid, polarity resolution (active_low) & dialog drift...
+  PASS: Devices grid, polarity resolution (active_low inverted wire, preserved display) & 0-byte drift verified.
+
+[CHECK 13] Command timeout, retry usability & late report...
+  PASS: Command timeout (3000 ms) & retry usability verified.
+
+[CHECK 14] Link staleness detection & recovery...
+  PASS: Link staleness bound (5000 ms), disconnection masking, toggle refusal & reconnection verified.
+
+[CHECK 15] Interactive fake node timing & keyboard shortcuts...
+[Interactive] Key 'F': Armed NEXT command to FAIL (node will stay alive but not apply)
+[Interactive] Key 'T': Node STOPPED reporting status frames (simulating link timeout/staleness)
+[Interactive] Key 'T': Node RESUMED reporting status frames
+  PASS: Interactive fake node (700 ms turnaround, 'F' fail, 'T' staleness toggle) verified.
+
+[CHECK 16] Pixel geometry anchor coordinate assertions against prototype...
+  PASS: Pixel geometry anchor coordinates verified against prototype.
+
+[CHECK 17] SNR-driven signal bars, hysteresis, spreading factor & palette fills...
+  PASS: Hysteresis prevented flicker across 10 boundary oscillations (9.5 dB <-> 10.5 dB).
+  PASS: Spreading factor configuration correctly moves demodulator limits and bar levels.
+  Sampled bar fills: Active=0x1BE6 (expected 0x1BE6), Inactive=0x94F2 (expected 0x94F2)
+  Bar pixel count in 2-bar state: active=33, inactive=69
+  PASS: Sub-limit SNR (margin -12.5 dB) kept link 'Connected' (1 bar) and accepted relay command.
+  PASS: Anti-flicker verified: label stayed 'Connected' (1 bar) and cluster positions remained stationary across 10 limit crossings.
+  PASS: SNR mapping, boundaries, hysteresis anti-flicker, SF shift & Study 12 fills verified.
+
+[CHECK 18] Page & dialog rebuild idempotence (pixel-identical across rebuilds)...
+  PASS: Home page rebuild idempotence verified (0 differing pixels).
+  PASS: Trends page rebuild idempotence verified (0 differing pixels).
+  PASS: Devices page rebuild idempotence verified (0 differing pixels).
+  PASS: Settings dialog rebuild idempotence verified (0 differing pixels).
+  PASS: Rebuild idempotence verified across Home, Trends, Devices, and Dialog.
+
+[CHECK 19] Value round-trip idempotence (metric width shifts & restorations)...
+  PASS: CO2 420->1420->420 round-trip rebuild idempotence verified (0 differing pixels).
+  PASS: Temperature 23.5->-2.5->23.5 round-trip rebuild idempotence verified (0 differing pixels).
+  PASS: Value round-trip idempotence verified for width shifts.
+
+[CHECK 20] Device config restore, schema migration & boot TX gating (C1)...
+  PASS: Config restore, schema migration, validation fallback & boot TX gating verified.
+
+[CHECK 21] Auto rule evaluation boundaries, qualification & hold (C7)...
+  PASS: Auto rule boundaries, 3-frame qualification, 10s hold, deadband & fault masking verified.
+
+[CHECK 22] Threshold editor steppers, bounds, validation & draft lifecycle (C8)...
+  PASS: Threshold editor steppers, bounds, validation, reset, back & save verified.
+
+[CHECK 23] Auto mode behavior across tabs, manual override & retry (C9)...
+  PASS: Auto mode across tabs, manual override, error pause & retry verified.
+
+[CHECK 24] Zero flush on Trends/Devices & no false comfort claims (C4, C5)...
+  PASS: Zero flush on Trends/Devices & elimination of false comfort claims verified.
+
+[CHECK 25] V1 Compiled Restore Integration Suite...
+  PASS: V1 Flash restore integration suite passed (missing/current/legacy/truncated/callbacks).
+
+[CHECK 26] V2 Open Dropdown Typography, Pitch >= 44px, Bounds, Scrim & Pointer Interaction...
+  PASS: V2 open dropdown typography, pitch >= 44px, bounds, and pointer interaction verified.
+
+[CHECK 27] Invalid Draft Stepper Creation, Save Disabled, Pointer Cancel & Isolation...
+  PASS: Invalid draft cancel, discard on reopen, and callback isolation verified.
+
+[CHECK 28] V4 Home Tile Mode/State/Action Bounds & Native Spacing...
+  [Hitbox Proof] Recovered Devices switch at x=240 (click 642..709), Retry at x=304 (click 713..760)
+  PASS: V4 Home tile mode/state/action bounds, gaps >= 4px and bottom clearance >= 10px verified.
+
+[CHECK 29] Recording TX Loop (Gated TX Ordering, Periodic & Sequence Sends)...
+  PASS: Recording TX loop, exact bytes, periodic/sequence gating & negative doubles verified.
+
+[CHECK 30] Auto Lifecycle (Sensor Recovery Hold, Reconnect Latch, Explicit Re-arm)...
+  PASS: Auto lifecycle, all 3 rules sensor recovery hold, fresh frame qualification & re-arm verified.
+
+[CHECK 31] 50 Complete Cycles Memory Stress (Peak, Fragmentation, Drift)...
+  Heap before CHECK 31: used=76% free=9856 biggest=7296 frag=26%
+    [Cycle 1 Heap Settled  ] Trends                        : used=74% free=10856 biggest=7632 frag=30%
+    [Cycle 1 Heap Settled  ] Devices                       : used=77% free=9448 biggest=8328 frag=12%
+    [Cycle 1 Heap Immediate] Device settings first rendered: used=63% free=15280 biggest=8624 frag=44%
+    [Cycle 1 Heap Settled  ] Device settings settled       : used=63% free=15280 biggest=8624 frag=44%
+    [Cycle 1 Heap Settled  ] Dropdown open                 : used=65% free=14704 biggest=8624 frag=42%
+    [Cycle 1 Heap Settled  ] Dropdown closed               : used=64% free=14992 biggest=8624 frag=43%
+    [Cycle 1 Heap Settled  ] Auto limits open              : used=65% free=14368 biggest=8624 frag=40%
+    [Cycle 1 Heap Settled  ] Validation error visible (genuine invalid draft): used=65% free=14336 biggest=8624 frag=40%
+    [Cycle 1 Heap Settled  ] Back to device settings       : used=63% free=15248 biggest=8624 frag=44%
+    [Cycle 1 Heap Settled  ] Device settings closed        : used=77% free=9520 biggest=8496 frag=11%
+    [Cycle 1 Heap Settled  ] Home page                     : used=87% free=5560 biggest=4456 frag=20%
+  50-Cycle Stress Results:
+    Immediate Measurements:
+      Peak Used:       76%
+      Min Total Free:  9856 bytes (threshold > 4096, state: Start)
+      Min Largest Blk: 7296 bytes
+      Peak Frag:       44%
+    Settled/Stable Measurements:
+      Peak Used:       87%
+      Min Total Free:  5480 bytes (threshold > 4096, state: Home page)
+      Min Largest Blk: 4000 bytes
+      Peak Frag:       50%
+      Stable Drift:    +72 bytes (cycles 10->50)
+    Auto Lifecycle Counters:
+      Commands Sent:   10
+      Pending States:  5
+      Timeouts:        5
+      Error Latches:   5
+      Recoveries:      5
+      Explicit Rearms: 5
+  PASS: 50 complete cycles stress passed with >4096 free and stable heap.
+
+[CHECK 32] >=18px typography, air summary, focused editor and live data...
+  Expected negative typography diagnostic follows:
+  Font audit: visible text uses a font outside the >=18px contract
+  Expected negative collision/containment diagnostics follow:
+  Glyph collision: sibling 'StatA' ([20..99, 20..43]) overlaps sibling 'StatB' ([60..139, 20..43])
+  Glyph collision: sibling 'Ventilation Fan' ([52..227, 6..38]) overlaps sibling 'widget' ([150..203, 10..39])
+  Glyph collision: sibling '10000 ppm / 9950 ppm' ([600..739, 10..53]) overlaps sibling '>' ([712..731, 22..41])
+  Glyph collision: sibling 'widget' ([440..731, 201..246]) overlaps sibling 'Save rejected: command pending' ([430..729, 210..239])
+  Glyph containment: visible label 'Long label that extends way beyond parent bounds' ([100..349, 100..139]) extends outside ancestor ([100..199, 100..149])
+  PASS: All visible fonts >=18px; editor, validity and summary transitions verified.
+
+[CHECK 33] Comprehensive probe diagnostic scenario suite (13 critical fixtures)...
+  PASS: All 13 probe diagnostic scenarios passed containment and typography audits.
+
+[CHECK 34] Calibrated micro-geometry, pointer hit-testing, name boundary & concurrent auto...
+  PASS: Calibrated micro-geometry, pointer hit-testing, name boundary & concurrent auto verified.
+
+====================================================
+ Performance Flush & Draw Metrics (Measured)
+====================================================
+  (a1) 10 Identical Frames (Home Valid):        0 flushes, 0 pixels pushed
+  (a2) 10 Identical Frames (Home Unavail):      0 flushes, 0 pixels pushed
+  (a3) 10 Identical Frames (Trends Valid):      0 flushes, 0 pixels pushed
+  (a4) 10 Identical Frames (Trends Unavail):    0 flushes, 0 pixels pushed
+  (a5) 10 Identical Frames (Devices Valid):     0 flushes, 0 pixels pushed
+  (a6) 10 Identical Frames (Devices Unavail):   0 flushes, 0 pixels pushed
+  (a7) 10 Identical Frames (Auto Purifier/VOC  Valid):   0 flushes, 0 pixels pushed
+  (a8) 10 Identical Frames (Auto Purifier/VOC  Unavail): 0 flushes, 0 pixels pushed
+  (a9) 10 Identical Frames (Auto Fan/CO2       Valid):   0 flushes, 0 pixels pushed
+  (a10) 10 Identical Frames (Auto Fan/CO2       Unavail): 0 flushes, 0 pixels pushed
+  (a11) 10 Identical Frames (Auto Humidifier/RH Valid):   0 flushes, 0 pixels pushed
+  (a12) 10 Identical Frames (Auto Humidifier/RH Unavail): 0 flushes, 0 pixels pushed
+  (b) 10 CO2-Changing Status Frames:      18 flushes, 80955 pixels pushed
+  (c) 1 Navigation Cycle (H->T->D->H): 118 flushes, 852604 pixels pushed
+  (d) Idle Home Sub-second (500ms):   0 flushes, 0 pixels pushed
+  (e) Idle Home Full-second (1000ms): 1 flushes, 4558 pixels pushed (uptime header only)
+  (f) Per-tick Change Test:           Revision counter comparison + link staleness check (nominal check, 0 flushes)
+
+====================================================
+ Summary: 34 / 34 checks passed.
+====================================================
+

@@ -1,0 +1,62 @@
+====================================================================
+ Smart Hub UI — Permanent Trends Benchmark & Responsiveness Fixture
+====================================================================
+
+--- Benchmark State: 1. Empty Trends (0 points) ---
+  Metric 0 (CO2  ): pixels=      0 bytes=      0 flushes= 0 max_area=    0 max_w=  0 800w=0 rect=[800..  0, 480..  0] cpu_ms=0.00 heap_free=13936 biggest=12720
+  Metric 1 (VOC  ): pixels=  52917 bytes= 105834 flushes= 8 max_area= 7992 max_w=194 800w=0 rect=[ 19..367, 107..284] cpu_ms=0.00 heap_free=13864 biggest=12720
+  Metric 2 (Temp ): pixels=  60844 bytes= 121688 flushes=10 max_area= 7954 max_w=245 800w=0 rect=[ 19..473, 107..372] cpu_ms=0.00 heap_free=13816 biggest=12600
+  Metric 3 (Humid): pixels=  60844 bytes= 121688 flushes=10 max_area= 7954 max_w=245 800w=0 rect=[ 19..473, 107..460] cpu_ms=1.00 heap_free=13768 biggest=12480
+
+--- Benchmark State: 2. Singleton Trends (1 point) ---
+  Metric 0 (CO2  ): pixels= 154706 bytes= 309412 flushes=26 max_area= 7980 max_w=466 800w=0 rect=[ 19..761, 107..460] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 1 (VOC  ): pixels= 149217 bytes= 298434 flushes=24 max_area= 7992 max_w=466 800w=0 rect=[ 19..761, 107..419] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 2 (Temp ): pixels= 156809 bytes= 313618 flushes=26 max_area= 7980 max_w=466 800w=0 rect=[ 19..761, 107..419] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 3 (Humid): pixels= 156809 bytes= 313618 flushes=26 max_area= 7980 max_w=466 800w=0 rect=[ 19..761, 107..460] cpu_ms=1.00 heap_free=13768 biggest=12480
+
+--- Benchmark State: 3. Fully Populated Trends (16 points) ---
+  Metric 0 (CO2  ): pixels=  65593 bytes= 131186 flushes=13 max_area= 7954 max_w=194 800w=0 rect=[ 19..721, 107..460] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 1 (VOC  ): pixels=  60786 bytes= 121572 flushes=11 max_area= 7992 max_w=194 800w=0 rect=[ 19..721, 107..284] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 2 (Temp ): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..419] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 3 (Humid): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..460] cpu_ms=1.00 heap_free=13768 biggest=12480
+
+--- Benchmark State: 4. Invalid-Gap Trends (gaps at slots 1, 4, 7, 10, 13) ---
+  Metric 0 (CO2  ): pixels=  65593 bytes= 131186 flushes=13 max_area= 7954 max_w=194 800w=0 rect=[ 19..721, 107..460] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 1 (VOC  ): pixels=  60786 bytes= 121572 flushes=11 max_area= 7992 max_w=194 800w=0 rect=[ 19..721, 107..284] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 2 (Temp ): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..419] cpu_ms=0.00 heap_free=13768 biggest=12480
+  Metric 3 (Humid): pixels=  90685 bytes= 181370 flushes=17 max_area= 7965 max_w=245 800w=0 rect=[ 19..715, 107..460] cpu_ms=0.00 heap_free=13768 biggest=12480
+
+--- Benchmark State: 5. Live-Updating Trends ---
+  Autonomous tick: pixels=111056 bytes=222112 flushes=21 max_area=7935 max_w=466 800w=0 rect=[221..772, 119..449] cpu_ms=1.00
+
+====================================================================
+ Two-Stage Tactile Feedback Measurement (User Tap on VOC card)
+====================================================================
+Stage 1 (Immediate Tactile Highlight):
+  pixels   : 42080 px (84160 bytes)
+  flushes  : 6 flushes (bounded <= 6)
+  rect     : [19..339, 107..284] (Left-rail tab cards only!)
+  pending  : TRUE (Chart deferred)
+  host_cpu : 0.00 ms (Tactile response completed instantly)
+
+Stage 2 (Deferred Chart & Stats Rasterization in ui_tick):
+  pixels   : 98718 px (197436 bytes)
+  flushes  : 17 flushes
+  rect     : [221..761, 173..419] (Chart area and stats)
+  pending  : FALSE (Cleared)
+  host_cpu : 0.00 ms
+
+====================================================================
+ Rapid Tap Coalescing Benchmark (Burst: VOC -> TEMP -> HUMIDITY)
+====================================================================
+Uncoalesced (3 full chart renders) : 452218 px, 75 flushes, 1.00 ms
+Coalesced (3 tactile + 1 chart)    : 243139 px, 39 flushes, 0.00 ms
+Savings from Coalescing            : 209079 px (-46.2% pixels), 36 flushes (-48.0% flushes)
+
+====================================================================
+ 100-Tap Rapid Switching Stress & Memory Stability
+====================================================================
+  100 switches : 14968375 px, 2500 flushes, 32.00 ms total CPU
+  Heap before  : 13768 B free (largest 12480 B)
+  Heap after   : 13768 B free (largest 12480 B)
+  Heap drift   : 0 B (Zero drift verified!)

@@ -1,0 +1,54 @@
+[
+    {
+        "file":  "ui.c",
+        "sha256":  "2712ac29d73a6df4d0946267d0089062d29336f21c9569da9d64020499649b91"
+    },
+    {
+        "file":  "ui_auto.c",
+        "sha256":  "efc85f4d54b433f67f21ec7b822ee74182ad83f9d45c35e9a490f6bb60ba2b74"
+    },
+    {
+        "file":  "ui_theme.c",
+        "sha256":  "399297be04672ef6fc817b60c2bb2b0a0bcc3cf50dc156b7ed4ad4e034ad27d8"
+    },
+    {
+        "file":  "ui_theme.h",
+        "sha256":  "130d8ac2bdf34bd09d44a7aa50bf30f7921530d4fe0a7c4aa1dfd5901276925e"
+    },
+    {
+        "file":  "ui_icons.c",
+        "sha256":  "a03035b9494a047cf40928bc74a3a09c4e49505a00b5d6d4588eea3fffd159d1"
+    },
+    {
+        "file":  "ui_fonts.c",
+        "sha256":  "d13965717edece44a5c834bc8745a4d17a30b22ba24790e255108d88ceaaa9ca"
+    },
+    {
+        "file":  "ui_splash_logo.c",
+        "sha256":  "d1b934c8a31907ed14a0865e1f674f456630fa37c57c452ce3dc895eb0b65ebd"
+    },
+    {
+        "file":  "ui_mcu_profile.h",
+        "sha256":  "cbf5b1b8afd4984b04a51a0f1b19353bc3e4648afa2e5faa0dc784cc8980364c"
+    },
+    {
+        "file":  "sim_pc/lv_conf.h",
+        "sha256":  "c861d936c91cc6960d4186c43be0b130954cd4e0bb5cfbab5af542b70a22f4d3"
+    },
+    {
+        "file":  "sim_pc/main.c",
+        "sha256":  "f262130205e7107be3ff65d26e29331db53a7a34f44350a04b3b29f40b972542"
+    },
+    {
+        "file":  "sim_pc/build/sim_pc.exe",
+        "sha256":  "d643e19de177f1e42bf77e847482e6b4207f7b3be8c62b364045060f581aa10a"
+    },
+    {
+        "file":  "docs/reviews/2026-09-21-const-style-review/probe.c",
+        "sha256":  "11dfbef9c9e1ea56c16b2fb6c5e76bae56367c96a45c7410a1541af46f8939ab"
+    },
+    {
+        "file":  "docs/reviews/2026-09-21-const-style-review/build-40k/sim_pc.exe",
+        "sha256":  "4a91294adf0ed6460055f2d1602f6bb9581bb0f6f95bb7aaf27107a54c4629ce"
+    }
+]

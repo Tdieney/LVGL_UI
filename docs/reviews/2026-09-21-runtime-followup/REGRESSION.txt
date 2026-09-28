@@ -1,0 +1,225 @@
+--- Running Smoke Test ---
+lvgl heap: used=85% free=6680 biggest=6680 frag=0%
+smoke: PASS (768000 pixels flushed)
+--- Running Regression Suite ---
+====================================================
+ Smart Hub UI - Comprehensive Regression Test Suite 
+====================================================
+
+[CHECK 1] Uptime calculation, formatting & 32-bit rollover...
+  PASS: Uptime boundaries, production wrap link & Auto hold verified.
+
+[CHECK 2] Signed fixed-point temperature formatting...
+  PASS: Signed temperature formatting verified (-2.5, -0.5, 0.0, 23.5, -12.0).
+
+[CHECK 3] Desired versus reported relay state & remote flips...
+  PASS: Desired vs reported relay state, timeout, late report & unprompted node report verified.
+
+[CHECK 4] Hub-local device settings immediate persistence (Defect fix)...
+  PASS: Hub-local device configuration immediate persistence verified (observed 5.0s, no reversion).
+
+[CHECK 5] Font glyph coverage (62px digits, unicode fallbacks)...
+  PASS: Font glyph coverage verified.
+
+[CHECK 6] Trends sliding history window & midnight clock wrap...
+  PASS: Trends sliding history window & midnight clock wrap verified.
+
+[CHECK 7] Chart point inspection returning tooltip...
+  Synthetic indev touch tooltip: '14:21 · 425 ppm'
+  Inspected point 6 tooltip: '14:23 · 430 ppm'
+  PASS: Chart point inspection returning tooltip (both synthetic touch & direct API) verified.
+
+[CHECK 8] Heap headroom assertion across all screens (> 4 KiB free)...
+  Home page:    used=88% free=5560 biggest=3760 frag=33%
+  Trends (data):used=74% free=11280 biggest=5640 frag=50%
+  Trends (empty):used=74% free=11280 biggest=5640 frag=50%
+  Devices page: used=78% free=9504 biggest=5640 frag=41%
+  Dialog open:  used=64% free=15848 biggest=9120 frag=43%
+  Splash screen:used=78% free=9848 biggest=8200 frag=17%
+  Splash->Home: used=76% free=10432 biggest=8384 frag=20%
+  PASS: Heap headroom verified with > 4 KiB free across all views.
+
+[CHECK 9] Memory stability across 50 page navigation cycles...
+  Start: used=88% free=5480 biggest=3680 frag=33%
+  End:   used=88% free=5480 biggest=3680 frag=33%
+  PASS: Measured heap drift: 0 bytes (threshold: 64 bytes) & stable fragmentation: +0% (threshold: +5%).
+
+[CHECK 10] Trends in-place metric switching, units & empty state...
+  PASS: Trends metric switching (CO2, VOC, Temp, Humid), units, empty state & 0-byte drift verified.
+
+[CHECK 11] Home tab telemetry, quality badges, offline states & card navigation...
+  PASS: Home tab telemetry, quality badges, offline states & card navigation verified.
+
+[CHECK 12] Devices grid, polarity resolution (active_low) & dialog drift...
+  PASS: Devices grid, polarity resolution (active_low inverted wire, preserved display) & 0-byte drift verified.
+
+[CHECK 13] Command timeout, retry usability & late report...
+  PASS: Command timeout (3000 ms) & retry usability verified.
+
+[CHECK 14] Link staleness detection & recovery...
+  PASS: Link staleness bound (5000 ms), disconnection masking, toggle refusal & reconnection verified.
+
+[CHECK 15] Interactive fake node timing & keyboard shortcuts...
+[Interactive] Key 'F': Armed NEXT command to FAIL (node will stay alive but not apply)
+[Interactive] Key 'T': Node STOPPED reporting status frames (simulating link timeout/staleness)
+[Interactive] Key 'T': Node RESUMED reporting status frames
+  PASS: Interactive fake node (700 ms turnaround, 'F' fail, 'T' staleness toggle) verified.
+
+[CHECK 16] Pixel geometry anchor coordinate assertions against prototype...
+  PASS: Pixel geometry anchor coordinates verified against prototype.
+
+[CHECK 17] SNR-driven signal bars, hysteresis, spreading factor & palette fills...
+  PASS: Hysteresis prevented flicker across 10 boundary oscillations (9.5 dB <-> 10.5 dB).
+  PASS: Spreading factor configuration correctly moves demodulator limits and bar levels.
+  Sampled bar fills: Active=0x1BE6 (expected 0x1BE6), Inactive=0x94F2 (expected 0x94F2)
+  Bar pixel count in 2-bar state: active=33, inactive=69
+  PASS: Sub-limit SNR (margin -12.5 dB) kept link 'Connected' (1 bar) and accepted relay command.
+  PASS: Anti-flicker verified: label stayed 'Connected' (1 bar) and cluster positions remained stationary across 10 limit crossings.
+  PASS: SNR mapping, boundaries, hysteresis anti-flicker, SF shift & Study 12 fills verified.
+
+[CHECK 18] Page & dialog rebuild idempotence (pixel-identical across rebuilds)...
+  PASS: Home page rebuild idempotence verified (0 differing pixels).
+  PASS: Trends page rebuild idempotence verified (0 differing pixels).
+  PASS: Devices page rebuild idempotence verified (0 differing pixels).
+  PASS: Settings dialog rebuild idempotence verified (0 differing pixels).
+  PASS: Rebuild idempotence verified across Home, Trends, Devices, and Dialog.
+
+[CHECK 19] Value round-trip idempotence (metric width shifts & restorations)...
+  PASS: CO2 420->1420->420 round-trip rebuild idempotence verified (0 differing pixels).
+  PASS: Temperature 23.5->-2.5->23.5 round-trip rebuild idempotence verified (0 differing pixels).
+  PASS: Value round-trip idempotence verified for width shifts.
+
+[CHECK 20] Device config restore, schema migration & boot TX gating (C1)...
+  PASS: Config restore, schema migration, validation fallback & boot TX gating verified.
+
+[CHECK 21] Auto rule evaluation boundaries, qualification & hold (C7)...
+  PASS: Auto rule boundaries, 3-frame qualification, 10s hold, deadband & fault masking verified.
+
+[CHECK 22] Threshold editor steppers, bounds, validation & draft lifecycle (C8)...
+  PASS: Threshold editor steppers, bounds, validation, reset, back & save verified.
+
+[CHECK 23] Auto mode behavior across tabs, manual override & retry (C9)...
+  PASS: Auto mode across tabs, manual override, error pause & retry verified.
+
+[CHECK 24] Zero flush on Trends/Devices & no false comfort claims (C4, C5)...
+  PASS: Zero flush on Trends/Devices & elimination of false comfort claims verified.
+
+[CHECK 25] V1 Compiled Restore Integration Suite...
+  PASS: V1 Flash restore integration suite passed (missing/current/legacy/truncated/callbacks).
+
+[CHECK 26] V2 Open Dropdown Typography, Pitch >= 44px, Bounds, Scrim & Pointer Interaction...
+  PASS: V2 open dropdown typography, pitch >= 44px, bounds, and pointer interaction verified.
+
+[CHECK 27] Invalid Draft Stepper Creation, Save Disabled, Pointer Cancel & Isolation...
+  PASS: Invalid draft cancel, discard on reopen, and callback isolation verified.
+
+[CHECK 28] V4 Home Tile Mode/State/Action Bounds & Native Spacing...
+  [Hitbox Proof] Recovered Devices switch at x=240 (click 642..709), Retry at x=304 (click 713..760)
+  PASS: V4 Home tile mode/state/action bounds, gaps >= 4px and bottom clearance >= 10px verified.
+
+[CHECK 29] Recording TX Loop (Gated TX Ordering, Periodic & Sequence Sends)...
+  PASS: Recording TX loop, exact bytes, periodic/sequence gating & negative doubles verified.
+
+[CHECK 30] Auto Lifecycle (Sensor Recovery Hold, Reconnect Latch, Explicit Re-arm)...
+  PASS: Auto lifecycle, all 3 rules sensor recovery hold, fresh frame qualification & re-arm verified.
+
+[CHECK 31] 50 Complete Cycles Memory Stress (Peak, Fragmentation, Drift)...
+  Heap before CHECK 31: used=76% free=10352 biggest=7736 frag=26%
+    [Cycle 1 Heap Settled  ] Trends                        : used=74% free=11368 biggest=8088 frag=29%
+    [Cycle 1 Heap Settled  ] Devices                       : used=77% free=10016 biggest=8864 frag=12%
+    [Cycle 1 Heap Immediate] Device settings first rendered: used=64% free=15776 biggest=8992 frag=44%
+    [Cycle 1 Heap Settled  ] Device settings settled       : used=64% free=15776 biggest=8992 frag=44%
+    [Cycle 1 Heap Settled  ] Dropdown open                 : used=65% free=15200 biggest=8992 frag=41%
+    [Cycle 1 Heap Settled  ] Dropdown closed               : used=64% free=15488 biggest=8992 frag=42%
+    [Cycle 1 Heap Settled  ] Auto limits open              : used=66% free=14792 biggest=8992 frag=40%
+    [Cycle 1 Heap Settled  ] Validation error visible (genuine invalid draft): used=66% free=14760 biggest=8992 frag=40%
+    [Cycle 1 Heap Settled  ] Back to device settings       : used=64% free=15752 biggest=8992 frag=43%
+    [Cycle 1 Heap Settled  ] Device settings closed        : used=77% free=10016 biggest=8864 frag=12%
+    [Cycle 1 Heap Settled  ] Home page                     : used=87% free=6008 biggest=4896 frag=19%
+  50-Cycle Stress Results:
+    Immediate Measurements:
+      Peak Used:       76%
+      Min Total Free:  10352 bytes (threshold > 4096, state: Start)
+      Min Largest Blk: 7736 bytes
+      Peak Frag:       44%
+    Settled/Stable Measurements:
+      Peak Used:       87%
+      Min Total Free:  5992 bytes (threshold > 4096, state: Home page)
+      Min Largest Blk: 4504 bytes
+      Peak Frag:       52%
+      Stable Drift:    +40 bytes (cycles 10->50)
+    Auto Lifecycle Counters:
+      Commands Sent:   10
+      Pending States:  5
+      Timeouts:        5
+      Error Latches:   5
+      Recoveries:      5
+      Explicit Rearms: 5
+  PASS: 50 complete cycles stress passed with >4096 free and stable heap.
+
+[CHECK 32] >=18px typography, air summary, focused editor and live data...
+  Expected negative typography diagnostic follows:
+  Font audit: visible text uses a font outside the >=18px contract
+  Expected negative collision/containment diagnostics follow:
+  Glyph collision: sibling 'StatA' ([20..99, 20..43]) overlaps sibling 'StatB' ([60..139, 20..43])
+  Glyph collision: sibling 'Ventilation Fan' ([52..227, 6..38]) overlaps sibling 'widget' ([150..203, 10..39])
+  Glyph collision: sibling '10000 ppm / 9950 ppm' ([600..739, 10..53]) overlaps sibling '>' ([712..731, 22..41])
+  Glyph collision: sibling 'widget' ([440..731, 201..246]) overlaps sibling 'Save rejected: command pending' ([430..729, 210..239])
+  Glyph containment: visible label 'Long label that extends way beyond parent bounds' ([100..349, 100..139]) extends outside ancestor ([100..199, 100..149])
+  PASS: All visible fonts >=18px; editor, validity and summary transitions verified.
+
+[CHECK 33] Comprehensive probe diagnostic scenario suite (13 critical fixtures)...
+  PASS: All 13 probe diagnostic scenarios passed containment and typography audits.
+
+[CHECK 34] Calibrated micro-geometry, pointer hit-testing, name boundary & concurrent auto...
+  PASS: Calibrated micro-geometry, pointer hit-testing, name boundary & concurrent auto verified.
+
+====================================================
+ Performance Flush & Draw Metrics (Measured)
+====================================================
+  (a) 10 Identical Status Frames (Home):  0 flushes, 0 pixels pushed
+  (b) 10 CO2-Changing Status Frames:      18 flushes, 80955 pixels pushed
+  (c) 1 Navigation Cycle (H->T->D->H): 118 flushes, 852604 pixels pushed
+  (d) Idle Home Sub-second (500ms):   0 flushes, 0 pixels pushed
+  (e) Idle Home Full-second (1000ms): 1 flushes, 4644 pixels pushed (uptime header only)
+  (f) Per-tick Change Test:           Revision counter comparison + link staleness check (nominal check, 0 flushes)
+
+====================================================
+ Summary: 34 / 34 checks passed.
+====================================================
+--- Running Single Headless Shot ---
+lvgl heap: used=85% free=6680 biggest=6680 frag=0%
+shot: wrote C:\Users\vanth\AppData\Local\Temp\smart_hub_6f40775893ac476a9ed98eb9086274de.raw (800x480 RGB565)
+--- Running Full Scenario Generator (Timeout: 15s) ---
+Generating deterministic scenario framebuffers into 'C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884'...
+  [1/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/splash.raw
+  [2/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_good.raw
+  [3/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_moderate.raw
+  [4/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_poor.raw
+  [5/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_offline.raw
+  [5b] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_auto_paused_switch.raw
+  [6/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_sensor_fail.raw
+  [7/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_relay_pending.raw
+  [8/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_relay_retry.raw
+  [9/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/trends_data.raw
+  [9b] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/trends_voc.raw
+  [9c] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/trends_temp.raw
+  [9d] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/trends_humid.raw
+  [10/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/trends_empty.raw
+  [11/12] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_grid.raw
+  [12/13] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_settings.raw
+  [13/15] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_link_degraded.raw
+  [14/15] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_auto_paused.raw
+  [15] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_auto_thresholds.raw
+  [16] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_settings_manual_only.raw
+  [17] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_auto_purifier.raw
+  [18] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_auto_humidifier.raw
+  [19] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_auto_max_10000.raw
+  [20] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/devices_auto_invalid_draft.raw
+  [21] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/home_temp_humid_invalid.raw
+  [22] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/dropdown_open_top.raw
+  [23] Generated C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884/dropdown_open_bottom.raw
+lvgl heap: used=76% free=10456 biggest=8344 frag=21%
+All 24 scenario shots generated successfully in 'C:\Users\vanth\AppData\Local\Temp\smart_hub_shots_a7badae4c6f241b093bff0debf600884'.
+Generated 27 scenario shots successfully.
+Smart Hub UI regression: PASS

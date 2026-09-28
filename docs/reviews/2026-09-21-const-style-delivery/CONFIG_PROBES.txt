@@ -1,0 +1,5 @@
+assert_probe: exit 0
+STYLE_SENTINEL actual=aabbccdd expected=aabbccdd
+COLOR swap=0 actual=ef7c expected=ef7c
+swap_probe: exit 0
+COLOR swap=1 actual=7cef expected=7cef

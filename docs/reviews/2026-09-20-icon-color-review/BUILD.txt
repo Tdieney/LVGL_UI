@@ -1,0 +1,15 @@
+Configuring simulator in C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\sim_pc\build
+CMake Warning (dev) at build/_deps/lvgl-src/env_support/cmake/custom.cmake:66 (install):
+  Policy CMP0177 is not set: install() DESTINATION paths are normalized.  Run
+  "cmake --help-policy CMP0177" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  build/_deps/lvgl-src/CMakeLists.txt:16 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (0.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/Users/vanth/Documents/MyDocument/Embedded/LVGL_UI/sim_pc/build
+Building simulator (Release)
+ninja: no work to do.
+Simulator ready: C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\sim_pc\build\sim_pc.exe

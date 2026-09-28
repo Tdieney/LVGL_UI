@@ -1,0 +1,79 @@
+MEM lv_init                  free=40408 largest=40384 used=7% frag=1% max_used=104
+MEM display/default theme    free=34744 largest=34744 used=20% frag=0% max_used=3204
+MEM home rendered            free=8464 largest=8464 used=81% frag=0% max_used=16490
+IDENTICAL HOME flushes=0 pixels=0
+IDLE NO RX flushes=0 pixels=0
+UPTIME '99:59:59' separator gap=28
+UPTIME '100:00:00' separator gap=23
+BUS FAULT Home air='Unavailable' co2='???' voc='???' temp='???' humidity='???'
+BUS FAULT Auto editor live='No live data'
+IDENTICAL AUTO EDITOR flushes=0 pixels=0
+NO-OP SAVE name='Studio Fan' callbacks=0
+REOPEN DROPDOWN 100x free=17160->17152 delta=-8 list_styles=16->16
+TRENDS CO2 cur='100' min='100' max='100' unit='ppm'
+TRENDS RH cur='100' min='100' max='100' unit='%'
+TRENDS RH next cur='99'
+CHART first ymin=96 ymax=104 cache=96..104
+CHART rebuilt ymin=96 ymax=104 cache=96..104
+ISOLATED point=0 xy=312,379 forest_pixels_9x9=13
+ISOLATED point=2 xy=529,339 forest_pixels_9x9=13
+ISOLATED point=4 xy=746,300 forest_pixels_9x9=29
+RESELECT SAME METRIC 200x free=13080->13080 delta=0 selected_style_count=3->3
+UPTIME FOLLOWUP '100:00:00' gap=23 label_x=518 width=97 clock_x=490
+UPTIME FOLLOWUP '100:08:08' gap=27 label_x=518 width=93 clock_x=490
+UPTIME FOLLOWUP '188:58:58' gap=35 label_x=518 width=85 clock_x=490
+UPTIME FOLLOWUP '1000:00:00' gap=22 label_x=506 width=110 clock_x=478
+UPTIME FOLLOWUP '1888:58:58' gap=36 label_x=506 width=96 clock_x=478
+UPTIME FOLLOWUP '1193046:28:15' gap=47 label_x=467 width=124 clock_x=439
+UPTIME RECONNECT '111:11:11' gap=59
+UPTIME AFTER RECONNECT '111:20:00' gap=37
+AVAIL f=0 HOME co2=420 voc=80 temp=23.5 rh=45
+AVAIL f=0 TRENDS co2=420 voc=80 temp=23.5 rh=45
+AVAIL f=0 AUTO dev=0 live=80
+VALID AUTO dev=0 flushes=0 pixels=0
+AVAIL f=0 AUTO dev=1 live=420
+VALID AUTO dev=1 flushes=0 pixels=0
+AVAIL f=0 AUTO dev=2 live=45
+VALID AUTO dev=2 flushes=0 pixels=0
+AVAIL f=1 HOME co2=??? voc=??? temp=??? rh=???
+AVAIL f=1 TRENDS co2=??? voc=??? temp=??? rh=???
+AVAIL f=1 AUTO dev=0 live=No live data
+AVAIL f=1 AUTO dev=1 live=No live data
+AVAIL f=1 AUTO dev=2 live=No live data
+AVAIL f=2 HOME co2=??? voc=??? temp=23.5 rh=45
+AVAIL f=2 TRENDS co2=??? voc=??? temp=23.5 rh=45
+AVAIL f=2 AUTO dev=0 live=No live data
+AVAIL f=2 AUTO dev=1 live=No live data
+AVAIL f=2 AUTO dev=2 live=45
+AVAIL f=3 HOME co2=420 voc=80 temp=??? rh=???
+AVAIL f=3 TRENDS co2=420 voc=80 temp=??? rh=???
+AVAIL f=3 AUTO dev=0 live=80
+AVAIL f=3 AUTO dev=1 live=420
+AVAIL f=3 AUTO dev=2 live=No live data
+AVAIL f=4 HOME co2=??? voc=80 temp=23.5 rh=45
+AVAIL f=4 TRENDS co2=??? voc=80 temp=23.5 rh=45
+AVAIL f=4 AUTO dev=0 live=80
+AVAIL f=4 AUTO dev=1 live=No live data
+AVAIL f=4 AUTO dev=2 live=45
+AVAIL f=5 HOME co2=420 voc=0 temp=23.5 rh=45
+AVAIL f=5 TRENDS co2=420 voc=0 temp=23.5 rh=45
+AVAIL f=5 AUTO dev=0 live=0
+AVAIL f=5 AUTO dev=1 live=420
+AVAIL f=5 AUTO dev=2 live=45
+AVAIL f=6 HOME co2=420 voc=??? temp=23.5 rh=45
+AVAIL f=6 TRENDS co2=420 voc=??? temp=23.5 rh=45
+AVAIL f=6 AUTO dev=0 live=No live data
+AVAIL f=6 AUTO dev=1 live=420
+AVAIL f=6 AUTO dev=2 live=45
+AVAIL f=7 HOME co2=??? voc=80 temp=23.5 rh=45
+AVAIL f=7 TRENDS co2=??? voc=80 temp=23.5 rh=45
+AVAIL f=7 AUTO dev=0 live=80
+AVAIL f=7 AUTO dev=1 live=No live data
+AVAIL f=7 AUTO dev=2 live=45
+AVAIL f=8 HOME co2=420 voc=80 temp=23.5 rh=???
+AVAIL f=8 TRENDS co2=420 voc=80 temp=23.5 rh=???
+AVAIL f=8 AUTO dev=0 live=80
+AVAIL f=8 AUTO dev=1 live=420
+AVAIL f=8 AUTO dev=2 live=No live data
+LINK OFFLINE text='Disconnected' x1=655 x2=777 width=123 screen_right=799 expected_right=777
+LINK RECONNECTED text='Connected' x1=678 x2=777

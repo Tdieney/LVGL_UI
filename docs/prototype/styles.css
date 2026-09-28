@@ -18,7 +18,7 @@
   --switch-off:#bdc7d6;
   --card-shadow:0 2px 10px 0 rgba(24,43,77,.06);
   --radius:18px;
-  font-family:"Segoe UI",Arial,sans-serif;
+  font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   color:var(--ink);
   font-synthesis:none
 }
@@ -1032,7 +1032,7 @@ dialog {
 }
 
 .splash {
-  background:#e9ecf1
+  background:var(--canvas)
 }
 
 /* Study 04: native 800x480 readability, without the secondary copy. */
@@ -1157,8 +1157,8 @@ dialog select { background:var(--canvas); }
 #content { height:360px; padding:12px 20px; }
 .home-layout { grid-template-columns:1fr 1fr 236px; grid-template-rows:208px 116px; gap:12px; }
 .sensor-card { padding:16px 18px; text-align:left; display:flex; flex-direction:column; }
-.sensor-co2 { background:#d6e7ff; color:#153e79; }
-.sensor-voc { background:#e7dbff; color:#483277; }
+.sensor-co2 { background:#adceff; color:#153e79; }
+.sensor-voc { background:#ceb5f7; color:#483277; }
 .sensor-heading { display:flex; align-items:center; justify-content:space-between; }
 .sensor-label { font-size:24px; font-weight:600; line-height:30px; }
 .sensor-heading .icon { width:28px; height:28px; }
@@ -1170,8 +1170,8 @@ dialog select { background:var(--canvas); }
 .status { border-radius:8px; padding:3px 8px; line-height:20px; }
 .comfort-stack { gap:12px; grid-template-rows:repeat(2,minmax(0,1fr)); min-height:0; }
 .comfort-card { padding:10px 12px; gap:10px; min-height:0; }
-.comfort-temperature { background:#ffebce; }
-.comfort-humidity { background:#ceefe7; }
+.comfort-temperature { background:#ffd394; }
+.comfort-humidity { background:#94d7c6; }
 .comfort-card .icon-box { width:28px; height:36px; background:transparent; }
 .comfort-temperature .icon-box { color:#985116; }
 .comfort-humidity .icon-box { color:#17665d; }
@@ -1190,12 +1190,12 @@ dialog select { background:var(--canvas); }
 .page-title { height:36px; margin-bottom:12px; }
 .page-title h1 { font-size:30px; line-height:36px; }
 .metric-tabs { margin-bottom:12px; }
-.metric-tabs button { background:#deebf7; border-radius:12px; font-weight:600; }
+.metric-tabs button { background:#bdd3ef; border-radius:12px; font-weight:600; }
 .metric-tabs button[aria-pressed=true] { background:var(--action-fill); }
 .chart-card { height:228px; background:#ffffff; }
 .chart-unavailable { top:auto; bottom:12px; right:16px; background:#ffefef; border-radius:6px; padding:2px 6px; }
 .device-large { height:136px; background:var(--device-fill); }
-.device-large .icon-box { background:#deebff; }
+.device-large .icon-box { background:#b5cef7; }
 .device-large-bottom { margin-top:8px; }
 .primary { background:var(--action-fill); }
 dialog { background:#ffffff; }

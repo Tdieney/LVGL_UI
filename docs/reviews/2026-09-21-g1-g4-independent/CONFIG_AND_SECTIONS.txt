@@ -1,0 +1,16 @@
+[SMOKE] Starting production UI smoke test (UI_TEST_HOOKS disabled)...
+[Warn]	(0.000, +0)	 lv_init: Style sanity checks are enabled that uses more RAM 	(in lv_obj.c line #181)
+[SMOKE] Production UI smoke test PASSED successfully.
+STYLE_SENTINEL actual=aabbccdd expected=aabbccdd
+COLOR swap=0 actual=ef7c expected=ef7c
+COLOR swap=1 actual=7cef expected=7cef
+   text	   data	    bss	    dec	    hex	filename
+  89124	    576	   4064	  93764	  16e44	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\docs\reviews\2026-09-21-g1-g4-independent\build-assert\CMakeFiles\smoke_production.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui.c.obj
+   3592	      0	      0	   3592	    e08	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\docs\reviews\2026-09-21-g1-g4-independent\build-assert\CMakeFiles\smoke_production.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui_auto.c.obj
+ 100336	      0	      0	 100336	  187f0	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\docs\reviews\2026-09-21-g1-g4-independent\build-assert\CMakeFiles\smoke_production.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui_fonts.c.obj
+  39424	      0	      0	  39424	   9a00	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\docs\reviews\2026-09-21-g1-g4-independent\build-assert\CMakeFiles\smoke_production.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui_icons.c.obj
+  48992	      0	      0	  48992	   bf60	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\docs\reviews\2026-09-21-g1-g4-independent\build-assert\CMakeFiles\smoke_production.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui_splash_logo.c.obj
+   3232	      0	      0	   3232	    ca0	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\docs\reviews\2026-09-21-g1-g4-independent\build-assert\CMakeFiles\smoke_production.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui_theme.c.obj
+   text	   data	    bss	    dec	    hex	filename
+   2944	      0	      0	   2944	    b80	C:\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\sim_pc\build\CMakeFiles\sim_pc.dir\C_\Users\vanth\Documents\MyDocument\Embedded\LVGL_UI\ui_theme.c.obj
+
