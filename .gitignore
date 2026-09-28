@@ -22,6 +22,7 @@ cmake_install.cmake
 
 # IDEs & Local configurations
 .claude/
+.agents/
 .vscode/
 .idea/
 *.user
@@ -45,4 +46,5 @@ desktop.ini
 sim_pc/build_review*/
 scratch/
 build_shots/
+smart_hub_ui_*.zip
 .temp_tiles_*.png
