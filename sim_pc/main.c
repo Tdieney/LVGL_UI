@@ -1002,12 +1002,12 @@ static int run_regression(void)
         test1_pass = false;
     }
 
-    /* Preset 2: Purifier / VOC (ON >= 150, OFF <= 100) across wrap */
+    /* Preset 2: Purifier / TVOC (defaults ON >= 660, OFF <= 220 ppb) across wrap */
     ui_hub_device_config_t cfg_pur;
     ui_auto_get_defaults(0, UI_PRESET_PURIFIER, &cfg_pur);
     cfg_pur.mode = UI_MODE_AUTO;
     pkt_wrap.bits.voc_valid = 1;
-    pkt_wrap.bits.tvoc_ppb = 200;
+    pkt_wrap.bits.tvoc_ppb = 700;
     ui_auto_state_t st_pur;
     ui_auto_state_init(&st_pur, UINT32_MAX - 5000u);
     ui_auto_restart_hold(&st_pur, UINT32_MAX - 5000u);
@@ -1028,7 +1028,7 @@ static int run_regression(void)
         test1_pass = false;
     }
 
-    /* Reverse direction: Purifier OFF (VOC <= 100) across wrap */
+    /* Reverse direction: Purifier OFF (TVOC <= 220) across wrap */
     pkt_wrap.bits.tvoc_ppb = 80;
     ui_auto_state_init(&st_pur, UINT32_MAX - 5000u);
     ui_auto_restart_hold(&st_pur, UINT32_MAX - 5000u);
@@ -4572,7 +4572,7 @@ static int run_regression(void)
 
     /* Invalidate VOC sensor */
     lora_node_status.bits.voc_valid = 0;
-    lora_node_status.bits.tvoc_ppb = 250; /* High VOC, but invalid */
+    lora_node_status.bits.tvoc_ppb = 700; /* High TVOC (above the 660 ppb default), but invalid */
     lora_node_status.bits.sample_seq++;
     lora_rx_revision++;
     advance_ui(100u);
@@ -4666,7 +4666,7 @@ static int run_regression(void)
         lora_last_rx_tick_ms = lv_tick_get();
         advance_ui(1000u);
     }
-    lora_node_status.bits.tvoc_ppb = 200;
+    lora_node_status.bits.tvoc_ppb = 700;
     lora_last_rx_tick_ms = lv_tick_get(); lora_node_status.bits.sample_seq++; lora_rx_revision++; advance_ui(100u);
     lora_last_rx_tick_ms = lv_tick_get(); lora_node_status.bits.sample_seq++; lora_rx_revision++; advance_ui(100u);
     lora_last_rx_tick_ms = lv_tick_get(); lora_node_status.bits.sample_seq++; lora_rx_revision++; advance_ui(100u);
@@ -6846,12 +6846,12 @@ static int run_regression(void)
     ui_set_device_config(0, &dev_pur);
     advance_ui(50u);
 
-    /* Feed 3 frames with high VOC (200 >= 150 on_thresh) */
-    sim_post_node_status(true, 500, true, 200, true, 230, true, 45, true, 1, 0, 0, 0);
+    /* Feed 3 frames with high TVOC (700 >= 660 on_thresh) */
+    sim_post_node_status(true, 500, true, 700, true, 230, true, 45, true, 1, 0, 0, 0);
     advance_ui(50u);
-    sim_post_node_status(true, 500, true, 202, true, 230, true, 45, true, 1, 0, 0, 0);
+    sim_post_node_status(true, 500, true, 702, true, 230, true, 45, true, 1, 0, 0, 0);
     advance_ui(50u);
-    sim_post_node_status(true, 500, true, 205, true, 230, true, 45, true, 1, 0, 0, 0);
+    sim_post_node_status(true, 500, true, 705, true, 230, true, 45, true, 1, 0, 0, 0);
     advance_ui(50u);
     if (h35->device_cmds[0].phase != UI_CMD_PHASE_PENDING) {
         printf("  FAIL 35b2: Active low Purifier did not command on frame 3\n");
@@ -8160,7 +8160,7 @@ static int run_regression(void)
         }
     }
 
-    /* A5(f): Schema: a 0x02 config for Air Purifier comes back as 0x03 with 150/100, other presets keep thresholds, boot staging fires no callback */
+    /* A5(f): Schema: a 0x02 config for Air Purifier comes back as 0x03 with the ppb defaults 660/220, other presets keep thresholds, boot staging fires no callback */
     {
         s_r6_config_cb_count = 0;
         ui_set_config_changed_cb(r6_config_changed_probe_cb);
@@ -8180,7 +8180,7 @@ static int run_regression(void)
         ui_set_device_config(0, &v2_pur);
 
         const ui_hub_device_config_t *v3_pur = ui_get_device_config(0);
-        if (!v3_pur || v3_pur->schema_version != 0x03 || v3_pur->auto_on_thresh != 150 || v3_pur->auto_off_thresh != 100) {
+        if (!v3_pur || v3_pur->schema_version != 0x03 || v3_pur->auto_on_thresh != 660 || v3_pur->auto_off_thresh != 220) {
             printf("  FAIL 41f: Schema v2 Purifier migration failed (schema=0x%02X, on=%d, off=%d)\n",
                    v3_pur ? v3_pur->schema_version : 0, v3_pur ? (int)v3_pur->auto_on_thresh : 0, v3_pur ? (int)v3_pur->auto_off_thresh : 0);
             test41_pass = false;
@@ -8981,7 +8981,7 @@ static int run_scenario_shots(const char *dir)
     ui_close_device_settings();
     advance_ui(100u);
 
-    /* 27. Devices Auto Thresholds with Invalid Pair (Air Purifier VOC ON=OFF=150) */
+    /* 27. Devices Auto Thresholds with Invalid Pair (Air Purifier TVOC: OFF stepped up to ON) */
     dev1_cfg = *ui_get_device_config(1);
     ui_auto_get_defaults(1, UI_PRESET_PURIFIER, &dev1_cfg);
     ui_set_device_config(1, &dev1_cfg);
@@ -8989,10 +8989,15 @@ static int run_scenario_shots(const char *dir)
     advance_ui(100u);
     ui_dialog_open_limits();
     advance_ui(100u);
-    for (int s = 0; s < 10; s++) {
+    for (int s = 0; s < (UI_AUTO_VOC_DEF_ON - UI_AUTO_VOC_DEF_OFF) / UI_AUTO_VOC_STEP; s++) {
         ui_dialog_step_thresh(false, 1);
     }
     advance_ui(100u);
+    if (ui_get_dialog_edit_on_thresh() != ui_get_dialog_edit_off_thresh()) {
+        fprintf(stderr, "FATAL: Invalid-draft scenario did not reach ON == OFF (on=%d, off=%d)\n",
+                (int)ui_get_dialog_edit_on_thresh(), (int)ui_get_dialog_edit_off_thresh());
+        return 1;
+    }
     if (save_scenario_shot(dir, "devices_auto_invalid_draft.raw", 27, 30) != 0) return 1;
     ui_close_device_settings();
     advance_ui(100u);

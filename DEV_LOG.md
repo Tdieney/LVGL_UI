@@ -1,5 +1,11 @@
 # Smart Hub development log
 
+## 2026-09-28 — Purifier Auto defaults aligned with TVOC bands
+
+- `ui_auto.h`: `UI_AUTO_VOC_DEF_ON` 150 → 660 ppb and `UI_AUTO_VOC_DEF_OFF` 100 → 220 ppb (D-043, owner approved). Stored thresholds are unchanged; defaults, Reset limits and the v2→v3 migration use the new pair.
+- Tests first: CHECK 41f (migration) and the restore fallback now expect 660/220, and failed before the change. Tests that relied on the old defaults to trigger the purifier (tick wrap, recovery hold, timeout latch, unrelated fault, active-low) now use 700 ppb. The invalid-draft capture steps OFF up to ON and asserts ON == OFF.
+- All gates pass: assets, build (0 compiler warnings), 42 and 40 KiB regression 42/42, 30/30 captures, export manifest, production verifier and `git diff --check`. The Auto editor captures were checked visually.
+
 ## 2026-09-28 — TVOC ppb bands, TVOC naming, plan tidy-up
 
 - `ui.c`: replaced the index-era TVOC cut-offs (100/250) with ppb bands Good <= 220 and Moderate <= 660, based on UBA TVOC levels for SGP30-class sensors (D-042). Named band constants now cover both TVOC and eCO₂; the eCO₂ values are unchanged. The subtitle reads `Based on eCO₂ and TVOC` and the Purifier Auto label `Auto · TVOC`.

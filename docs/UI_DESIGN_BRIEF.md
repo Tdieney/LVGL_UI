@@ -10,7 +10,7 @@ The owner asked for sensible ppb bands, using the MXVC10S manual as a reference.
 | Moderate | 221–660 | 801–1200 |
 | Poor | > 660 | > 1200 |
 
-The Overview air-quality status is the worse of the two categories. The remaining `VOC` copy now reads `Based on eCO₂ and TVOC` and `Auto · TVOC`. The bands are constants in `ui.c` (`UI_TVOC_*_MAX_PPB`, `UI_ECO2_*_MAX_PPM`), and CHECK 32 asserts the 220/221/660/661 ppb edges. Not changed: Purifier Auto defaults (ON ≥ 150 / OFF ≤ 100 ppb), which now both lie inside "Good". Aligning them (for example ON ≥ 660 / OFF ≤ 220) is a separate owner decision.
+The Overview air-quality status is the worse of the two categories. The remaining `VOC` copy now reads `Based on eCO₂ and TVOC` and `Auto · TVOC`. The bands are constants in `ui.c` (`UI_TVOC_*_MAX_PPB`, `UI_ECO2_*_MAX_PPM`), and CHECK 32 asserts the 220/221/660/661 ppb edges. The owner then approved aligning the Purifier Auto defaults to the bands: ON ≥ 660 ppb (Moderate/Poor boundary) and OFF ≤ 220 ppb (back inside Good), recorded as D-043. Stored thresholds are kept; the new values apply to defaults, Reset limits and the v2→v3 migration.
 
 ## 2026-09-26 — Trends: the current minute follows the live value (owner decision)
 
@@ -54,7 +54,7 @@ is migrated to the v3 schema with the purifier thresholds reset to ppb defaults.
 | Appliance / sensor | Default ON | Default OFF | Range | Step | Gap |
 |---|---|---|---|---|---|
 | Ventilation / eCO₂ ppm | at or above 1000 | at or below 800 | 0..60000 | 50 | ON - OFF >= 50 |
-| Air purifier / TVOC ppb | at or above 150 | at or below 100 | 1..60000 | 5 | ON - OFF >= 5 |
+| Air purifier / TVOC ppb | at or above 660 (D-043; was 150) | at or below 220 (D-043; was 100) | 1..60000 | 5 | ON - OFF >= 5 |
 | Humidifier / RH % | at or below 40 | at or above 50 | 0..100 | 1 | OFF - ON >= 5 |
 
 ### Trends refinements (2026-09-25, implemented)
@@ -840,6 +840,7 @@ Tiles render icon, appliance name, switch toggle, and `Manual/Auto` mode. Redund
 | 2026-09-14 | D-037 | Hub-side Auto v1 automation module supporting 3 appliances (Fan/CO₂, Purifier/VOC, Humidifier/RH) with LCD-editable thresholds in a 440x368 modal subview. Features 3-frame qualification, 10s anti-hunting hold, sensor fault masking, instant manual override, error latching (`Auto paused`), and safe re-arm. |
 | 2026-09-25 | D-038 | LoRa protocol v2 (`0x02`): Hub-driven request/response. `GET_STATUS` (`0x03`) polls ~1 Hz; `HUB_CMD` only for pending commands (≤ 3 attempts). The Node replies only to requests. `sample_seq` gates Auto qualification; a decrease in `uptime_sec` triggers re-synchronization. `lora_last_rssi` is `int16_t`. Frame sizes unchanged. |
 | 2026-09-25 | D-039 | Supersedes D-002/D-003: labels `eCO₂` (ppm) and `TVOC` (ppb). Purifier thresholds in ppb; config schema v3 resets v2 purifier thresholds to 150/100 ppb. |
-| 2026-09-28 | D-042 | TVOC ppb bands Good ≤ 220 / Moderate ≤ 660 / Poor > 660 (UBA levels via Sensirion SGP30-class guidance; the MXVC10S manual has no bands); remaining `VOC` copy renamed `TVOC`. Purifier Auto defaults unchanged. |
+| 2026-09-28 | D-043 | Purifier Auto defaults ON ≥ 660 / OFF ≤ 220 ppb, aligned with the TVOC bands (were 150/100, both inside "Good"). Applies to defaults, Reset limits and v2→v3 migration; stored thresholds are kept. |
+| 2026-09-28 | D-042 | TVOC ppb bands Good ≤ 220 / Moderate ≤ 660 / Poor > 660 (UBA levels via Sensirion SGP30-class guidance; the MXVC10S manual has no bands); remaining `VOC` copy renamed `TVOC`. Purifier Auto defaults aligned separately (D-043). |
 | 2026-09-26 | D-041 | Trends current minute follows the latest valid reading (not the first sample of the minute); a closed minute keeps its last reading. Fixes the chart lagging up to 60 s behind the live value on all four metrics. |
 | 2026-09-25 | D-040 | Trends simplified and refined by owner: restored hero forest card indicator with celadon dot, touch-down selection with 150 ms settle, native chart on normalized 0..1000 range, lowered title and chart (title y=14, chart y=136), raised unit label (y=96), fixed 15-min X-axis window (-15 min..Now), and round-number Y ticks (3 labels). Current/Min/Max, span label, tooltip, and area shading removed. |

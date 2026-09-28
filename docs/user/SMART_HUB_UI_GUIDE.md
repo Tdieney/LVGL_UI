@@ -379,7 +379,7 @@ bool ui_is_tx_ready(void);
 bool ui_has_pending_command(void);
 ```
 
-The v3 layout is byte-identical to v2; only the purifier threshold unit changed (VOC index → TVOC ppb). `ui_set_device_config()` accepts a v2 record, sets `schema_version` to `0x03` and, for an Air Purifier, replaces its thresholds with the ppb defaults (150/100). There is no valid index-to-ppb conversion. Other presets keep their values. A restore at boot does not fire `ui_config_changed_cb`. To avoid repeating the migration on every boot, firmware should rewrite the record from `ui_get_device_config(i)` when the stored schema was `0x02`.
+The v3 layout is byte-identical to v2; only the purifier threshold unit changed (VOC index → TVOC ppb). `ui_set_device_config()` accepts a v2 record, sets `schema_version` to `0x03` and, for an Air Purifier, replaces its thresholds with the ppb defaults (660/220). There is no valid index-to-ppb conversion. Other presets keep their values. A restore at boot does not fire `ui_config_changed_cb`. To avoid repeating the migration on every boot, firmware should rewrite the record from `ui_get_device_config(i)` when the stored schema was `0x02`.
 
 ### 8.1 Auto v1 Automation Rules (Hub-side)
 
@@ -387,7 +387,7 @@ The v3 layout is byte-identical to v2; only the purifier threshold unit changed 
 
 1. **Supported Appliances:**
    - **Ventilation Fan:** Evaluates eCO₂ (ppm). Turns ON when >= `auto_on_thresh` (default 1000), turns OFF when <= `auto_off_thresh` (default 800). Bounds: 0..60000 ppm, step 50 ppm, minimum ON - OFF gap: 50 ppm. Readings below 400 ppm are treated as invalid.
-   - **Air Purifier:** Evaluates TVOC (ppb; 0 is a valid reading). Turns ON when >= `auto_on_thresh` (default 150 ppb), turns OFF when <= `auto_off_thresh` (default 100 ppb). Bounds: 1..60000 ppb, step 5 ppb, minimum ON - OFF gap: 5 ppb.
+   - **Air Purifier:** Evaluates TVOC (ppb; 0 is a valid reading). Turns ON when >= `auto_on_thresh` (default 660 ppb, the Moderate/Poor boundary), turns OFF when <= `auto_off_thresh` (default 220 ppb, back inside Good). Bounds: 1..60000 ppb, step 5 ppb, minimum ON - OFF gap: 5 ppb.
    - **Humidifier:** Evaluates Humidity %RH (inverted logic: activates when dry, turns off when moist). Turns ON when <= `auto_on_thresh` (default 40%), turns OFF when >= `auto_off_thresh` (default 50%). Bounds: 0%..100%, step 1%, minimum OFF - ON gap: 5% RH. If current humidity is above 50% while OFF, it correctly remains OFF.
    - **Other Presets (Dehumidifier, Heater, Light, Smart Socket, Generic):** Manual mode only. Auto selection is disabled with caption `"Manual only for this device type"`.
 
@@ -632,7 +632,7 @@ Review these items when planning deployment:
 | Power-on / link-loss relay default policy | Open (safety considerations) |
 | Frame encryption & authentication | Plaintext (demo baseline) |
 | Hardware acceptance testing | Pending target bench deployment |
-| TVOC ppb quality bands | **Decided (2026-09-28)** — Good ≤ 220, Moderate ≤ 660, Poor > 660 ppb (UBA levels); eCO₂ ≤ 800 / ≤ 1200 ppm. Purifier Auto defaults (150/100 ppb) not yet aligned |
+| TVOC ppb quality bands | **Decided (2026-09-28)** — Good ≤ 220, Moderate ≤ 660, Poor > 660 ppb (UBA levels); eCO₂ ≤ 800 / ≤ 1200 ppm. Purifier Auto defaults aligned to ON ≥ 660 / OFF ≤ 220 ppb |
 | Host simulator & regression for LoRa v2 / Trends 2026-09-25 | **Implemented** — Simulator and 42/40 KiB regression suites pass 42/42 checks |
 
 ---
@@ -670,7 +670,7 @@ Execute bring-up sequentially:
 | Always `Disconnected` although Node replies arrive | `lora_last_rx_tick_ms` written from a different clock than `lv_tick_get()` (e.g. `HAL_GetTick()` with a separate `lv_tick_inc()` counter) |
 | Hub never becomes TX-ready after boot | `GET_STATUS` polling gated by `ui_is_tx_ready()`; a v2 Node replies only to requests |
 | All frames rejected after an upgrade | One board still on protocol `0x01`; update Hub and Node together |
-| Purifier Auto limits reset to 150/100 after upgrade | Expected v2→v3 migration (VOC index → TVOC ppb); rewrite the record to stop repeating it |
+| Purifier Auto limits reset to 660/220 after upgrade | Expected v2→v3 migration (VOC index → TVOC ppb); rewrite the record to stop repeating it |
 | Switch remains stuck on `Sending…` | Node readback missing, mismatched `active_low`, or `UI_CMD_TIMEOUT_MS` too short for SF airtime |
 | Inverted relay state on initial boot | `active_low` polarity configuration needed for that output |
 | Device names revert to default on reboot | Flash storage driver not yet implemented (Section 8) |

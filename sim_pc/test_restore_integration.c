@@ -566,7 +566,7 @@ bool test_restore_integration_suite(void)
         config_load_from_flash();
         ui_test_set_boot_staging(false);
         c0 = ui_get_device_config(0);
-        if (c0->mode != UI_MODE_MANUAL || c0->auto_on_thresh != 150 || c0->auto_off_thresh != 100) {
+        if (c0->mode != UI_MODE_MANUAL || c0->auto_on_thresh != 660 || c0->auto_off_thresh != 220) {
             fprintf(stderr, "FAIL: Bad Purifier threshold pair (%d, %d) was not rejected to defaults\n",
                     (int)pur_pairs[f][0], (int)pur_pairs[f][1]);
             return false;

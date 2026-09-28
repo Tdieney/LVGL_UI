@@ -14,7 +14,6 @@ This is the only list of open work. Unchecked boxes in the dated sections below 
 - [ ] Validate the MXVC10S / TH10S Modbus register mapping and value ranges on real sensors.
 - [ ] Firmware Flash/NVS persistence driver. The UI callbacks exist; rewrite v2 records after migration.
 - [ ] Policies to decide: relay state at power-on and on link loss (safety), RF parameters (SF, channel), and frame authentication/encryption (plaintext demo baseline).
-- [ ] Optional owner decision: align the Purifier Auto defaults (ON >= 150 / OFF <= 100 ppb, now both "Good") with the new TVOC bands, for example ON >= 660 / OFF <= 220.
 
 ## 2026-09-28 — TVOC bands, TVOC naming and repository tidy-up
 
@@ -24,6 +23,7 @@ This is the only list of open work. Unchecked boxes in the dated sections below 
 - [x] The `home_moderate`/`home_poor` scenarios use 400/900 ppb so the captures still show each category.
 - [x] All gates pass: assets, build with 0 compiler warnings, 42 and 40 KiB regression 42/42, 30/30 captures, the negative control, export manifest, production verifier and `git diff --check`.
 - [x] Consolidated the open items above, marked superseded boxes, and recorded the owner's Trends revisions in `AGENTS.md`.
+- [x] The owner approved aligning the Purifier Auto defaults: ON >= 660 / OFF <= 220 ppb, were 150/100 (D-043). Default-dependent tests now use data above 660 ppb. The invalid-draft capture steps OFF up to ON and asserts ON == OFF. All gates pass (42/42 on 42 and 40 KiB, 30/30 captures).
 
 ## 2026-09-26 — Trends chart lagged the live value (all four metrics)
 

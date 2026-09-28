@@ -35,8 +35,8 @@ extern "C" {
 #define UI_AUTO_VOC_MAX         60000
 #define UI_AUTO_VOC_STEP        5
 #define UI_AUTO_VOC_MIN_GAP     5
-#define UI_AUTO_VOC_DEF_ON      150
-#define UI_AUTO_VOC_DEF_OFF     100
+#define UI_AUTO_VOC_DEF_ON      660   /* TVOC ppb: turn on at the Moderate/Poor boundary (D-042) */
+#define UI_AUTO_VOC_DEF_OFF     220   /* TVOC ppb: turn off back inside "Good" */
 
 #define UI_AUTO_HUMID_MIN       0
 #define UI_AUTO_HUMID_MAX       100
