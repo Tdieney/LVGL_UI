@@ -13,7 +13,7 @@
  *      A minimal header of { version, msg_id } is retained so mismatched builds
  *      are safely rejected.
  *   2) Single combined Node -> Hub status frame: Relay readback states and
- *      sensor telemetry are carried together in one periodic frame to minimize
+ *      sensor telemetry are carried together in one response to minimize
  *      packet count, contention, and airtime overhead.
  *
  * Memory layout conventions:
@@ -36,10 +36,12 @@
 extern "C" {
 #endif
 
-#define LORA_PROTO_VERSION      0x01u
+#define LORA_PROTO_VERSION      0x02u
 
 #define LORA_MSG_HUB_CMD        0x01u
 #define LORA_MSG_NODE_STATUS    0x02u
+#define LORA_MSG_GET_STATUS     0x03u
+#define LORA_DEFAULT_NODE_ADDR  0x0001u
 
 #define LORA_HUB_CMD_LEN        8u
 #define LORA_NODE_STATUS_LEN    20u
@@ -68,8 +70,8 @@ typedef enum {
 /* =========================================================================
  * 1) HUB -> NODE: lora_hub_cmd_t (8 bytes)
  *
- * Transmitted by Hub on relay state change, and re-transmitted periodically
- * so lost packets self-heal.
+ * Transmitted by Hub while a relay command is pending, with bounded retries.
+ * The same 8-byte envelope also carries read-only GET_STATUS requests.
  *
  * Node applies raw GPIO levels verbatim (0 or 1) to PD16..PD13 without
  * knowing appliance semantics or polarity.
@@ -77,7 +79,7 @@ typedef enum {
 typedef union {
     struct {
         /* Byte 0..1: Protocol Header */
-        uint8_t  version;          /* LORA_PROTO_VERSION (0x01) */
+        uint8_t  version;          /* LORA_PROTO_VERSION (0x02) */
         uint8_t  msg_id;           /* LORA_MSG_HUB_CMD (0x01) */
 
         /* Byte 2..3: Addressing placeholder */
@@ -110,14 +112,14 @@ typedef char lora_assert_hub_cmd_sz[(sizeof(lora_hub_cmd_t) == LORA_HUB_CMD_LEN)
 /* =========================================================================
  * 2) NODE -> HUB: lora_node_status_t (20 bytes)
  *
- * Periodic status & telemetry broadcast from Node to Hub.
+ * Status & telemetry response from Node to Hub.
  * Contains readback GPIO levels, sequence echo, validity flags, fault flags,
  * node uptime, and environmental sensor readings.
  * ========================================================================= */
 typedef union {
     struct {
         /* Byte 0..1: Protocol Header */
-        uint8_t  version;          /* LORA_PROTO_VERSION (0x01) */
+        uint8_t  version;          /* LORA_PROTO_VERSION (0x02) */
         uint8_t  msg_id;           /* LORA_MSG_NODE_STATUS (0x02) */
 
         /* Byte 2..3: Addressing placeholder */
@@ -146,17 +148,17 @@ typedef union {
         uint32_t uptime_sec;       /* Node operational uptime in seconds */
 
         /* Byte 12..13: CO2 Reading */
-        uint16_t co2_ppm;          /* CO2 concentration in ppm (0..10000) */
+        uint16_t co2_ppm;          /* Equivalent CO2 concentration, ppm */
 
         /* Byte 14..15: VOC Reading */
-        uint16_t voc_index;        /* TVOC unitless index (0..500) */
+        uint16_t tvoc_ppb;         /* TVOC concentration in ppb */
 
         /* Byte 16..17: Temperature Reading */
         int16_t  temp_deci_c;      /* Signed temperature in 0.1 °C (e.g. 235 = +23.5 °C, -25 = -2.5 °C) */
 
-        /* Byte 18..19: Humidity & Padding */
+        /* Byte 18..19: Humidity and sensor sample revision */
         uint8_t  humidity_pct;     /* Relative humidity in whole percent (0..100 %) */
-        uint8_t  reserved_pad;     /* Reserved padding (always 0) */
+        uint8_t  sample_seq;       /* Increments after each sensor poll cycle */
 
         /* Link quality is deliberately NOT carried on the wire.
          *
@@ -189,14 +191,14 @@ static inline void lora_hub_cmd_init_header(lora_hub_cmd_t *cmd)
 {
     cmd->bits.version = LORA_PROTO_VERSION;
     cmd->bits.msg_id = LORA_MSG_HUB_CMD;
-    cmd->bits.node_addr = 0x0001u;
+    cmd->bits.node_addr = LORA_DEFAULT_NODE_ADDR;
 }
 
 static inline void lora_node_status_init_header(lora_node_status_t *status)
 {
     status->bits.version = LORA_PROTO_VERSION;
     status->bits.msg_id = LORA_MSG_NODE_STATUS;
-    status->bits.node_addr = 0x0001u;
+    status->bits.node_addr = LORA_DEFAULT_NODE_ADDR;
 }
 
 static inline uint8_t lora_hub_cmd_get_relay_gpio(const lora_hub_cmd_t *cmd, uint8_t idx)
@@ -276,8 +278,9 @@ static inline void lora_node_status_set_relay_gpios_mask(lora_node_status_t *sta
 /* =========================================================================
  * Wire Globals (Shared State Contract)
  *
- * Declared extern here, defined in the application layer (or sim_pc),
- * and accessed directly by the UI.
+ * Storage is defined exactly once in ui.c, matching the motorCmd convention.
+ * Hub firmware/simulator includes this header; do not redefine these globals.
+ * The UI writes commands; application code sends them and publishes RX status.
  * ========================================================================= */
 extern lora_hub_cmd_t     lora_hub_cmd;
 extern lora_node_status_t  lora_node_status;

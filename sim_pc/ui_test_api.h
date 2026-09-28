@@ -11,6 +11,11 @@
 extern "C" {
 #endif
 
+#define UI_TRENDS_SETTLE_MS 150u
+#ifndef UI_CMD_TIMEOUT_MS
+#define UI_CMD_TIMEOUT_MS 3000u
+#endif
+
 /* Legacy synthesized snapshot types for simulator assertions (excluded from MCU export) */
 typedef struct {
     int32_t value;                  /* Scaled value: CO2 ppm, VOC index (unitless), Temp 0.1 deg C, Humidity % */
@@ -49,13 +54,22 @@ const ui_snapshot_t *ui_get_snapshot(void);
 void ui_test_reset_device_commands(void);
 void ui_set_uptime_seconds(uint32_t seconds);
 void ui_format_temp(char *buf, size_t buf_size, int32_t tenths);
-void ui_inspect_chart_point(uint32_t point_id);
-const char *ui_get_chart_tooltip_text(void);
+/* Trends page testing and inspection helpers */
 ui_metric_id_t ui_get_selected_trend_metric(void);
-const char *ui_get_trends_stat_cur(void);
-const char *ui_get_trends_stat_min(void);
-const char *ui_get_trends_stat_max(void);
 const ui_history_sample_t *ui_get_history_sample(ui_metric_id_t metric, uint16_t index);
+void ui_test_reset_history(void);
+const char *ui_get_trends_title_str(void);
+const char *ui_get_trends_unit_str(void);
+bool ui_is_trends_unavail_badge_hidden(void);
+bool ui_is_trends_empty_box_hidden(void);
+const char *ui_get_trends_empty_lbl_str(void);
+bool ui_is_trends_empty_hint_hidden(void);
+const char *ui_get_trends_y_lbl_str(uint8_t idx);
+const char *ui_get_trends_time_lbl_str(uint8_t idx);
+bool ui_is_trends_tab_checked(uint8_t idx);
+bool ui_is_trends_tab_dot_hidden(uint8_t idx);
+const char *ui_get_trends_tab_val_str(uint8_t idx);
+const char *ui_get_trends_tab_unit_str(uint8_t idx);
 
 /* Home page testing and inspection helpers */
 const char *ui_get_home_co2_str(void);
@@ -95,14 +109,35 @@ int32_t ui_get_dialog_edit_off_thresh(void);
 const char *ui_get_dialog_validation_msg(void);
 bool ui_is_dialog_limits_subview_active(void);
 bool ui_get_auto_paused_error(uint8_t idx);
+bool ui_is_auto_hold_active(uint8_t idx);
 bool ui_is_tx_ready_test(void);
 bool test_restore_pre_init_fixture(void);
+bool test_restore_post_init_assertion(void);
 bool test_restore_integration_suite(void);
 void ui_test_set_boot_staging(bool active);
 void ui_test_reset_device_configs(void);
 void ui_dialog_open_dropdown(void);
 void ui_dialog_close_dropdown(void);
 struct _lv_obj_t *ui_dialog_get_dropdown_list(void);
+bool ui_test_is_link_connected(uint32_t now);
+
+/* Host TX Recording Structures & Integration Loop Stub (W3/X3/Y3) */
+typedef struct {
+    uint32_t tick_ms;
+    uint8_t bytes[sizeof(lora_hub_cmd_t)];
+    uint16_t seq;
+    uint8_t relay_mask;
+    bool tx_ready_at_send;
+} sim_tx_record_t;
+
+#define SIM_MAX_TX_RECORDS 128
+
+void sim_set_tx_sink(void (*sink)(uint32_t now, const lora_hub_cmd_t *cmd));
+void sim_reset_tx_records(void);
+void sim_record_tx(uint32_t now, const lora_hub_cmd_t *cmd);
+size_t sim_get_tx_count(void);
+const sim_tx_record_t *sim_get_tx_record(size_t index);
+const sim_tx_record_t *sim_get_tx_records(void);
 
 #ifdef __cplusplus
 }

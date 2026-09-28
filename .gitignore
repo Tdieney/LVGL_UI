@@ -12,6 +12,8 @@
 # CMake & Build outputs
 build/
 sim_pc/build/
+build-40k/
+__pycache__/
 CMakeFiles/
 CMakeCache.txt
 build.ninja

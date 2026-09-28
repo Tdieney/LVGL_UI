@@ -1,194 +1,289 @@
 #include "ui_theme.h"
 #include "ui_fonts.h"
 
-lv_style_t ui_style_canvas;
-lv_style_t ui_style_card_co2;
-lv_style_t ui_style_card_voc;
-lv_style_t ui_style_card_temp;
-lv_style_t ui_style_card_humid;
-lv_style_t ui_style_card_device;
-lv_style_t ui_style_card_chart;
-lv_style_t ui_style_action;
-lv_style_t ui_style_tab_inactive;
-lv_style_t ui_style_tab_active;
-lv_style_t ui_style_soft_btn;
-lv_style_t ui_style_dd_list;
-lv_style_t ui_style_dd_list_selected;
-lv_style_t ui_style_dialog_btn_on;
-lv_style_t ui_style_dialog_btn_off;
-lv_style_t ui_style_action_disabled;
-lv_style_t ui_style_lbl_18_ink;
-lv_style_t ui_style_lbl_24_ink;
-lv_style_t ui_style_lbl_18_muted;
-lv_style_t ui_style_lbl_18_red;
-lv_style_t ui_style_lbl_24_white;
-lv_style_t ui_style_lbl_24_center;
+/* Helper macro to encode RGB888 hex as RGB565 compile-time constant.
+ * Matches lv_color_hex() across both LV_COLOR_16_SWAP=0 and LV_COLOR_16_SWAP=1. */
+#if LV_COLOR_16_SWAP == 0
+#define UI_HEX(c) { .full = (uint16_t)(((uint32_t)(c) & 0xF80000u) >> 8 | ((uint32_t)(c) & 0xFC00u) >> 5 | ((uint32_t)(c) & 0xFFu) >> 3) }
+#else
+#define UI_HEX(c) { .full = (uint16_t)(((uint32_t)(c) & 0xF80000u) >> 16 | ((uint32_t)(c) & 0xFC00u) >> 13 | ((uint32_t)(c) & 0x1C00u) << 3 | ((uint32_t)(c) & 0xF8u) << 5) }
+#endif
+#define UI_WHITE  { .full = 0xFFFF }
+#define UI_BLACK  { .full = 0x0000 }
 
-static void setup_card_shadow(lv_style_t *style)
-{
-    /* Faint soft shadow: 0 2px 10px 0 rgba(24, 43, 77, 0.06) */
-    lv_style_set_shadow_color(style, lv_color_hex(0x182B4D));
-    lv_style_set_shadow_opa(style, 15);
-    lv_style_set_shadow_width(style, 10);
-    lv_style_set_shadow_ofs_x(style, 0);
-    lv_style_set_shadow_ofs_y(style, 2);
-    lv_style_set_shadow_spread(style, 0);
-}
+/* 1. Pressed states */
+static const lv_style_const_prop_t s_pressed_props[] = {
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_70 } },
+};
+LV_STYLE_CONST_INIT(ui_style_pressed, s_pressed_props);
+
+static const lv_style_const_prop_t s_nav_btn_pressed_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xD7E0BC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_40 } },
+};
+LV_STYLE_CONST_INIT(ui_style_nav_btn_pressed, s_nav_btn_pressed_props);
+
+/* 2. Canvas */
+static const lv_style_const_prop_t s_canvas_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xEEECE7) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 0 } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 0 } },
+};
+LV_STYLE_CONST_INIT(ui_style_canvas, s_canvas_props);
+
+/* 3. Hero Card (Forest fill) */
+static const lv_style_const_prop_t s_card_hero_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0x214539) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 0 } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 16 } },
+};
+LV_STYLE_CONST_INIT(ui_style_card_hero, s_card_hero_props);
+
+/* 4. Porcelain Card */
+static const lv_style_const_prop_t s_card_porcelain_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 1 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xD8D1C2) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 16 } },
+};
+LV_STYLE_CONST_INIT(ui_style_card_porcelain, s_card_porcelain_props);
+
+/* 5. Celadon Sensor Strip */
+static const lv_style_const_prop_t s_strip_celadon_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xDFE7CB) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 1 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xD7E0BC) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 12 } },
+};
+LV_STYLE_CONST_INIT(ui_style_strip_celadon, s_strip_celadon_props);
+
+/* 6. Buttons */
+static const lv_style_const_prop_t s_btn_forest_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0x214539) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 0 } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 12 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_WHITE } },
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+};
+LV_STYLE_CONST_INIT(ui_style_btn_forest, s_btn_forest_props);
+
+static const lv_style_const_prop_t s_btn_outlined_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 1 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xD8D1C2) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 12 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+};
+LV_STYLE_CONST_INIT(ui_style_btn_outlined, s_btn_outlined_props);
+
+static const lv_style_const_prop_t s_stepper_btn_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 1 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xD8D1C2) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 12 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+};
+LV_STYLE_CONST_INIT(ui_style_stepper_btn, s_stepper_btn_props);
+
+/* 7. Fields */
+static const lv_style_const_prop_t s_field_outlined_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 1 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xD8D1C2) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 10 } },
+};
+LV_STYLE_CONST_INIT(ui_style_field_outlined, s_field_outlined_props);
+
+static const lv_style_const_prop_t s_field_error_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 2 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xC93B2B) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 10 } },
+};
+LV_STYLE_CONST_INIT(ui_style_field_error, s_field_error_props);
+
+/* 8. Dropdown List */
+static const lv_style_const_prop_t s_dd_list_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_LINE_SPACE, .value = { .num = 21 } },
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 0 } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 10 } },
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+    { .prop = LV_STYLE_SHADOW_WIDTH, .value = { .num = 16 } },
+    { .prop = LV_STYLE_SHADOW_COLOR, .value = { .color = UI_BLACK } },
+    { .prop = LV_STYLE_SHADOW_OPA, .value = { .num = 40 } },
+    { .prop = LV_STYLE_SHADOW_OFS_Y, .value = { .num = 4 } },
+    { .prop = LV_STYLE_PAD_LEFT, .value = { .num = 12 } },
+    { .prop = LV_STYLE_PAD_RIGHT, .value = { .num = 12 } },
+    { .prop = LV_STYLE_PAD_TOP, .value = { .num = 8 } },
+    { .prop = LV_STYLE_PAD_BOTTOM, .value = { .num = 8 } },
+    { .prop = LV_STYLE_MAX_HEIGHT, .value = { .num = 240 } },
+};
+LV_STYLE_CONST_INIT(ui_style_dd_list, s_dd_list_props);
+
+static const lv_style_const_prop_t s_dd_list_selected_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_LINE_SPACE, .value = { .num = 21 } },
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xD7E0BC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x214539) } },
+};
+LV_STYLE_CONST_INIT(ui_style_dd_list_selected, s_dd_list_selected_props);
+
+static const lv_style_const_prop_t s_action_disabled_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0x939E94) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+};
+LV_STYLE_CONST_INIT(ui_style_action_disabled, s_action_disabled_props);
+
+/* 9. Static Labels */
+static const lv_style_const_prop_t s_lbl_18_ink_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_18_ink, s_lbl_18_ink_props);
+
+static const lv_style_const_prop_t s_lbl_24_ink_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_24_ink, s_lbl_24_ink_props);
+
+static const lv_style_const_prop_t s_lbl_18_muted_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x59665A) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_18_muted, s_lbl_18_muted_props);
+
+static const lv_style_const_prop_t s_lbl_18_red_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0xC93B2B) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_18_red, s_lbl_18_red_props);
+
+static const lv_style_const_prop_t s_lbl_24_white_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_WHITE } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_24_white, s_lbl_24_white_props);
+
+static const lv_style_const_prop_t s_lbl_18_blue_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x214539) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_18_blue, s_lbl_18_blue_props);
+
+static const lv_style_const_prop_t s_lbl_18_blue_text_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x214539) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_18_blue_text, s_lbl_18_blue_text_props);
+
+static const lv_style_const_prop_t s_lbl_24_amber_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x8A5000) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_24_amber, s_lbl_24_amber_props);
+
+static const lv_style_const_prop_t s_lbl_24_muted_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_24 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x59665A) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_24_muted, s_lbl_24_muted_props);
+
+static const lv_style_const_prop_t s_lbl_34_ink_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_34 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_34_ink, s_lbl_34_ink_props);
+
+static const lv_style_const_prop_t s_lbl_48_white_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_48 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_WHITE } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_48_white, s_lbl_48_white_props);
+
+static const lv_style_const_prop_t s_lbl_48_ink_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_48 } },
+    { .prop = LV_STYLE_TEXT_COLOR, .value = { .color = UI_HEX(0x17251F) } },
+};
+LV_STYLE_CONST_INIT(ui_style_lbl_48_ink, s_lbl_48_ink_props);
+
+/* 10. Icons */
+static const lv_style_const_prop_t s_icon_blue_props[] = {
+    { .prop = LV_STYLE_IMG_RECOLOR, .value = { .color = UI_HEX(0x214539) } },
+    { .prop = LV_STYLE_IMG_RECOLOR_OPA, .value = { .num = LV_OPA_COVER } },
+};
+LV_STYLE_CONST_INIT(ui_style_icon_blue, s_icon_blue_props);
+
+static const lv_style_const_prop_t s_icon_muted_props[] = {
+    { .prop = LV_STYLE_IMG_RECOLOR, .value = { .color = UI_HEX(0x59665A) } },
+    { .prop = LV_STYLE_IMG_RECOLOR_OPA, .value = { .num = LV_OPA_COVER } },
+};
+LV_STYLE_CONST_INIT(ui_style_icon_muted, s_icon_muted_props);
+
+static const lv_style_const_prop_t s_icon_white_props[] = {
+    { .prop = LV_STYLE_IMG_RECOLOR, .value = { .color = UI_WHITE } },
+    { .prop = LV_STYLE_IMG_RECOLOR_OPA, .value = { .num = LV_OPA_COVER } },
+};
+LV_STYLE_CONST_INIT(ui_style_icon_white, s_icon_white_props);
+
+/* 11. Modal Overlay */
+static const lv_style_const_prop_t s_dialog_overlay_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xEEECE7) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+};
+LV_STYLE_CONST_INIT(ui_style_dialog_overlay, s_dialog_overlay_props);
+
+/* 12. Modal Dropdown Button */
+static const lv_style_const_prop_t s_dialog_dropdown_props[] = {
+    { .prop = LV_STYLE_BORDER_WIDTH, .value = { .num = 1 } },
+    { .prop = LV_STYLE_BORDER_COLOR, .value = { .color = UI_HEX(0xD8D1C2) } },
+    { .prop = LV_STYLE_RADIUS, .value = { .num = 10 } },
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0xF3F1EC) } },
+    { .prop = LV_STYLE_BG_OPA, .value = { .num = LV_OPA_COVER } },
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_PAD_LEFT, .value = { .num = 12 } },
+    { .prop = LV_STYLE_PAD_RIGHT, .value = { .num = 12 } },
+    { .prop = LV_STYLE_PAD_TOP, .value = { .num = 10 } },
+    { .prop = LV_STYLE_PAD_BOTTOM, .value = { .num = 10 } },
+};
+LV_STYLE_CONST_INIT(ui_style_dialog_dropdown, s_dialog_dropdown_props);
+
+/* 13. Switch */
+static const lv_style_const_prop_t s_switch_main_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0x939E94) } },
+    { .prop = LV_STYLE_ANIM_TIME, .value = { .num = 0 } },
+};
+LV_STYLE_CONST_INIT(ui_style_switch_main, s_switch_main_props);
+
+static const lv_style_const_prop_t s_switch_indicator_props[] = {
+    { .prop = LV_STYLE_BG_COLOR, .value = { .color = UI_HEX(0x214539) } },
+};
+LV_STYLE_CONST_INIT(ui_style_switch_indicator, s_switch_indicator_props);
+
+/* 14. Dropdown list label */
+static const lv_style_const_prop_t s_dd_label_props[] = {
+    { .prop = LV_STYLE_TEXT_FONT, .value = { .ptr = &ui_font_18 } },
+    { .prop = LV_STYLE_TEXT_LINE_SPACE, .value = { .num = 21 } },
+};
+LV_STYLE_CONST_INIT(ui_style_dd_label, s_dd_label_props);
 
 void ui_theme_init(void)
 {
-    /* Canvas flat background: #EFEFEF */
-    lv_style_init(&ui_style_canvas);
-    lv_style_set_bg_color(&ui_style_canvas, lv_color_hex(0xEFEFEF));
-    lv_style_set_bg_opa(&ui_style_canvas, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_canvas, 0);
-    lv_style_set_radius(&ui_style_canvas, 0);
-
-    /* CO2 Card: flat #D6E7FF */
-    lv_style_init(&ui_style_card_co2);
-    lv_style_set_bg_color(&ui_style_card_co2, lv_color_hex(0xD6E7FF));
-    lv_style_set_bg_opa(&ui_style_card_co2, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_card_co2, 0);
-    lv_style_set_radius(&ui_style_card_co2, 20);
-    setup_card_shadow(&ui_style_card_co2);
-
-    /* VOC Card: flat #E7DBFF */
-    lv_style_init(&ui_style_card_voc);
-    lv_style_set_bg_color(&ui_style_card_voc, lv_color_hex(0xE7DBFF));
-    lv_style_set_bg_opa(&ui_style_card_voc, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_card_voc, 0);
-    lv_style_set_radius(&ui_style_card_voc, 20);
-    setup_card_shadow(&ui_style_card_voc);
-
-    /* Temperature Card: flat #FFEBCE */
-    lv_style_init(&ui_style_card_temp);
-    lv_style_set_bg_color(&ui_style_card_temp, lv_color_hex(0xFFEBCE));
-    lv_style_set_bg_opa(&ui_style_card_temp, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_card_temp, 0);
-    lv_style_set_radius(&ui_style_card_temp, 20);
-    setup_card_shadow(&ui_style_card_temp);
-
-    /* Humidity Card: flat #CEEFE7 */
-    lv_style_init(&ui_style_card_humid);
-    lv_style_set_bg_color(&ui_style_card_humid, lv_color_hex(0xCEEFE7));
-    lv_style_set_bg_opa(&ui_style_card_humid, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_card_humid, 0);
-    lv_style_set_radius(&ui_style_card_humid, 20);
-    setup_card_shadow(&ui_style_card_humid);
-
-    /* Device Card: flat #F7F7F7 */
-    lv_style_init(&ui_style_card_device);
-    lv_style_set_bg_color(&ui_style_card_device, lv_color_hex(0xF7F7F7));
-    lv_style_set_bg_opa(&ui_style_card_device, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_card_device, 0);
-    lv_style_set_radius(&ui_style_card_device, 20);
-    setup_card_shadow(&ui_style_card_device);
-
-    /* Chart & Settings Dialog Card: flat #FFFFFF */
-    lv_style_init(&ui_style_card_chart);
-    lv_style_set_bg_color(&ui_style_card_chart, lv_color_hex(0xFFFFFF));
-    lv_style_set_bg_opa(&ui_style_card_chart, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_card_chart, 0);
-    lv_style_set_radius(&ui_style_card_chart, 20);
-    setup_card_shadow(&ui_style_card_chart);
-
-    /* Primary Action / Selected Nav Fill: flat #215DDE */
-    lv_style_init(&ui_style_action);
-    lv_style_set_bg_color(&ui_style_action, lv_color_hex(0x215DDE));
-    lv_style_set_bg_opa(&ui_style_action, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_action, 0);
-    lv_style_set_radius(&ui_style_action, 14);
-
-    /* Inactive metric tab: solid #DEEBF7, radius 12, border 0 */
-    lv_style_init(&ui_style_tab_inactive);
-    lv_style_set_bg_color(&ui_style_tab_inactive, lv_color_hex(0xDEEBF7));
-    lv_style_set_bg_opa(&ui_style_tab_inactive, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_tab_inactive, 0);
-    lv_style_set_radius(&ui_style_tab_inactive, 12);
-    lv_style_set_text_color(&ui_style_tab_inactive, UI_COLOR_INK);
-
-    /* Active metric tab: flat #215DDE, radius 12, border 0 */
-    lv_style_init(&ui_style_tab_active);
-    lv_style_set_bg_color(&ui_style_tab_active, lv_color_hex(0x215DDE));
-    lv_style_set_bg_opa(&ui_style_tab_active, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_tab_active, 0);
-    lv_style_set_radius(&ui_style_tab_active, 12);
-    lv_style_set_text_color(&ui_style_tab_active, lv_color_white());
-
-    /* Soft button (modal X, limits, steppers, reset): radius 10, #EFF3F7 */
-    lv_style_init(&ui_style_soft_btn);
-    lv_style_set_bg_color(&ui_style_soft_btn, UI_COLOR_NEUTRAL_SOFT);
-    lv_style_set_bg_opa(&ui_style_soft_btn, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_soft_btn, 0);
-    lv_style_set_radius(&ui_style_soft_btn, 10);
-
-    /* Open dropdown list: flat white, font 18, line space 19, shadow, radius 10, pad 12/8 */
-    lv_style_init(&ui_style_dd_list);
-    lv_style_set_text_font(&ui_style_dd_list, &ui_font_18);
-    lv_style_set_text_line_space(&ui_style_dd_list, 19);
-    lv_style_set_border_width(&ui_style_dd_list, 0);
-    lv_style_set_radius(&ui_style_dd_list, 10);
-    lv_style_set_bg_color(&ui_style_dd_list, lv_color_hex(0xFFFFFF));
-    lv_style_set_bg_opa(&ui_style_dd_list, LV_OPA_COVER);
-    lv_style_set_text_color(&ui_style_dd_list, UI_COLOR_INK);
-    lv_style_set_shadow_width(&ui_style_dd_list, 16);
-    lv_style_set_shadow_color(&ui_style_dd_list, lv_color_black());
-    lv_style_set_shadow_opa(&ui_style_dd_list, 40);
-    lv_style_set_shadow_ofs_y(&ui_style_dd_list, 4);
-    lv_style_set_pad_hor(&ui_style_dd_list, 12);
-    lv_style_set_pad_ver(&ui_style_dd_list, 8);
-    lv_style_set_max_height(&ui_style_dd_list, 240);
-
-    /* Dropdown list selected item: blue soft fill, blue text */
-    lv_style_init(&ui_style_dd_list_selected);
-    lv_style_set_text_font(&ui_style_dd_list_selected, &ui_font_18);
-    lv_style_set_text_line_space(&ui_style_dd_list_selected, 19);
-    lv_style_set_bg_color(&ui_style_dd_list_selected, UI_COLOR_BLUE_SOFT);
-    lv_style_set_bg_opa(&ui_style_dd_list_selected, LV_OPA_COVER);
-    lv_style_set_text_color(&ui_style_dd_list_selected, UI_COLOR_BLUE_TEXT);
-
-    /* Dialog mode selected button: #EFF3FF, radius 10 */
-    lv_style_init(&ui_style_dialog_btn_on);
-    lv_style_set_bg_color(&ui_style_dialog_btn_on, UI_COLOR_BLUE_SOFT);
-    lv_style_set_bg_opa(&ui_style_dialog_btn_on, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_dialog_btn_on, 0);
-    lv_style_set_radius(&ui_style_dialog_btn_on, 10);
-
-    /* Dialog mode unselected button: #F7F7F7, radius 10 */
-    lv_style_init(&ui_style_dialog_btn_off);
-    lv_style_set_bg_color(&ui_style_dialog_btn_off, lv_color_hex(0xF7F7F7));
-    lv_style_set_bg_opa(&ui_style_dialog_btn_off, LV_OPA_COVER);
-    lv_style_set_border_width(&ui_style_dialog_btn_off, 0);
-    lv_style_set_radius(&ui_style_dialog_btn_off, 10);
-
-    /* Action button disabled state */
-    lv_style_init(&ui_style_action_disabled);
-    lv_style_set_bg_color(&ui_style_action_disabled, UI_COLOR_SWITCH_OFF);
-    lv_style_set_bg_opa(&ui_style_action_disabled, LV_OPA_COVER);
-
-    /* Shared static label styles to eliminate per-label local style allocations */
-    lv_style_init(&ui_style_lbl_18_ink);
-    lv_style_set_text_font(&ui_style_lbl_18_ink, &ui_font_18);
-    lv_style_set_text_color(&ui_style_lbl_18_ink, UI_COLOR_INK);
-
-    lv_style_init(&ui_style_lbl_24_ink);
-    lv_style_set_text_font(&ui_style_lbl_24_ink, &ui_font_24);
-    lv_style_set_text_color(&ui_style_lbl_24_ink, UI_COLOR_INK);
-
-    lv_style_init(&ui_style_lbl_18_muted);
-    lv_style_set_text_font(&ui_style_lbl_18_muted, &ui_font_18);
-    lv_style_set_text_color(&ui_style_lbl_18_muted, UI_COLOR_MUTED);
-
-    lv_style_init(&ui_style_lbl_18_red);
-    lv_style_set_text_font(&ui_style_lbl_18_red, &ui_font_18);
-    lv_style_set_text_color(&ui_style_lbl_18_red, UI_COLOR_RED);
-
-    lv_style_init(&ui_style_lbl_24_white);
-    lv_style_set_text_font(&ui_style_lbl_24_white, &ui_font_24);
-    lv_style_set_text_color(&ui_style_lbl_24_white, lv_color_white());
-
-    lv_style_init(&ui_style_lbl_24_center);
-    lv_style_set_text_font(&ui_style_lbl_24_center, &ui_font_24);
-    lv_style_set_text_color(&ui_style_lbl_24_center, UI_COLOR_INK);
-    lv_style_set_text_align(&ui_style_lbl_24_center, LV_TEXT_ALIGN_CENTER);
+    /* Gradient cache disabled for flat RGB565 fills */
+    lv_gradient_set_cache_size(0);
 }

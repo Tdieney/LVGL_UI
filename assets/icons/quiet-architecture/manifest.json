@@ -1,0 +1,1402 @@
+{
+  "schema_version": "2.0",
+  "theme": "Quiet Architecture",
+  "provenance_authority": "Raster pixels from docs/drafts/2026-09-17-pro-max/",
+  "sources": {
+    "devices-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "62b5011a2783219a00f482a6c1a6bd6011c49a1f03928de9c60843cd69462ea8"
+    },
+    "dashboard-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "a990b5747a9b4bddbae2151c7fe062463ca4951c86919e95c6f089aae84f4bd4"
+    },
+    "settings-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "4645b359d2aba3c21af33361ad5a873c47faa2599d652e525c1881797a20a0b1"
+    },
+    "auto-co2-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "09f0a227f2dab6f0324fdb7c9eb7bdbde64dc49e2a1916d449e19db2bcbc7fbe"
+    },
+    "auto-voc-invalid-quiet-architecture.png": {
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "756b0c0cca236c5c7d606cb43c32ff8afeb9beb1dba1b91e706719246342c3f5"
+    }
+  },
+  "masters": {
+    "purifier": {
+      "source_image": "devices-quiet-architecture.png",
+      "source_roi": [
+        100,
+        255,
+        190,
+        377
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/purifier_master.png",
+      "master_size": [
+        90,
+        122
+      ],
+      "master_sha256": "89ba8edee232c99db37521662a21a7afe98092f5d3ec50075081ea7b01a84596",
+      "ink_bbox": [
+        8,
+        9,
+        83,
+        115
+      ],
+      "topology_notes": "Canonical 1-row 5-perforation purifier tower with curved slit and top oval"
+    },
+    "fan": {
+      "source_image": "devices-quiet-architecture.png",
+      "source_roi": [
+        852,
+        252,
+        957,
+        374
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/fan_master.png",
+      "master_size": [
+        105,
+        122
+      ],
+      "master_sha256": "c06266d0e0b50deda9052f03579239f1ff34b55340020baaa589b437becbfe91",
+      "ink_bbox": [
+        10,
+        10,
+        96,
+        110
+      ],
+      "topology_notes": "Canonical 4-paddle fan on central hollow circular hub with aspect ratio 0.838"
+    },
+    "drop": {
+      "source_image": "devices-quiet-architecture.png",
+      "source_roi": [
+        102,
+        606,
+        186,
+        716
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/drop_master.png",
+      "master_size": [
+        84,
+        110
+      ],
+      "master_sha256": "5908f4c73d29452d33c44897464c17b25ccdc9c04d3fb08badc0b74b5dc35a48",
+      "ink_bbox": [
+        9,
+        9,
+        75,
+        103
+      ],
+      "topology_notes": "Canonical svelte liquid teardrop with smooth contour and circular bulb"
+    },
+    "light": {
+      "source_image": "devices-quiet-architecture.png",
+      "source_roi": [
+        855,
+        601,
+        944,
+        723
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/light_master.png",
+      "master_size": [
+        89,
+        122
+      ],
+      "master_sha256": "b126c91c6c1b22482e8ce3782a1b90ad0e6960514be55ec389db50ada912ae77",
+      "ink_bbox": [
+        9,
+        10,
+        83,
+        114
+      ],
+      "topology_notes": "Canonical architectural task lamp with hollow pedestal base and conical shade"
+    },
+    "home": {
+      "source_image": "dashboard-quiet-architecture.png",
+      "source_roi": [
+        55,
+        34,
+        120,
+        99
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/home_master.png",
+      "master_size": [
+        65,
+        65
+      ],
+      "master_sha256": "2a22f14c6a65b265144d4c681177bf7e14331b4aa15501e7d5fabd1f79a551cd",
+      "ink_bbox": [
+        6,
+        6,
+        58,
+        58
+      ],
+      "topology_notes": "Pentagonal house silhouette with solid dark-filled rectangular doorway"
+    },
+    "timer": {
+      "source_image": "dashboard-quiet-architecture.png",
+      "source_roi": [
+        1115,
+        50,
+        1157,
+        95
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/timer_master.png",
+      "master_size": [
+        42,
+        45
+      ],
+      "master_sha256": "cb80e828ce6c8701eb419ba1690e88f0cc3df78c67d5b3f3220a1ad3f650ff36",
+      "ink_bbox": [
+        7,
+        7,
+        35,
+        40
+      ],
+      "topology_notes": "Stopwatch with top buttons and vertical hand"
+    },
+    "thermometer": {
+      "source_image": "dashboard-quiet-architecture.png",
+      "source_roi": [
+        104,
+        717,
+        151,
+        799
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/thermometer_master.png",
+      "master_size": [
+        47,
+        82
+      ],
+      "master_sha256": "37885db18139b30510b6c60e1643ef1963964e8fa9a7f63f90f805534519f831",
+      "ink_bbox": [
+        8,
+        9,
+        41,
+        76
+      ],
+      "topology_notes": "Thermometer capsule with inner mercury line and filled bottom bulb"
+    },
+    "sliders": {
+      "source_image": "settings-quiet-architecture.png",
+      "source_roi": [
+        102,
+        405,
+        180,
+        487
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/sliders_master.png",
+      "master_size": [
+        78,
+        82
+      ],
+      "master_sha256": "8cf5a48d927aa687bafef637f148cb3905ca2d1f881b7d4d475b744278fc72d3",
+      "ink_bbox": [
+        8,
+        8,
+        70,
+        77
+      ],
+      "topology_notes": "Three adjustment track sliders with circular knobs and hollow centers"
+    },
+    "leaf": {
+      "source_image": "settings-quiet-architecture.png",
+      "source_roi": [
+        102,
+        549,
+        177,
+        624
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/leaf_master.png",
+      "master_size": [
+        75,
+        75
+      ],
+      "master_sha256": "1cb209e74dd99f6234582ed88f0d3ae393d79d4c6fdf72e76cc376eb8bf6425b",
+      "ink_bbox": [
+        8,
+        5,
+        67,
+        68
+      ],
+      "topology_notes": "Natural organic leaf with base stem and curved central vein"
+    },
+    "gear": {
+      "source_image": "settings-quiet-architecture.png",
+      "source_roi": [
+        98,
+        685,
+        180,
+        766
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/gear_master.png",
+      "master_size": [
+        82,
+        81
+      ],
+      "master_sha256": "ae10b1262d0660dee718cda67ac22a332123dc6f0d002210f5ede648dbab7f99",
+      "ink_bbox": [
+        7,
+        7,
+        75,
+        76
+      ],
+      "topology_notes": "8-tooth mechanical gear with central hollow circle"
+    },
+    "chevron_left": {
+      "source_image": "settings-quiet-architecture.png",
+      "source_roi": [
+        63,
+        139,
+        103,
+        197
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/chevron_left_master.png",
+      "master_size": [
+        40,
+        58
+      ],
+      "master_sha256": "8a86da6590de23e720b1ffebc0a10fac1a0f44de475fc610d6a4cb639fbf881b",
+      "ink_bbox": [
+        8,
+        7,
+        33,
+        52
+      ],
+      "topology_notes": "Left-pointing back chevron"
+    },
+    "chevron_right": {
+      "source_image": "settings-quiet-architecture.png",
+      "source_roi": [
+        1483,
+        558,
+        1520,
+        610
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/chevron_right_master.png",
+      "master_size": [
+        37,
+        52
+      ],
+      "master_sha256": "52469afdc71d9a03c43a47c4008128a8514b2e966d079ba019236a7be0d16014",
+      "ink_bbox": [
+        9,
+        8,
+        29,
+        44
+      ],
+      "topology_notes": "Right-pointing forward chevron"
+    },
+    "chevron_down": {
+      "source_image": "settings-quiet-architecture.png",
+      "source_roi": [
+        1456,
+        282,
+        1505,
+        322
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/chevron_down_master.png",
+      "master_size": [
+        49,
+        40
+      ],
+      "master_sha256": "02d9558162eca7a45fbd9b1af026232cd7c8a8e74e75fe31a9df11dabd89cedc",
+      "ink_bbox": [
+        6,
+        11,
+        40,
+        31
+      ],
+      "topology_notes": "Downward-pointing dropdown chevron"
+    },
+    "minus": {
+      "source_image": "auto-co2-quiet-architecture.png",
+      "source_roi": [
+        128,
+        626,
+        184,
+        653
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/minus_master.png",
+      "master_size": [
+        56,
+        27
+      ],
+      "master_sha256": "ba6aad6857b8304af758e37673f6e2375bf8ece1b6fffffff0fbf086142c0498",
+      "ink_bbox": [
+        8,
+        10,
+        49,
+        18
+      ],
+      "topology_notes": "Horizontal minus stepper bar"
+    },
+    "plus": {
+      "source_image": "auto-co2-quiet-architecture.png",
+      "source_roi": [
+        671,
+        611,
+        729,
+        669
+      ],
+      "extraction_method": "dark_ink",
+      "master_file": "masters/plus_master.png",
+      "master_size": [
+        58,
+        58
+      ],
+      "master_sha256": "cf3d8c9d29d721bb591d5c4833dadeb9ad9c8826e9cb40b7e5068ed87cabb6f9",
+      "ink_bbox": [
+        8,
+        8,
+        49,
+        49
+      ],
+      "topology_notes": "Centered plus stepper cross"
+    },
+    "warning": {
+      "source_image": "auto-voc-invalid-quiet-architecture.png",
+      "source_roi": [
+        48,
+        746,
+        111,
+        807
+      ],
+      "extraction_method": "warning_red",
+      "master_file": "masters/warning_master.png",
+      "master_size": [
+        63,
+        61
+      ],
+      "master_sha256": "a4d0713f1a99e000c8778d6a1b7e9c654da244d40437ad58bd67723a3aa3cd22",
+      "ink_bbox": [
+        7,
+        8,
+        56,
+        53
+      ],
+      "topology_notes": "Equilateral rounded warning triangle with centered exclamation mark"
+    },
+    "air": {
+      "source_image": "dashboard-quiet-architecture.png",
+      "source_roi": [
+        760,
+        251,
+        858,
+        342
+      ],
+      "extraction_method": "light_on_dark",
+      "master_file": "masters/air_master.png",
+      "master_size": [
+        98,
+        91
+      ],
+      "master_sha256": "7b339975bb3a1217abf5a8ee183d25f55ddb8c231d1fda48e15057b9771602cd",
+      "ink_bbox": [
+        8,
+        10,
+        91,
+        85
+      ],
+      "topology_notes": "Three flowing air wind streams on dark hero card"
+    },
+    "check_circle": {
+      "source_image": "dashboard-quiet-architecture.png",
+      "source_roi": [
+        399,
+        331,
+        486,
+        415
+      ],
+      "extraction_method": "check_badge",
+      "master_file": "masters/check_circle_master.png",
+      "master_size": [
+        87,
+        84
+      ],
+      "master_sha256": "ad937eae4592783e75b18ec590f398130f974e4852c4edac85d3b4916448c88b",
+      "ink_bbox": [
+        9,
+        6,
+        80,
+        78
+      ],
+      "topology_notes": "Celadon circular badge with dark checkmark cutout"
+    },
+    "chart": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/chart_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "31773b9589c78e82424cca1e42ff6c6e152e11be6dfaef5518b5646f29614232",
+      "ink_bbox": [
+        11,
+        15,
+        116,
+        118
+      ],
+      "topology_notes": "Documented extension: trend line chart with axes and series curve"
+    },
+    "devices": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/devices_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "9f3a12a6d0273d15760a5f7150a56e2c6d46a4ccb42be102614b1ad6a81c6b6b",
+      "ink_bbox": [
+        21,
+        15,
+        107,
+        113
+      ],
+      "topology_notes": "Documented extension: device card rectangle with content lines"
+    },
+    "radio": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/radio_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "dba415bc2f673f3f573122ed45d59858f719f61ab19cf7b4ded1558a7f70f70f",
+      "ink_bbox": [
+        18,
+        23,
+        114,
+        110
+      ],
+      "topology_notes": "Documented extension: 4-bar stepped radio RSSI indicator"
+    },
+    "plug": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/plug_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "179b4558fda48073bb76eba7b3931c149dd29847ac5b4fb465cd3a5911a8d2ec",
+      "ink_bbox": [
+        37,
+        10,
+        91,
+        118
+      ],
+      "topology_notes": "Documented extension: electrical plug outline"
+    },
+    "heat": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/heat_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "81a50036e3e59fc2c3041870ab11ac4bf868649de0fafc4fd4d60d1ae4e42071",
+      "ink_bbox": [
+        15,
+        10,
+        113,
+        107
+      ],
+      "topology_notes": "Documented extension: heater coil arches"
+    },
+    "close": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/close_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "fd7e7613861d91201acb5dfbf1f127cef5d417a9ab4bb21554b09ac7b23f1d6b",
+      "ink_bbox": [
+        28,
+        28,
+        100,
+        100
+      ],
+      "topology_notes": "Documented extension: modal close X"
+    },
+    "check": {
+      "source_image": null,
+      "source_roi": null,
+      "extraction_method": "vector_supersampled_extension",
+      "master_file": "masters/check_master.png",
+      "master_size": [
+        128,
+        128
+      ],
+      "master_sha256": "a6542b14a90077f527a2457df48a1a12a253f1fcae3198c9040124410703ab4e",
+      "ink_bbox": [
+        15,
+        15,
+        113,
+        113
+      ],
+      "topology_notes": "Documented extension: checkmark with circular outline"
+    }
+  },
+  "icons": [
+    {
+      "asset_name": "ui_icon_home_32",
+      "descriptor_name": "ui_icon_home_32",
+      "master_key": "home",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "403318ff4af9a961d13bc0d344623006cf120fdbc921c50ab42302dc3acfe213"
+    },
+    {
+      "asset_name": "ui_icon_home_30",
+      "descriptor_name": "ui_icon_home_30",
+      "master_key": "home",
+      "canvas_width": 30,
+      "canvas_height": 30,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 450,
+      "data_sha256": "e0cf5e4ed5dea3dd70a4e73018b042aed27e591e41ba32ccfdd391f67011eca7"
+    },
+    {
+      "asset_name": "ui_icon_chart_32",
+      "descriptor_name": "ui_icon_chart_32",
+      "master_key": "chart",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "c62d62670412a76751893947b45b8eabdd367eeea96cab233e85a636a0f2da4e"
+    },
+    {
+      "asset_name": "ui_icon_devices_32",
+      "descriptor_name": "ui_icon_devices_32",
+      "master_key": "devices",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "de5c9c03144fa7fafe33e5e81a1aebcfaaade560ec83748ca2df182df0360274"
+    },
+    {
+      "asset_name": "ui_icon_home_24",
+      "descriptor_name": "ui_icon_home_24",
+      "master_key": "home",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "cafcc3ad15d26adb30de97ee3c7580c22336476533dc93da456997beafa44caa"
+    },
+    {
+      "asset_name": "ui_icon_chart_24",
+      "descriptor_name": "ui_icon_chart_24",
+      "master_key": "chart",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "5b38ffc47da7f23f0909c8f4717c974f272cd62214e11de6189430b7fba7ab0e"
+    },
+    {
+      "asset_name": "ui_icon_devices_24",
+      "descriptor_name": "ui_icon_devices_24",
+      "master_key": "devices",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "2cb7b8b0a5fa2d463481326167f4556675d5a603cb00ef8f5bb82434d17ef4c5"
+    },
+    {
+      "asset_name": "ui_icon_sliders_24",
+      "descriptor_name": "ui_icon_sliders_24",
+      "master_key": "sliders",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "a11f3a251fed759074f4f26d7265c855dc73e7b53f6c7523841e0aec31ed88d9"
+    },
+    {
+      "asset_name": "ui_icon_radio_20",
+      "descriptor_name": "ui_icon_radio_20",
+      "master_key": "radio",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "e1d5cbb8a3638a230645e21cb258d420b815a5281f02965dcb4d5dc5d29309b3"
+    },
+    {
+      "asset_name": "ui_icon_timer_20",
+      "descriptor_name": "ui_icon_timer_20",
+      "master_key": "timer",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "f6fd66686122f60508daebe887793096fc86bf04877176a0a9c17939f0bbde92"
+    },
+    {
+      "asset_name": "ui_icon_air_28",
+      "descriptor_name": "ui_icon_air_28",
+      "master_key": "air",
+      "canvas_width": 28,
+      "canvas_height": 28,
+      "padding": 2,
+      "color_role": "UI_COLOR_CELADON",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 392,
+      "data_sha256": "5d6e4e7277965f64c79a2076bd4e66311f404506a06d0a1096f801c397287137"
+    },
+    {
+      "asset_name": "ui_icon_air_32",
+      "descriptor_name": "ui_icon_air_32",
+      "master_key": "air",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_CELADON",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "3051c37e70034bd8b10a4732071a5d142618a6f47893fd17d171d51f724fd161"
+    },
+    {
+      "asset_name": "ui_icon_thermometer_24",
+      "descriptor_name": "ui_icon_thermometer_24",
+      "master_key": "thermometer",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "046a092bd553f6587074efd1019162eb4c530dcb390d5fbfdb82565f173a1ee6"
+    },
+    {
+      "asset_name": "ui_icon_thermometer_32",
+      "descriptor_name": "ui_icon_thermometer_32",
+      "master_key": "thermometer",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "b167ad74e377dfb7b1877411a79048d2374260b42d86f2a838920ed5015c9e37"
+    },
+    {
+      "asset_name": "ui_icon_drop_24",
+      "descriptor_name": "ui_icon_drop_24",
+      "master_key": "drop",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "1d6149d3a696f31f066bad5fd09983e177581e5fbd44ac8d399bdbea67fe4fce"
+    },
+    {
+      "asset_name": "ui_icon_drop_32",
+      "descriptor_name": "ui_icon_drop_32",
+      "master_key": "drop",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "eb49162770a2c6616b84b04396026b8c8980cd1db6c23ac70d6d89f26dde2803"
+    },
+    {
+      "asset_name": "ui_icon_drop_36",
+      "descriptor_name": "ui_icon_drop_36",
+      "master_key": "drop",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "ee6395d41a5758c73c9510ab9e25ef4114659c9a736c95cd6c54ac77a1fc9580"
+    },
+    {
+      "asset_name": "ui_icon_drop_40",
+      "descriptor_name": "ui_icon_drop_40",
+      "master_key": "drop",
+      "canvas_width": 40,
+      "canvas_height": 40,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 800,
+      "data_sha256": "72b14dfd12fe82489820536e3b16805eab1e5f83f1847b0b47847e46c8c079d0"
+    },
+    {
+      "asset_name": "ui_icon_drop_42",
+      "descriptor_name": "ui_icon_drop_42",
+      "master_key": "drop",
+      "canvas_width": 42,
+      "canvas_height": 42,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 882,
+      "data_sha256": "c1517a9650065aae825610f2bcfc9de81225a17a50330abc6a2d1a4e9512606c"
+    },
+    {
+      "asset_name": "ui_icon_drop_44",
+      "descriptor_name": "ui_icon_drop_44",
+      "master_key": "drop",
+      "canvas_width": 44,
+      "canvas_height": 56,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 1232,
+      "data_sha256": "19c2d64e515b75692689a0e02db44cc9cddd1a667f9ade76da1987fbec65379e"
+    },
+    {
+      "asset_name": "ui_icon_purifier_24",
+      "descriptor_name": "ui_icon_purifier_24",
+      "master_key": "purifier",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "86070a5880e5117b8bb98b991c945c9a6e1c5a62cd18da7b23aefcbafc95d7ed"
+    },
+    {
+      "asset_name": "ui_icon_purifier_32",
+      "descriptor_name": "ui_icon_purifier_32",
+      "master_key": "purifier",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "60edc4a21f3922de0d1ef188c8c7511ea1c36b1e732e7ba6a4f64147cbcdda01"
+    },
+    {
+      "asset_name": "ui_icon_purifier_36",
+      "descriptor_name": "ui_icon_purifier_36",
+      "master_key": "purifier",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "aa001d249e8281e75f81bef01192869ab77c1f3db9c35743e1a9b04a7894f973"
+    },
+    {
+      "asset_name": "ui_icon_purifier_40",
+      "descriptor_name": "ui_icon_purifier_40",
+      "master_key": "purifier",
+      "canvas_width": 40,
+      "canvas_height": 40,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 800,
+      "data_sha256": "70099d1a981d5cc811b701fdf73049670a3b22d79ecf850a6fca365959e58de7"
+    },
+    {
+      "asset_name": "ui_icon_purifier_42",
+      "descriptor_name": "ui_icon_purifier_42",
+      "master_key": "purifier",
+      "canvas_width": 42,
+      "canvas_height": 42,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 882,
+      "data_sha256": "3b7690300bc18500c839e25a12b29c1bcef6172568883d964411cd5715b48d67"
+    },
+    {
+      "asset_name": "ui_icon_purifier_44",
+      "descriptor_name": "ui_icon_purifier_44",
+      "master_key": "purifier",
+      "canvas_width": 44,
+      "canvas_height": 56,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 1232,
+      "data_sha256": "60f05b00fada5f3af8bf2f4afdea9d6a06eee051154a871eaf8fa660c69eaeea"
+    },
+    {
+      "asset_name": "ui_icon_fan_24",
+      "descriptor_name": "ui_icon_fan_24",
+      "master_key": "fan",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "ef42081b1030020d887470ec02416617a730696b5f9c9f847d2c1fb10bb5ff44"
+    },
+    {
+      "asset_name": "ui_icon_fan_32",
+      "descriptor_name": "ui_icon_fan_32",
+      "master_key": "fan",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "a9d31e1df8926d2e177afccfb78d648ffddd9b8fecc7fc3fe70ea17a747fda19"
+    },
+    {
+      "asset_name": "ui_icon_fan_36",
+      "descriptor_name": "ui_icon_fan_36",
+      "master_key": "fan",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "be81615d8df945d7576ecc039769c8dfcdf2e7d3efcba032b4ecb8bab7851f6b"
+    },
+    {
+      "asset_name": "ui_icon_fan_40",
+      "descriptor_name": "ui_icon_fan_40",
+      "master_key": "fan",
+      "canvas_width": 40,
+      "canvas_height": 40,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 800,
+      "data_sha256": "8eec55b18024af24dd88129737cbac39a73c3d211c19687a403d765d108c692c"
+    },
+    {
+      "asset_name": "ui_icon_fan_42",
+      "descriptor_name": "ui_icon_fan_42",
+      "master_key": "fan",
+      "canvas_width": 42,
+      "canvas_height": 42,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 882,
+      "data_sha256": "30869f068192931ca57e226300821c8b773ec6d0382969a1052d63d96eb06c97"
+    },
+    {
+      "asset_name": "ui_icon_fan_44",
+      "descriptor_name": "ui_icon_fan_44",
+      "master_key": "fan",
+      "canvas_width": 44,
+      "canvas_height": 52,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 1144,
+      "data_sha256": "64d62593cc877ba925015d7b4c36d7f4dcedb314000d52ccb14f68eaeac62bdc"
+    },
+    {
+      "asset_name": "ui_icon_light_24",
+      "descriptor_name": "ui_icon_light_24",
+      "master_key": "light",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "1ffba5216139c297f0d2bb4e11ef2114c4cd094f6e9798fc52e27e981529ce52"
+    },
+    {
+      "asset_name": "ui_icon_light_32",
+      "descriptor_name": "ui_icon_light_32",
+      "master_key": "light",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "087947d79032c63fa10ad001d1988b545fe4d0f75cfb36c6636356c12a4fc4d2"
+    },
+    {
+      "asset_name": "ui_icon_light_36",
+      "descriptor_name": "ui_icon_light_36",
+      "master_key": "light",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "b8c4093197795d121b62adbd7c0a0ce5d946aa230aee55bccb6190ef14708ce0"
+    },
+    {
+      "asset_name": "ui_icon_light_40",
+      "descriptor_name": "ui_icon_light_40",
+      "master_key": "light",
+      "canvas_width": 40,
+      "canvas_height": 40,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 800,
+      "data_sha256": "3a1b23cc294d3c84834b73fc6e1ae70f570ca7eab6204ef96e1cd7d1ef12eaae"
+    },
+    {
+      "asset_name": "ui_icon_light_42",
+      "descriptor_name": "ui_icon_light_42",
+      "master_key": "light",
+      "canvas_width": 42,
+      "canvas_height": 42,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 882,
+      "data_sha256": "7ec3f50fdc6dbb9bcbab753b708a602458967ef0bb7f1a040ba4c2ebbb301052"
+    },
+    {
+      "asset_name": "ui_icon_light_44",
+      "descriptor_name": "ui_icon_light_44",
+      "master_key": "light",
+      "canvas_width": 44,
+      "canvas_height": 56,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 1232,
+      "data_sha256": "6d461fcc44c999ae99f98615cacc0befd368a46367c0e8e6232df8f233f93988"
+    },
+    {
+      "asset_name": "ui_icon_plug_24",
+      "descriptor_name": "ui_icon_plug_24",
+      "master_key": "plug",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "6e26f8428e13cd61d3329742c53b84cfa7dabc2285c0ecafe0c654916a60cdd1"
+    },
+    {
+      "asset_name": "ui_icon_plug_32",
+      "descriptor_name": "ui_icon_plug_32",
+      "master_key": "plug",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "5f38158dbaa63cd873078d4d21e338b7b571829a4f8266793baef864910c6752"
+    },
+    {
+      "asset_name": "ui_icon_plug_36",
+      "descriptor_name": "ui_icon_plug_36",
+      "master_key": "plug",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "665aa5c53e8a5fe56ca2e2bca095753afa0faa3599f1752ca0e0ea690834fb52"
+    },
+    {
+      "asset_name": "ui_icon_plug_40",
+      "descriptor_name": "ui_icon_plug_40",
+      "master_key": "plug",
+      "canvas_width": 40,
+      "canvas_height": 40,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 800,
+      "data_sha256": "1ca73689ed414dbb0104b88a7452a7c07783bc7698038edbe03d6d640e48dc43"
+    },
+    {
+      "asset_name": "ui_icon_plug_42",
+      "descriptor_name": "ui_icon_plug_42",
+      "master_key": "plug",
+      "canvas_width": 42,
+      "canvas_height": 42,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 882,
+      "data_sha256": "e502f4c4865bc075ca16841e14bb3493e86f31677fcbd7395e4c6cc09f808ef3"
+    },
+    {
+      "asset_name": "ui_icon_plug_44",
+      "descriptor_name": "ui_icon_plug_44",
+      "master_key": "plug",
+      "canvas_width": 44,
+      "canvas_height": 54,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 1188,
+      "data_sha256": "d4d505bbb42a77e4db2ed5ab245143a47241bc0a01fc08043ad538d47a8ea6a1"
+    },
+    {
+      "asset_name": "ui_icon_heat_24",
+      "descriptor_name": "ui_icon_heat_24",
+      "master_key": "heat",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "c563e1d7b476611e8e237af5baa01bd02fbcf19c11f16bb0b3a9714d4b3a5ae4"
+    },
+    {
+      "asset_name": "ui_icon_heat_32",
+      "descriptor_name": "ui_icon_heat_32",
+      "master_key": "heat",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "c64e5976254cd1cdaad5ec72b584522997ec32af102147e9779c021c4ba21ba3"
+    },
+    {
+      "asset_name": "ui_icon_heat_36",
+      "descriptor_name": "ui_icon_heat_36",
+      "master_key": "heat",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "523e933d922cf9c25e94ad921350e2856cfe660b55e08ff45c44ca611c2cf7d3"
+    },
+    {
+      "asset_name": "ui_icon_heat_40",
+      "descriptor_name": "ui_icon_heat_40",
+      "master_key": "heat",
+      "canvas_width": 40,
+      "canvas_height": 40,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 800,
+      "data_sha256": "61c2848a5db909e7302dabcbaf958fd2488f02d2430585db621565e7049a04cf"
+    },
+    {
+      "asset_name": "ui_icon_heat_42",
+      "descriptor_name": "ui_icon_heat_42",
+      "master_key": "heat",
+      "canvas_width": 42,
+      "canvas_height": 42,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 882,
+      "data_sha256": "6e1eec25a3c84972ca8f74ce76a9490368b91db6983b9281f27884f9b9c8410b"
+    },
+    {
+      "asset_name": "ui_icon_heat_44",
+      "descriptor_name": "ui_icon_heat_44",
+      "master_key": "heat",
+      "canvas_width": 46,
+      "canvas_height": 54,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 1242,
+      "data_sha256": "e60e0d68c788ff192df614cf805dcb8859669bb87d4bc5262a07440e330a55be"
+    },
+    {
+      "asset_name": "ui_icon_close_20",
+      "descriptor_name": "ui_icon_close_20",
+      "master_key": "close",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "16bf910a62ab2a18482ea2b6de80f1ba636fed507847b9e2dcabf82b54d04499"
+    },
+    {
+      "asset_name": "ui_icon_check_20",
+      "descriptor_name": "ui_icon_check_20",
+      "master_key": "check",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "e67f84bd002e18848240865423b539d398a9e8faca5b268515618e03654e4086"
+    },
+    {
+      "asset_name": "ui_icon_check_circle_32",
+      "descriptor_name": "ui_icon_check_circle_32",
+      "master_key": "check_circle",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_CELADON",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "5e592140a93c417a0b2c0f31de4afdb7bf88d95f24d56a59e5327eec9040fb65"
+    },
+    {
+      "asset_name": "ui_icon_warning_20",
+      "descriptor_name": "ui_icon_warning_20",
+      "master_key": "warning",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_RED",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "c231ac72afe50eebd16a0744a83dfedb8b47e6ccf0429d56ebd75f97b9fc8a60"
+    },
+    {
+      "asset_name": "ui_icon_warning_24",
+      "descriptor_name": "ui_icon_warning_24",
+      "master_key": "warning",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_RED",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "060dc9cb494cebf1437bd5a7ab2a4b6cce2d5ae7c48ce7e345c6cd8eb1bc6157"
+    },
+    {
+      "asset_name": "ui_icon_leaf_18",
+      "descriptor_name": "ui_icon_leaf_18",
+      "master_key": "leaf",
+      "canvas_width": 18,
+      "canvas_height": 18,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 162,
+      "data_sha256": "cf7a38750c23121b6f15247b8da77dca07bff286e689ddb7d9af068fdf605445"
+    },
+    {
+      "asset_name": "ui_icon_leaf_24",
+      "descriptor_name": "ui_icon_leaf_24",
+      "master_key": "leaf",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "ceff482b651d21cb1247fe42984990456f09123b45ac086be4e524f904f3aa62"
+    },
+    {
+      "asset_name": "ui_icon_leaf_32",
+      "descriptor_name": "ui_icon_leaf_32",
+      "master_key": "leaf",
+      "canvas_width": 32,
+      "canvas_height": 32,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 512,
+      "data_sha256": "0d5f45b9c837592a5dae3594c8b6bf59e4f50032b07b0fe99c55da8a3254dcc9"
+    },
+    {
+      "asset_name": "ui_icon_leaf_36",
+      "descriptor_name": "ui_icon_leaf_36",
+      "master_key": "leaf",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "5c45a9e669d32882fa15da6c729d928d6177020d2fe71abf72121faa4f64aad4"
+    },
+    {
+      "asset_name": "ui_icon_gear_24",
+      "descriptor_name": "ui_icon_gear_24",
+      "master_key": "gear",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "4c02c474c761073e2e2c9ed2d694c6490780393f78575029f27ca893e9c4ff3a"
+    },
+    {
+      "asset_name": "ui_icon_gear_36",
+      "descriptor_name": "ui_icon_gear_36",
+      "master_key": "gear",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "ea5d808fd1d83e466ec2008f83156cd0e8053826ea65ea38c8b7d88f9036c474"
+    },
+    {
+      "asset_name": "ui_icon_sliders_36",
+      "descriptor_name": "ui_icon_sliders_36",
+      "master_key": "sliders",
+      "canvas_width": 36,
+      "canvas_height": 36,
+      "padding": 2,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 648,
+      "data_sha256": "b4ad8d6ebbae5658fc8982a7fd43f7a10dff4ed161bd04c1c713bfee5f26dcc6"
+    },
+    {
+      "asset_name": "ui_icon_chevron_right_20",
+      "descriptor_name": "ui_icon_chevron_right_20",
+      "master_key": "chevron_right",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "3f1563ac762d7197580107a9bd4942c87284300941a54630d89c6c528323fafc"
+    },
+    {
+      "asset_name": "ui_icon_chevron_left_20",
+      "descriptor_name": "ui_icon_chevron_left_20",
+      "master_key": "chevron_left",
+      "canvas_width": 20,
+      "canvas_height": 20,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 200,
+      "data_sha256": "78f21c3fea2301ec318f7568974bf4942e7c1ae8be0c44f4ecd1dc30685652cf"
+    },
+    {
+      "asset_name": "ui_icon_chevron_left_24",
+      "descriptor_name": "ui_icon_chevron_left_24",
+      "master_key": "chevron_left",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "164f242abb4e8ff5be12ef0322e6d4fdd061d47e934df180b9bc64986a87ec48"
+    },
+    {
+      "asset_name": "ui_icon_chevron_down_18",
+      "descriptor_name": "ui_icon_chevron_down_18",
+      "master_key": "chevron_down",
+      "canvas_width": 18,
+      "canvas_height": 18,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 162,
+      "data_sha256": "85c301c5de2780173f670fdb7d596273b281fb1c0e370d37985982fd8878038c"
+    },
+    {
+      "asset_name": "ui_icon_plus_24",
+      "descriptor_name": "ui_icon_plus_24",
+      "master_key": "plus",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "380ce489fdbb970d530890b8fb3772393b04adadf3e2b05afd9fc4c42b51cb10"
+    },
+    {
+      "asset_name": "ui_icon_minus_24",
+      "descriptor_name": "ui_icon_minus_24",
+      "master_key": "minus",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1,
+      "color_role": "UI_COLOR_INK",
+      "cf": "LV_IMG_CF_ALPHA_4BIT",
+      "data_size": 288,
+      "data_sha256": "2d1930c82b815ae0cc6079d3b8a405700dc0a127e700496037454a790e23d93d"
+    }
+  ]
+}

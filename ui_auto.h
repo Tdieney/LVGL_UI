@@ -25,14 +25,14 @@ extern "C" {
 
 /* Canonical threshold limits and tap steps (per CURRENT.md R8) */
 #define UI_AUTO_CO2_MIN         0
-#define UI_AUTO_CO2_MAX         10000
+#define UI_AUTO_CO2_MAX         60000
 #define UI_AUTO_CO2_STEP        50
 #define UI_AUTO_CO2_MIN_GAP     50
 #define UI_AUTO_CO2_DEF_ON      1000
 #define UI_AUTO_CO2_DEF_OFF     800
 
 #define UI_AUTO_VOC_MIN         1
-#define UI_AUTO_VOC_MAX         500
+#define UI_AUTO_VOC_MAX         60000
 #define UI_AUTO_VOC_STEP        5
 #define UI_AUTO_VOC_MIN_GAP     5
 #define UI_AUTO_VOC_DEF_ON      150

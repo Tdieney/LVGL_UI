@@ -14,13 +14,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-/* Provide extern wire globals required by the UI link contract */
-lora_hub_cmd_t lora_hub_cmd;
-lora_node_status_t lora_node_status;
-volatile uint32_t lora_last_rx_tick_ms = 0;
-volatile int8_t lora_last_rssi = 0;
-volatile int8_t lora_last_snr = 0;
-volatile uint32_t lora_rx_revision = 0;
+/* Wire globals are defined in ui.c (motor_comm convention) */
 
 static void dummy_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {

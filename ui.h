@@ -1,6 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
+#include "lvgl.h"
 #include "ui_types.h"
 #include "ui_auto.h"
 #include "lora_comm.h"
@@ -24,6 +25,7 @@ void ui_tick(void);
 
 /* Outbound transmit readiness gate (true only after first fresh report is reconciled) */
 bool ui_is_tx_ready(void);
+bool ui_has_pending_command(void);
 
 /* Hub-local device configuration API */
 const ui_hub_device_config_t *ui_get_device_config(uint8_t idx);

@@ -56,10 +56,10 @@ typedef struct {
 typedef struct {
     int32_t value;
     bool valid;
-    uint16_t minute_of_day;         /* e.g. 14*60 + 17 = 857 */
+    uint32_t minute_of_day;         /* External feed: wall-clock minute of day (0..1439). Autonomous: monotonic session minutes. */
 } ui_history_sample_t;
 
-#define UI_CONFIG_SCHEMA_VERSION 0x02u
+#define UI_CONFIG_SCHEMA_VERSION 0x03u
 
 /* Legacy v1 config struct (for Flash migration and regression testing) */
 typedef struct {
@@ -76,7 +76,7 @@ typedef struct {
     ui_device_mode_t mode;          /* Auto or Manual */
     uint8_t active_low;             /* 0 = Active High (GPIO 1 is ON), 1 = Active Low (GPIO 0 is ON) */
     uint8_t schema_version;         /* UI_CONFIG_SCHEMA_VERSION */
-    int32_t auto_on_thresh;         /* Threshold to turn ON (CO2: ppm, VOC: index, RH: %) */
+    int32_t auto_on_thresh;         /* Threshold to turn ON (eCO2: ppm, TVOC: ppb, RH: %) */
     int32_t auto_off_thresh;        /* Threshold to turn OFF */
 } ui_hub_device_config_t;
 

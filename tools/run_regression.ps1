@@ -25,7 +25,7 @@ if (-not (Test-Path -LiteralPath $simulator -PathType Leaf)) {
     throw "Simulator not found: $simulator"
 }
 
-function Invoke-SimulatorWithTimeout {
+function Invoke-SimulatorProcess {
     param(
         [string]$ExePath,
         [string]$Arguments,
@@ -46,10 +46,24 @@ function Invoke-SimulatorWithTimeout {
     }
     $stdout = $stdoutTask.Result
     $stderr = $stderrTask.Result
-    if ($stdout) { Write-Host $stdout.TrimEnd() }
-    if ($stderr) { Write-Error $stderr.TrimEnd() }
-    if ($process.ExitCode -ne 0) {
-        throw "Simulator failed ($Arguments) with exit code $($process.ExitCode)"
+    return [PSCustomObject]@{
+        ExitCode = $process.ExitCode
+        Stdout   = $stdout
+        Stderr   = $stderr
+    }
+}
+
+function Invoke-SimulatorWithTimeout {
+    param(
+        [string]$ExePath,
+        [string]$Arguments,
+        [int]$TimeoutSec = 15
+    )
+    $res = Invoke-SimulatorProcess -ExePath $ExePath -Arguments $Arguments -TimeoutSec $TimeoutSec
+    if ($res.Stdout) { Write-Host $res.Stdout.TrimEnd() }
+    if ($res.Stderr) { Write-Error $res.Stderr.TrimEnd() }
+    if ($res.ExitCode -ne 0) {
+        throw "Simulator failed ($Arguments) with exit code $($res.ExitCode)"
     }
 }
 
@@ -71,14 +85,77 @@ try {
         throw "Unexpected framebuffer size: $actualBytes (expected $expectedBytes)"
     }
 
+    Write-Host '--- Running Negative Test: Unwritable Output Destination (NUL) ---'
+    $negRes = Invoke-SimulatorProcess -ExePath $simulator -Arguments '--shots NUL' -TimeoutSec 10
+    if ($negRes.Stdout) { Write-Host $negRes.Stdout.TrimEnd() }
+    if ($negRes.Stderr) { Write-Host $negRes.Stderr.TrimEnd() }
+
+    # Strict assertion (N1): Exit code must be exactly 1; fail if 0 or any other code.
+    if ($negRes.ExitCode -eq 0) {
+        throw "Scenario generator unexpectedly succeeded with exit code 0 on unwritable destination 'NUL'!"
+    }
+    if ($negRes.ExitCode -ne 1) {
+        throw "Scenario generator returned unexpected exit code $($negRes.ExitCode) on unwritable destination 'NUL' (expected 1)"
+    }
+
+    # Strict diagnostic check: Stderr must contain the specific fatal message.
+    $expectedFatalPattern = "FATAL: Output directory 'NUL' is not a valid directory or could not be created"
+    if ($negRes.Stderr -notmatch [regex]::Escape($expectedFatalPattern)) {
+        throw "Scenario generator exit code was 1, but stderr did not match expected diagnostic: '$expectedFatalPattern'. Actual stderr: $($negRes.Stderr)"
+    }
+    Write-Host "Deterministic negative test passed: exit code 1, diagnostic matched: '$expectedFatalPattern'"
+
     Write-Host '--- Running Full Scenario Generator (Timeout: 15s) ---'
     New-Item -ItemType Directory -Path $scenarioDir -Force | Out-Null
     Invoke-SimulatorWithTimeout -ExePath $simulator -Arguments "--shots `"$scenarioDir`"" -TimeoutSec 15
     $rawFiles = Get-ChildItem -LiteralPath $scenarioDir -Filter '*.raw'
-    if ($rawFiles.Count -lt 10) {
-        throw "Scenario generator emitted only $($rawFiles.Count) shots, expected at least 10"
+    $expectedShots = @(
+        'splash.raw',
+        'home_good.raw',
+        'home_moderate.raw',
+        'home_poor.raw',
+        'home_offline.raw',
+        'home_auto_paused_switch.raw',
+        'home_sensor_fail.raw',
+        'home_relay_pending.raw',
+        'home_relay_retry.raw',
+        'trends_data.raw',
+        'trends_stage1_interim.raw',
+        'trends_voc.raw',
+        'trends_temp.raw',
+        'trends_humid.raw',
+        'trends_autonomous_partial.raw',
+        'trends_one_sample.raw',
+        'trends_empty.raw',
+        'devices_grid.raw',
+        'devices_settings.raw',
+        'home_link_degraded.raw',
+        'home_auto_paused.raw',
+        'devices_auto_thresholds.raw',
+        'devices_settings_manual_only.raw',
+        'devices_auto_purifier.raw',
+        'devices_auto_humidifier.raw',
+        'devices_auto_max_60000.raw',
+        'devices_auto_invalid_draft.raw',
+        'home_temp_humid_invalid.raw',
+        'dropdown_open_top.raw',
+        'dropdown_open_bottom.raw'
+    )
+    $expectedBytesPerShot = 800 * 480 * 2
+    if ($rawFiles.Count -ne $expectedShots.Count) {
+        throw "Scenario generator emitted $($rawFiles.Count) shots, expected exactly $($expectedShots.Count)"
     }
-    Write-Host "Generated $($rawFiles.Count) scenario shots successfully."
+    foreach ($shotName in $expectedShots) {
+        $shotPath = Join-Path $scenarioDir $shotName
+        if (-not (Test-Path -LiteralPath $shotPath)) {
+            throw "Missing required scenario shot: $shotName"
+        }
+        $shotSize = (Get-Item -LiteralPath $shotPath).Length
+        if ($shotSize -ne $expectedBytesPerShot) {
+            throw "Scenario shot $shotName has size $shotSize bytes (expected $expectedBytesPerShot)"
+        }
+    }
+    Write-Host "Generated and verified all $($expectedShots.Count) scenario shots successfully ($expectedBytesPerShot bytes each)."
 
     Write-Host 'Smart Hub UI regression: PASS'
 } finally {

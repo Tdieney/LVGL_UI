@@ -170,9 +170,120 @@ bool test_restore_pre_init_fixture(void)
         return false;
     }
 
-    /* Reset device configurations so subsequent regression suite starts from standard factory defaults */
-    ui_test_reset_device_configs();
+    /* X3: Keep restored configs in place so ui_init() boots with them */
+    return true;
+}
 
+/* Post-ui_init fixture assertion: called immediately AFTER ui_init() */
+bool test_restore_post_init_assertion(void)
+{
+    /* 1. Assert 0 callbacks occurred during ui_init() */
+    if (s_cb_count != 0) {
+        fprintf(stderr, "FAIL: ui_init() triggered %u callbacks during initialization (expected 0)\n", (unsigned)s_cb_count);
+        return false;
+    }
+
+    /* 2. Assert Channel 1 config survived ui_init() without being overwritten */
+    const ui_hub_device_config_t *c1 = ui_get_device_config(1);
+    if (strcmp(c1->name, "Living Fan") != 0 || c1->preset != UI_PRESET_FAN ||
+        c1->mode != UI_MODE_AUTO || c1->active_low != 1 ||
+        c1->auto_on_thresh != 1200 || c1->auto_off_thresh != 800) {
+        fprintf(stderr, "FAIL: Ch 1 restored config did NOT survive ui_init()\n");
+        return false;
+    }
+
+    /* 3. Assert Channel 2 legacy config migrated to Manual survived ui_init() */
+    const ui_hub_device_config_t *c2 = ui_get_device_config(2);
+    if (strcmp(c2->name, "Bed Humid") != 0 || c2->preset != UI_PRESET_HUMIDIFIER ||
+        c2->mode != UI_MODE_MANUAL || c2->active_low != 0 ||
+        c2->auto_on_thresh != 40 || c2->auto_off_thresh != 50) {
+        fprintf(stderr, "FAIL: Ch 2 legacy migrated config did NOT survive ui_init()\n");
+        return false;
+    }
+
+    /* 4. Assert Channel 0 (missing record) defaulted to Purifier, Manual */
+    const ui_hub_device_config_t *c0 = ui_get_device_config(0);
+    if (c0->preset != UI_PRESET_PURIFIER || c0->mode != UI_MODE_MANUAL) {
+        fprintf(stderr, "FAIL: Ch 0 missing record did not yield Purifier Manual\n");
+        return false;
+    }
+
+    /* 5. Assert initial TX remains blocked before first eligible report */
+    sim_reset_tx_records();
+    if (ui_is_tx_ready()) {
+        fprintf(stderr, "FAIL: ui_is_tx_ready() was true immediately after ui_init() before first report\n");
+        return false;
+    }
+    if (ui_is_tx_ready()) {
+        sim_record_tx(lv_tick_get(), &lora_hub_cmd);
+    }
+    if (sim_get_tx_count() != 0) {
+        fprintf(stderr, "FAIL: Outbound TX occurred before first eligible report\n");
+        return false;
+    }
+
+    /* 6. Assert Auto hold is active on Auto channel */
+    if (!ui_is_auto_hold_active(1)) {
+        fprintf(stderr, "FAIL: Auto hold was not active on Ch 1 after boot\n");
+        return false;
+    }
+
+    /* 7. Publish first eligible report: Node reports relay 1 is active */
+    lora_node_status_init_header(&lora_node_status);
+    lora_node_status.bits.co2_ppm = 420;
+    lora_node_status.bits.co2_valid = 1;
+    lora_node_status.bits.tvoc_ppb = 85;
+    lora_node_status.bits.voc_valid = 1;
+    lora_node_status.bits.temp_deci_c = 235;
+    lora_node_status.bits.temp_valid = 1;
+    lora_node_status.bits.humidity_pct = 48;
+    lora_node_status.bits.humid_valid = 1;
+    /* Node reports relay 1 active: for active_low=1, physical level 0 means relay energized */
+    lora_node_status_set_relay_gpio(&lora_node_status, 0, 1);
+    lora_node_status_set_relay_gpio(&lora_node_status, 1, 0); /* relay 1 on */
+    lora_node_status_set_relay_gpio(&lora_node_status, 2, 1);
+    lora_node_status_set_relay_gpio(&lora_node_status, 3, 1);
+    lv_tick_inc(10u);
+    uint32_t now = lv_tick_get();
+    lora_last_rx_tick_ms = now;
+    lora_rx_revision++;
+
+    ui_tick();
+    lv_timer_handler();
+
+    /* Assert TX is now permitted */
+    if (!ui_is_tx_ready()) {
+        fprintf(stderr, "FAIL: ui_is_tx_ready() remained false after first eligible report\n");
+        return false;
+    }
+
+    /* Integration loop step: Record first send through the TX loop */
+    if (ui_is_tx_ready()) {
+        sim_record_tx(now, &lora_hub_cmd);
+    }
+    if (sim_get_tx_count() != 1) {
+        fprintf(stderr, "FAIL: First send was not recorded through TX loop\n");
+        return false;
+    }
+
+    /* Assert first recorded packet adopts reported GPIOs without sending boot zero pulse */
+    const sim_tx_record_t *first_tx = sim_get_tx_record(0);
+    uint8_t adopted_mask = first_tx->relay_mask;
+    uint8_t reported_mask = lora_node_status_get_relay_gpios_mask(&lora_node_status);
+    if (adopted_mask != reported_mask) {
+        fprintf(stderr, "FAIL: First recorded packet mask (0x%02X) did not adopt reported mask (0x%02X)\n",
+                adopted_mask, reported_mask);
+        return false;
+    }
+    if (lora_hub_cmd_get_relay_gpios_mask(&lora_hub_cmd) != reported_mask) {
+        fprintf(stderr, "FAIL: Outbound command mask (0x%02X) did not adopt reported mask (0x%02X)\n",
+                lora_hub_cmd_get_relay_gpios_mask(&lora_hub_cmd), reported_mask);
+        return false;
+    }
+
+    /* Restore clean defaults for subsequent regression checks */
+    ui_test_reset_device_configs();
+    ui_test_reset_device_commands();
     return true;
 }
 
@@ -260,10 +371,8 @@ bool test_restore_integration_suite(void)
         return false;
     }
 
-    /* Comprehensive Truncation Matrix for V2 */
-    const size_t v2_trunc_lens[] = { 0, 1, 2, 4, 8, 16, 20, sizeof(ui_hub_device_config_v1_t), sizeof(ui_hub_device_config_t) - 1 };
-    for (size_t t = 0; t < sizeof(v2_trunc_lens)/sizeof(v2_trunc_lens[0]); t++) {
-        size_t len = v2_trunc_lens[t];
+    /* Comprehensive Truncation Matrix for V2 (all lengths 0..sizeof(ui_hub_device_config_t)-1) */
+    for (size_t len = 0; len < sizeof(ui_hub_device_config_t); len++) {
         s_mock_storage_exists[3] = true;
         s_mock_storage_kind[3] = NVS_RECORD_KIND_CURRENT_V2;
         if (len > 0) memcpy(s_mock_storage[3], &cur_cfg, len);
@@ -278,10 +387,8 @@ bool test_restore_integration_suite(void)
         }
     }
 
-    /* Comprehensive Truncation Matrix for V1 Legacy */
-    const size_t v1_trunc_lens[] = { 0, 1, 2, 4, 8, 16, sizeof(ui_hub_device_config_v1_t) - 1 };
-    for (size_t t = 0; t < sizeof(v1_trunc_lens)/sizeof(v1_trunc_lens[0]); t++) {
-        size_t len = v1_trunc_lens[t];
+    /* Comprehensive Truncation Matrix for V1 Legacy (all lengths 0..sizeof(ui_hub_device_config_v1_t)-1) */
+    for (size_t len = 0; len < sizeof(ui_hub_device_config_v1_t); len++) {
         s_mock_storage_exists[2] = true;
         s_mock_storage_kind[2] = NVS_RECORD_KIND_LEGACY_V1;
         if (len > 0) memcpy(s_mock_storage[2], &leg_cfg, len);
@@ -350,12 +457,81 @@ bool test_restore_integration_suite(void)
         }
     }
 
+    /* Empty Name Matrix */
+    ui_hub_device_config_t bad_name = cur_cfg;
+    bad_name.name[0] = '\0';
+    s_mock_storage_exists[3] = true;
+    s_mock_storage_kind[3] = NVS_RECORD_KIND_CURRENT_V2;
+    s_mock_storage_len[3] = sizeof(bad_name);
+    memcpy(s_mock_storage[3], &bad_name, sizeof(bad_name));
+    ui_test_set_boot_staging(true);
+    config_load_from_flash();
+    ui_test_set_boot_staging(false);
+    c3 = ui_get_device_config(3);
+    if (c3->preset != UI_PRESET_LIGHT || c3->mode != UI_MODE_MANUAL) {
+        fprintf(stderr, "FAIL: Empty name was not rejected\n");
+        return false;
+    }
+
+    /* Unterminated Name Matrix */
+    memset(bad_name.name, 'A', sizeof(bad_name.name));
+    s_mock_storage_exists[3] = true;
+    s_mock_storage_kind[3] = NVS_RECORD_KIND_CURRENT_V2;
+    s_mock_storage_len[3] = sizeof(bad_name);
+    memcpy(s_mock_storage[3], &bad_name, sizeof(bad_name));
+    ui_test_set_boot_staging(true);
+    config_load_from_flash();
+    ui_test_set_boot_staging(false);
+    c3 = ui_get_device_config(3);
+    if (c3->preset != UI_PRESET_LIGHT || c3->mode != UI_MODE_MANUAL) {
+        fprintf(stderr, "FAIL: Unterminated name was not rejected\n");
+        return false;
+    }
+
+    /* Invalid Modes Matrix */
+    const uint8_t bad_modes[] = { 2, 3, 99, 255 };
+    for (size_t m = 0; m < sizeof(bad_modes)/sizeof(bad_modes[0]); m++) {
+        ui_hub_device_config_t bad_m = cur_cfg;
+        bad_m.mode = bad_modes[m];
+        s_mock_storage_exists[3] = true;
+        s_mock_storage_kind[3] = NVS_RECORD_KIND_CURRENT_V2;
+        s_mock_storage_len[3] = sizeof(bad_m);
+        memcpy(s_mock_storage[3], &bad_m, sizeof(bad_m));
+        ui_test_set_boot_staging(true);
+        config_load_from_flash();
+        ui_test_set_boot_staging(false);
+        c3 = ui_get_device_config(3);
+        if (c3->preset != UI_PRESET_LIGHT || c3->mode != UI_MODE_MANUAL) {
+            fprintf(stderr, "FAIL: Bad mode %u was not rejected\n", (unsigned)bad_modes[m]);
+            return false;
+        }
+    }
+
+    /* Invalid Polarities Matrix */
+    const uint8_t bad_pols[] = { 2, 99, 255 };
+    for (size_t pol = 0; pol < sizeof(bad_pols)/sizeof(bad_pols[0]); pol++) {
+        ui_hub_device_config_t bad_pol = cur_cfg;
+        bad_pol.active_low = bad_pols[pol];
+        s_mock_storage_exists[3] = true;
+        s_mock_storage_kind[3] = NVS_RECORD_KIND_CURRENT_V2;
+        s_mock_storage_len[3] = sizeof(bad_pol);
+        memcpy(s_mock_storage[3], &bad_pol, sizeof(bad_pol));
+        ui_test_set_boot_staging(true);
+        config_load_from_flash();
+        ui_test_set_boot_staging(false);
+        c3 = ui_get_device_config(3);
+        if (c3->preset != UI_PRESET_LIGHT || c3->mode != UI_MODE_MANUAL) {
+            fprintf(stderr, "FAIL: Bad polarity %u was not rejected\n", (unsigned)bad_pols[pol]);
+            return false;
+        }
+    }
+
     /* Malformed Thresholds Matrix across all 3 Auto Rules */
-    /* Fan: ON < OFF + 50 (e.g. 800/1000, 1000/1000, out-of-bounds 10050) */
+    /* Fan: ON < OFF + 50 (e.g. 800/1000, 1000/1000, out-of-bounds 60050) */
     ui_hub_device_config_t bad_fan = cur_cfg;
     bad_fan.preset = UI_PRESET_FAN;
     bad_fan.mode = UI_MODE_AUTO;
-    const int32_t fan_pairs[][2] = { {800, 1000}, {1000, 1000}, {10050, 800} };
+    const int32_t fan_pairs[][2] = { {800, 1000}, {1000, 1000}, {60050, 800} };
     for (size_t f = 0; f < sizeof(fan_pairs)/sizeof(fan_pairs[0]); f++) {
         bad_fan.auto_on_thresh = fan_pairs[f][0];
         bad_fan.auto_off_thresh = fan_pairs[f][1];
@@ -374,11 +550,11 @@ bool test_restore_integration_suite(void)
         }
     }
 
-    /* Purifier: ON < OFF + 5 (e.g. 100/100, 0/100) */
+    /* Purifier: ON < OFF + 5 (e.g. 100/100, 0/100, out-of-bounds 60005) */
     ui_hub_device_config_t bad_pur;
     ui_auto_get_defaults(0, UI_PRESET_PURIFIER, &bad_pur);
     bad_pur.mode = UI_MODE_AUTO;
-    const int32_t pur_pairs[][2] = { {100, 100}, {0, 100}, {600, 100} };
+    const int32_t pur_pairs[][2] = { {100, 100}, {0, 100}, {60005, 100} };
     for (size_t f = 0; f < sizeof(pur_pairs)/sizeof(pur_pairs[0]); f++) {
         bad_pur.auto_on_thresh = pur_pairs[f][0];
         bad_pur.auto_off_thresh = pur_pairs[f][1];

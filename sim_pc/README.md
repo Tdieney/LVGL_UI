@@ -23,7 +23,7 @@ The interactive simulator includes a deterministic fake node that responds to de
 
 | Key | Action | Description |
 |---|---|---|
-| `S` | **Replay Splash** | Replays the 2.5s Hyphen Deux splash sequence (#E9ECF1 fade-in, rise +14 px, hold, fade-out). |
+| `S` | **Replay Splash** | Replays the 2.5s Hyphen Deux splash sequence (#F4F1EC Warm Stone Canvas fade-in, rise +14 px, hold, fade-out). |
 | `F` | **Force Next Command to Fail** | Arms the fake node to return a negative acknowledgement (`success = false`) after 700 ms. The affected device transitions to `Unknown` with an active `Retry` button. |
 | `T` | **Force Next Command to Timeout** | Arms the fake node to drop the next command and never send an ACK (simulating packet loss over LoRa). After `UI_CMD_TIMEOUT_MS` (3000 ms), the device automatically transitions to `Unknown` + `Retry`. |
 | `L` | **Cycle Link Quality / SNR** | Steps simulated link quality through disconnected (0 bars) → 1 bar (-7 dB) → 2 bars (-4 dB) → 3 bars (0 dB) → 4 bars (+6 dB). |
@@ -36,7 +36,7 @@ The interactive simulator includes a deterministic fake node that responds to de
 
 ```powershell
 sim_pc\build\sim_pc.exe --smoke           # Quick smoke test verifying draw buffer flushes
-sim_pc\build\sim_pc.exe --regression      # Complete 14-check regression suite & benchmarks
+sim_pc\build\sim_pc.exe --regression      # Complete 32-check regression suite & benchmarks
 sim_pc\build\sim_pc.exe --shot <file.raw> # Renders a single headless 800x480 RGB565 shot
-sim_pc\build\sim_pc.exe --shots <dir>     # Generates 12 deterministic scenario framebuffers
+sim_pc\build\sim_pc.exe --shots <dir>     # Generates 24 deterministic scenario framebuffers
 ```

@@ -11,12 +11,14 @@ extern "C" {
  * Smart Hub Local Link Bookkeeping
  *
  * Receive timestamps, link quality, and dirty-check revision counter
- * owned and populated by the Smart Hub firmware / simulator application.
+ * Storage is defined exactly once in ui.c. Values are populated by the
+ * Smart Hub firmware / simulator application using these extern declarations.
+ * Do not add duplicate definitions to application code.
  *
  * These variables are Hub-local receive state and do not cross the radio wire.
  * ========================================================================= */
 
-extern volatile uint32_t lora_last_rx_tick_ms; /* Timestamp (lv_tick_get) of last valid status frame */
+extern volatile uint32_t lora_last_rx_tick_ms; /* HAL_GetTick timestamp of last valid status frame */
 extern volatile uint32_t lora_rx_revision;     /* Incremented on each newly received status frame */
 
 /* Link quality of the frames THIS Hub receives from the Node, measured locally
@@ -31,7 +33,7 @@ extern volatile uint32_t lora_rx_revision;     /* Incremented on each newly rece
  * RSSI is kept for diagnostics only -- it separates "weak signal" from "strong
  * signal plus strong interference", which look identical in SNR alone. */
 extern volatile int8_t   lora_last_snr;        /* SNR of last status frame heard by Hub, whole dB */
-extern volatile int8_t   lora_last_rssi;       /* RSSI of last status frame heard by Hub, dBm (diagnostics) */
+extern volatile int16_t  lora_last_rssi;       /* RSSI of last status frame heard by Hub, dBm (diagnostics) */
 
 /* =========================================================================
  * LoRa Demodulator Limits and SNR Margin Mapping

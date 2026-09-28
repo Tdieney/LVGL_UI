@@ -10,8 +10,8 @@
 
 static const ui_auto_rule_info_t s_rules[] = {
     [UI_PRESET_PURIFIER] = {
-        .sensor_name = "VOC",
-        .unit_name = "",
+        .sensor_name = "TVOC",
+        .unit_name = "ppb",
         .min_val = UI_AUTO_VOC_MIN,
         .max_val = UI_AUTO_VOC_MAX,
         .step = UI_AUTO_VOC_STEP,
@@ -21,7 +21,7 @@ static const ui_auto_rule_info_t s_rules[] = {
         .off_op = "<="
     },
     [UI_PRESET_FAN] = {
-        .sensor_name = "CO2",
+        .sensor_name = "eCO2",
         .unit_name = "ppm",
         .min_val = UI_AUTO_CO2_MIN,
         .max_val = UI_AUTO_CO2_MAX,
@@ -101,7 +101,7 @@ bool ui_auto_validate_thresholds(uint8_t preset, int32_t on_val, int32_t off_val
     } else if (preset == UI_PRESET_PURIFIER) {
         if (on_val < off_val + UI_AUTO_VOC_MIN_GAP) {
             if (err_msg && err_sz > 0) {
-                snprintf(err_msg, err_sz, "ON must exceed OFF by at least %d", UI_AUTO_VOC_MIN_GAP);
+                snprintf(err_msg, err_sz, "ON must exceed OFF by at least %d ppb", UI_AUTO_VOC_MIN_GAP);
             }
             return false;
         }
@@ -249,7 +249,7 @@ void ui_auto_rearm(ui_auto_state_t *state, uint32_t now)
     state->paused_error = false;
     state->qualify_count = 0;
     state->in_qualification = false;
-    state->last_transition_ms = now;
+    (void)now;
 }
 
 void ui_auto_pause(ui_auto_state_t *state)
@@ -309,15 +309,15 @@ bool ui_auto_eval(ui_auto_state_t *state,
             sensor_invalid = true;
         } else {
             val = (int32_t)status->bits.co2_ppm;
-            if (val > 10000) sensor_invalid = true;
+            if (val < 400 || val > UI_AUTO_CO2_MAX) sensor_invalid = true;
         }
     } else if (cfg->preset == UI_PRESET_PURIFIER) {
         /* Relevant faults: rs485_fault or co2_timeout (VOC sensor shared bus/driver) */
         if (!status->bits.voc_valid || status->bits.rs485_fault || status->bits.co2_timeout) {
             sensor_invalid = true;
         } else {
-            val = (int32_t)status->bits.voc_index;
-            if (val > 500) sensor_invalid = true;
+            val = (int32_t)status->bits.tvoc_ppb;
+            if (val > UI_AUTO_VOC_MAX) sensor_invalid = true;
         }
     } else if (cfg->preset == UI_PRESET_HUMIDIFIER) {
         /* Relevant faults: rs485_fault or th_timeout */
@@ -391,10 +391,13 @@ bool ui_auto_eval(ui_auto_state_t *state,
     }
 
     /* If 10-second post-switch hold is active, ignore opposite-direction rule triggers (per B5) */
-    if (state->last_transition_ms != 0 && (now - state->last_transition_ms) < UI_AUTO_MIN_HOLD_MS) {
-        state->qualify_count = 0;
-        state->in_qualification = false;
-        return false;
+    if (state->last_transition_ms != 0) {
+        uint32_t elapsed = (now == 0 && state->last_transition_ms == 1u) ? 0 : (now - state->last_transition_ms);
+        if (elapsed < UI_AUTO_MIN_HOLD_MS) {
+            state->qualify_count = 0;
+            state->in_qualification = false;
+            return false;
+        }
     }
 
     /* Accumulate qualification frames */

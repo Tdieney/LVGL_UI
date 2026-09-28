@@ -52,14 +52,15 @@ const ui_snapshot_t *ui_get_snapshot(void)
     if (!h || !h->dev_configs || !h->device_cmds) return NULL;
 
     uint32_t now = lv_tick_get();
-    bool online = (lora_last_rx_tick_ms != 0) && ((now - lora_last_rx_tick_ms) < LORA_LINK_TIMEOUT_MS);
+    uint32_t rx_elapsed = (now == 0 && lora_last_rx_tick_ms == 1u) ? 0 : (now - lora_last_rx_tick_ms);
+    bool online = (lora_last_rx_tick_ms != 0) && (rx_elapsed < LORA_LINK_TIMEOUT_MS);
     s_view_snapshot.connection = online ? UI_CONN_CONNECTED : UI_CONN_DISCONNECTED;
 
     /* Metrics from lora_node_status */
     s_view_snapshot.metrics[UI_METRIC_CO2].value = lora_node_status.bits.co2_ppm;
     s_view_snapshot.metrics[UI_METRIC_CO2].valid = online && lora_node_status.bits.co2_valid;
 
-    s_view_snapshot.metrics[UI_METRIC_VOC].value = lora_node_status.bits.voc_index;
+    s_view_snapshot.metrics[UI_METRIC_VOC].value = lora_node_status.bits.tvoc_ppb;
     s_view_snapshot.metrics[UI_METRIC_VOC].valid = online && lora_node_status.bits.voc_valid;
 
     s_view_snapshot.metrics[UI_METRIC_TEMP].value = lora_node_status.bits.temp_deci_c;
@@ -111,27 +112,6 @@ void ui_format_temp(char *buf, size_t buf_size, int32_t tenths)
     if (h && h->format_temp_c) h->format_temp_c(buf, buf_size, tenths);
 }
 
-void ui_inspect_chart_point(uint32_t point_id)
-{
-    const ui_test_hooks_t *h = ui_get_test_hooks();
-    if (h && h->trends_chart && *(h->trends_chart) != NULL && point_id < UI_HISTORY_CAPACITY) {
-        lv_obj_t *chart = *(h->trends_chart);
-        lv_chart_t *cp = (lv_chart_t *)chart;
-        cp->pressed_point_id = (lv_coord_t)point_id;
-        lv_event_send(chart, LV_EVENT_VALUE_CHANGED, NULL);
-    }
-}
-
-const char *ui_get_chart_tooltip_text(void)
-{
-    const ui_test_hooks_t *h = ui_get_test_hooks();
-    if (h && h->trends_tooltip && *(h->trends_tooltip) != NULL &&
-        !lv_obj_has_flag(*(h->trends_tooltip), LV_OBJ_FLAG_HIDDEN)) {
-        return h->chart_tooltip_buf;
-    }
-    return NULL;
-}
-
 const ui_history_sample_t *ui_get_history_sample(ui_metric_id_t metric, uint16_t index)
 {
     const ui_test_hooks_t *h = ui_get_test_hooks();
@@ -148,22 +128,114 @@ ui_metric_id_t ui_get_selected_trend_metric(void)
     return UI_METRIC_CO2;
 }
 
-const char *ui_get_trends_stat_cur(void)
+const char *ui_get_trends_title_str(void)
 {
     const ui_test_hooks_t *h = ui_get_test_hooks();
-    return h ? h->stat_cur_buf : NULL;
+    if (h && h->trends_title_lbl && *(h->trends_title_lbl)) {
+        return lv_label_get_text(*(h->trends_title_lbl));
+    }
+    return NULL;
 }
 
-const char *ui_get_trends_stat_min(void)
+const char *ui_get_trends_unit_str(void)
 {
     const ui_test_hooks_t *h = ui_get_test_hooks();
-    return h ? h->stat_min_buf : NULL;
+    if (h && h->trends_unit_lbl && *(h->trends_unit_lbl)) {
+        return lv_label_get_text(*(h->trends_unit_lbl));
+    }
+    return NULL;
 }
 
-const char *ui_get_trends_stat_max(void)
+bool ui_is_trends_unavail_badge_hidden(void)
 {
     const ui_test_hooks_t *h = ui_get_test_hooks();
-    return h ? h->stat_max_buf : NULL;
+    if (h && h->trends_unavail_badge && *(h->trends_unavail_badge)) {
+        return lv_obj_has_flag(*(h->trends_unavail_badge), LV_OBJ_FLAG_HIDDEN);
+    }
+    return true;
+}
+
+bool ui_is_trends_empty_box_hidden(void)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_empty_box && *(h->trends_empty_box)) {
+        return lv_obj_has_flag(*(h->trends_empty_box), LV_OBJ_FLAG_HIDDEN);
+    }
+    return true;
+}
+
+const char *ui_get_trends_empty_lbl_str(void)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_empty_lbl && *(h->trends_empty_lbl)) {
+        return lv_label_get_text(*(h->trends_empty_lbl));
+    }
+    return NULL;
+}
+
+bool ui_is_trends_empty_hint_hidden(void)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_empty_hint && *(h->trends_empty_hint)) {
+        return lv_obj_has_flag(*(h->trends_empty_hint), LV_OBJ_FLAG_HIDDEN);
+    }
+    return true;
+}
+
+const char *ui_get_trends_y_lbl_str(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_y_lbls && idx < 3 && h->trends_y_lbls[idx] != NULL &&
+        !lv_obj_has_flag(h->trends_y_lbls[idx], LV_OBJ_FLAG_HIDDEN)) {
+        return h->trends_y_buf ? h->trends_y_buf[idx] : lv_label_get_text(h->trends_y_lbls[idx]);
+    }
+    return NULL;
+}
+
+const char *ui_get_trends_time_lbl_str(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_time_labels && idx < 4 && h->trends_time_labels[idx] != NULL &&
+        !lv_obj_has_flag(h->trends_time_labels[idx], LV_OBJ_FLAG_HIDDEN)) {
+        return h->time_axis_buf ? h->time_axis_buf[idx] : lv_label_get_text(h->trends_time_labels[idx]);
+    }
+    return NULL;
+}
+
+bool ui_is_trends_tab_checked(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_tab_cards && idx < 4 && h->trends_tab_cards[idx] != NULL) {
+        return lv_obj_has_state(h->trends_tab_cards[idx], LV_STATE_CHECKED);
+    }
+    return false;
+}
+
+bool ui_is_trends_tab_dot_hidden(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_tab_dots && idx < 4 && h->trends_tab_dots[idx] != NULL) {
+        return lv_obj_has_flag(h->trends_tab_dots[idx], LV_OBJ_FLAG_HIDDEN);
+    }
+    return true;
+}
+
+const char *ui_get_trends_tab_val_str(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_tab_vals && idx < 4 && h->trends_tab_vals[idx] != NULL) {
+        return h->trends_tab_val_buf ? h->trends_tab_val_buf[idx] : lv_label_get_text(h->trends_tab_vals[idx]);
+    }
+    return NULL;
+}
+
+const char *ui_get_trends_tab_unit_str(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->trends_tab_units && idx < 4 && h->trends_tab_units[idx] != NULL) {
+        return h->trends_tab_unit_buf ? h->trends_tab_unit_buf[idx] : lv_label_get_text(h->trends_tab_units[idx]);
+    }
+    return NULL;
 }
 
 const char *ui_get_home_co2_str(void)
@@ -390,8 +462,24 @@ void ui_test_reset_device_commands(void)
         bool reported_on = (reported_gpio ^ h->dev_configs[i].active_low) != 0;
         ((bool *)h->desired_on)[i] = reported_on;
         lora_hub_cmd_set_relay_gpio(&lora_hub_cmd, i, reported_gpio);
+        if (h->auto_states) {
+            ui_auto_state_t *ast = &((ui_auto_state_t *)h->auto_states)[i];
+            ast->paused_error = false;
+            ast->qualify_count = 0;
+            ast->in_qualification = false;
+            ast->last_transition_ms = 0;
+            ast->suspended_sensor = false;
+        }
     }
     ui_dismiss_toast();
+}
+
+void ui_test_reset_history(void)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (h && h->reset_history) {
+        h->reset_history();
+    }
 }
 
 void ui_dialog_open_limits(void)
@@ -462,6 +550,17 @@ bool ui_get_auto_paused_error(uint8_t idx)
     return false;
 }
 
+bool ui_is_auto_hold_active(uint8_t idx)
+{
+    const ui_test_hooks_t *h = ui_get_test_hooks();
+    if (!h || !h->auto_states || idx >= UI_DEVICE_COUNT) return false;
+    uint32_t last = h->auto_states[idx].last_transition_ms;
+    if (last == 0) return false;
+    uint32_t now = lv_tick_get();
+    uint32_t elapsed = (now == 0 && last == 1u) ? 0 : (now - last);
+    return (elapsed < UI_AUTO_MIN_HOLD_MS);
+}
+
 bool ui_is_tx_ready_test(void)
 {
     return ui_is_tx_ready();
@@ -490,5 +589,49 @@ struct _lv_obj_t *ui_dialog_get_dropdown_list(void)
         return lv_dropdown_get_list(*(h->dialog_preset_dd));
     }
     return NULL;
+}
+
+static sim_tx_record_t s_sim_tx_records[SIM_MAX_TX_RECORDS];
+static size_t s_sim_tx_count = 0;
+static void (*s_tx_sink)(uint32_t now, const lora_hub_cmd_t *cmd) = NULL;
+
+void sim_set_tx_sink(void (*sink)(uint32_t now, const lora_hub_cmd_t *cmd))
+{
+    s_tx_sink = sink;
+}
+
+void sim_reset_tx_records(void)
+{
+    s_sim_tx_count = 0;
+}
+
+void sim_record_tx(uint32_t now, const lora_hub_cmd_t *cmd)
+{
+    if (s_sim_tx_count < SIM_MAX_TX_RECORDS) {
+        sim_tx_record_t *r = &s_sim_tx_records[s_sim_tx_count++];
+        r->tick_ms = now;
+        memcpy(r->bytes, cmd->bytes, sizeof(lora_hub_cmd_t));
+        r->seq = cmd->bits.seq;
+        r->relay_mask = lora_hub_cmd_get_relay_gpios_mask(cmd);
+        r->tx_ready_at_send = ui_is_tx_ready();
+    }
+    if (s_tx_sink != NULL) {
+        s_tx_sink(now, cmd);
+    }
+}
+
+size_t sim_get_tx_count(void)
+{
+    return s_sim_tx_count;
+}
+
+const sim_tx_record_t *sim_get_tx_record(size_t index)
+{
+    return (index < s_sim_tx_count) ? &s_sim_tx_records[index] : NULL;
+}
+
+const sim_tx_record_t *sim_get_tx_records(void)
+{
+    return s_sim_tx_records;
 }
 

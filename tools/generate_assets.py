@@ -7,119 +7,84 @@ Generates:
 """
 import os
 import sys
+import json
+import hashlib
 import subprocess
 import tempfile
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-EDGE_PATH = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-
-SVG_PATHS = {
-    "home": '<path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/>',
-    "chart": '<path d="M4 3v17h17M7 15l4-5 4 2 5-7"/>',
-    "devices": '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 11h8M8 15h2M15 15h1"/>',
-    "sliders": '<path d="M4 7h5m4 0h7M4 17h9m4 0h3"/><circle cx="11" cy="7" r="2"/><circle cx="15" cy="17" r="2"/>',
-    "radio": '<circle cx="12" cy="12" r="2"/><path d="M7 7a7 7 0 0 0 0 10M17 7a7 7 0 0 1 0 10M4 4a11 11 0 0 0 0 16M20 4a11 11 0 0 1 0 16"/>',
-    "timer": '<circle cx="12" cy="14" r="8"/><path d="M9 2h6m-3 0v4m0 4v5l3 2m4-12 2 2"/>',
-    "air": '<path d="M3 8h12a3 3 0 1 0-3-3M2 12h17a3 3 0 1 1-3 3M4 17h5a2 2 0 1 1-2 2"/>',
-    "thermometer": '<path d="M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0Z"/><path d="M12 8v9"/><circle cx="12" cy="18" r="1"/>',
-    "drop": '<path d="M12 3S5 11 5 15a7 7 0 0 0 14 0c0-4-7-12-7-12Z"/><path d="M8 15a4 4 0 0 0 4 4"/>',
-    "purifier": '<rect x="5" y="2" width="14" height="20" rx="4"/><path d="M8 7h8M8 10h8M8 14h1m3 0h1m3 0h.1M8 17h1m3 0h1m3 0h.1"/>',
-    "fan": '<circle cx="12" cy="12" r="2"/><path d="M11 10C4 3 14-2 16 5c1 2-1 4-3 5M14 12c10-2 10 9 3 8-3 0-4-3-4-6M11 14c-3 9-12 3-7-2 2-2 4-1 6-1"/>',
-    "light": '<path d="m9 3 8 4-5 9-8-4 5-9ZM15 12l4 8M12 21h9M7 15l-2 3M3 14l-2 1"/>',
-    "plug": '<path d="M8 2v5m8-5v5M6 7h12v3a6 6 0 0 1-12 0V7Zm6 9v6"/>',
-    "heat": '<path d="M6 20V9m6 11V9m6 11V9M4 20h16M8 5V2m8 3V2"/>',
-    "check": '<path d="m7 12 3 3 7-7"/><circle cx="12" cy="12" r="9"/>',
-    "warning": '<path d="m12 3 10 18H2L12 3Zm0 6v5m0 3v.1"/>',
-    "close": '<path d="m6 6 12 12M18 6 6 18"/>',
-}
-
-ICON_SPECS = [
-    ("home_32", "home", 32, 32, 1.7),
-    ("chart_32", "chart", 32, 32, 1.7),
-    ("devices_32", "devices", 32, 32, 1.7),
-    ("home_24", "home", 24, 24, 1.7),
-    ("chart_24", "chart", 24, 24, 1.7),
-    ("devices_24", "devices", 24, 24, 1.7),
-    ("sliders_24", "sliders", 24, 24, 1.7),
-    ("radio_20", "radio", 20, 20, 1.7),
-    ("timer_20", "timer", 20, 20, 1.7),
-    ("air_28", "air", 28, 28, 1.7),
-    ("thermometer_24", "thermometer", 24, 24, 1.7),
-    ("drop_24", "drop", 24, 24, 1.7),
-    ("purifier_24", "purifier", 24, 24, 1.7),
-    ("fan_24", "fan", 24, 24, 1.7),
-    ("light_24", "light", 24, 24, 1.7),
-    ("plug_24", "plug", 24, 24, 1.7),
-    ("heat_24", "heat", 24, 24, 1.7),
-    ("close_20", "close", 20, 20, 1.7),
-    ("check_20", "check", 20, 20, 1.7),
-    ("warning_20", "warning", 20, 20, 1.7),
-]
+MANIFEST_PATH = os.path.join(ROOT, "assets", "icons", "quiet-architecture", "manifest.json")
+MASTERS_DIR = os.path.join(ROOT, "assets", "icons", "quiet-architecture")
+REF_DIR = os.path.join(ROOT, "docs", "drafts", "2026-09-17-pro-max")
 
 
-def generate_splash():
-    print("Generating ui_splash_logo.c...")
-    in_png = os.path.join(ROOT, "docs", "prototype", "splash-logo.png")
-    out_c = os.path.join(ROOT, "ui_splash_logo.c")
-    cmd = [sys.executable, os.path.join(ROOT, "tools", "png2lvgl.py"), in_png, "ui_img_splash_logo", out_c, "--cf", "indexed_8"]
-    subprocess.check_call(cmd)
+def load_icon_manifest():
+    if not os.path.exists(MANIFEST_PATH):
+        raise RuntimeError(f"Authoritative icon manifest not found at {MANIFEST_PATH}!")
+    with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
-def generate_icons():
-    c_path = os.path.join(ROOT, "ui_icons.c")
-    h_path = os.path.join(ROOT, "ui_icons.h")
-    if os.path.exists(c_path) and os.path.exists(h_path) and "--force-icons" not in sys.argv:
-        print("ui_icons.h and ui_icons.c exist and verified. Preserving bitmaps (pass --force-icons to re-render).")
-        return
+def render_icon_a4(master_img, ibox, cw, ch, pad, dilate_radius=0):
+    # Canonical Quiet Architecture stroke (dilate_radius=0, original ~1.4px stroke width).
+    if dilate_radius > 0:
+        size = 2 * dilate_radius + 1
+        proc_img = master_img.filter(ImageFilter.MaxFilter(size=size))
+        min_x = max(0, ibox[0] - 1 - dilate_radius)
+        min_y = max(0, ibox[1] - 1 - dilate_radius)
+        max_x = min(master_img.width, ibox[2] + 1 + dilate_radius)
+        max_y = min(master_img.height, ibox[3] + 1 + dilate_radius)
+    else:
+        proc_img = master_img
+        min_x = max(0, ibox[0] - 1)
+        min_y = max(0, ibox[1] - 1)
+        max_x = min(master_img.width, ibox[2] + 1)
+        max_y = min(master_img.height, ibox[3] + 1)
 
-    print("Generating icons via Edge headless...")
-    html_file = os.path.join(ROOT, "scratch", "icons.html")
-    png_file = os.path.join(ROOT, "scratch", "icons.png")
-    os.makedirs(os.path.join(ROOT, "scratch"), exist_ok=True)
+    ink_crop = proc_img.crop((min_x, min_y, max_x, max_y))
+    iw, ih = ink_crop.size
 
-    html_parts = ["""<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<style>
-body { margin: 0; padding: 0; background: #ffffff; }
-.icon { position: absolute; }
-svg { display: block; stroke: #000000; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-</style></head><body>"""]
+    avail_w = cw - 2 * pad
+    avail_h = ch - 2 * pad
+    s = min(avail_w / iw, avail_h / ih)
+    tw = max(1, int(round(iw * s)))
+    th = max(1, int(round(ih * s)))
 
-    cur_x, cur_y = 10, 10
-    row_h = 40
-    icon_positions = {}
-    for name, icon_key, w, h, stroke_w in ICON_SPECS:
-        if cur_x + w + 10 > 750:
-            cur_x = 10
-            cur_y += row_h + 10
-        svg_content = SVG_PATHS[icon_key]
-        html_parts.append(
-            f'<div class="icon" style="left:{cur_x}px;top:{cur_y}px;width:{w}px;height:{h}px;">'
-            f'<svg viewBox="0 0 24 24" width="{w}" height="{h}" style="stroke-width:{stroke_w};">'
-            f'{svg_content}</svg></div>'
-        )
-        icon_positions[name] = (cur_x, cur_y, w, h)
-        cur_x += w + 20
+    scaled = ink_crop.resize((tw, th), Image.Resampling.LANCZOS)
+    canvas = Image.new("L", (cw, ch), 0)
+    paste_x = (cw - tw) // 2
+    paste_y = (ch - th) // 2
+    canvas.paste(scaled, (paste_x, paste_y))
 
-    html_parts.append("</body></html>")
-    with open(html_file, "w", encoding="utf-8") as f:
-        f.write("\n".join(html_parts))
+    stride = (cw + 1) // 2
+    out_bytes = bytearray()
+    cpix = canvas.load()
+    for y in range(ch):
+        row = bytearray(stride)
+        for x in range(cw):
+            val = int(round(cpix[x, y] * 15.0 / 255.0))
+            if x % 2 == 0:
+                row[x // 2] |= (val << 4)
+            else:
+                row[x // 2] |= val
+        out_bytes += row
+    return bytes(out_bytes)
 
-    cmd = [EDGE_PATH, "--headless", "--disable-gpu", f"--screenshot={png_file}", "--window-size=800,600", f"file:///{html_file}"]
-    subprocess.check_call(cmd)
-    full_img = Image.open(png_file).convert("RGBA")
+
+def emit_icon_code(manifest):
+    masters_cache = {}
+    for k, m_info in manifest["masters"].items():
+        m_path = os.path.join(MASTERS_DIR, m_info["master_file"])
+        if not os.path.exists(m_path):
+            raise RuntimeError(f"Master file {m_path} missing!")
+        masters_cache[k] = (Image.open(m_path), m_info["ink_bbox"])
 
     h_lines = [
-        "// Generated by tools/generate_assets.py - do not edit",
+        "// Generated by tools/generate_assets.py from canonical masters - do not edit",
         "#ifndef UI_ICONS_H",
         "#define UI_ICONS_H",
-        "",
-        "#ifdef LV_LVGL_H_INCLUDE_SIMPLE",
         '#include "lvgl.h"',
-        "#else",
-        '#include "lvgl/lvgl.h"',
-        "#endif",
         "",
         "#ifdef __cplusplus",
         'extern "C" {',
@@ -128,7 +93,7 @@ svg { display: block; stroke: #000000; fill: none; stroke-linecap: round; stroke
     ]
 
     c_lines = [
-        "// Generated by tools/generate_assets.py - do not edit",
+        "// Generated by tools/generate_assets.py from canonical masters - do not edit",
         '#include "ui_icons.h"',
         "",
         "#ifndef LV_ATTRIBUTE_MEM_ALIGN",
@@ -137,41 +102,32 @@ svg { display: block; stroke: #000000; fill: none; stroke-linecap: round; stroke
         "",
     ]
 
-    for name, icon_key, w, h, stroke_w in ICON_SPECS:
-        gx, gy, gw, gh = icon_positions[name]
-        cropped = full_img.crop((gx, gy, gx + gw, gy + gh))
-        gray = cropped.convert("L")
-        px = gray.load()
+    for item in manifest["icons"]:
+        asset_name = item["asset_name"]
+        master_key = item["master_key"]
+        cw = item["canvas_width"]
+        ch = item["canvas_height"]
+        pad = item.get("padding", 1)
 
-        stride = (gw + 1) // 2
-        out_bytes = bytearray()
-        for y in range(gh):
-            row = bytearray(stride)
-            for x in range(gw):
-                val = 255 - px[x, y]
-                a = val >> 4  # 4-bit alpha 0..15
-                if x % 2 == 0:
-                    row[x // 2] |= (a << 4)
-                else:
-                    row[x // 2] |= a
-            out_bytes += row
+        master_img, ibox = masters_cache[master_key]
+        out_bytes = render_icon_a4(master_img, ibox, cw, ch, pad)
 
-        h_lines.append(f"extern const lv_img_dsc_t ui_icon_{name};")
+        h_lines.append(f"extern const lv_img_dsc_t {asset_name};")
 
-        c_lines.append(f"const LV_ATTRIBUTE_MEM_ALIGN uint8_t ui_icon_{name}_map[] = {{")
+        c_lines.append(f"const LV_ATTRIBUTE_MEM_ALIGN uint8_t {asset_name}_map[] = {{")
         for i in range(0, len(out_bytes), 16):
             chunk = out_bytes[i : i + 16]
             c_lines.append("    " + ", ".join(f"0x{b:02x}" for b in chunk) + ",")
         c_lines.append("};")
         c_lines.append("")
-        c_lines.append(f"const lv_img_dsc_t ui_icon_{name} = {{")
+        c_lines.append(f"const lv_img_dsc_t {asset_name} = {{")
         c_lines.append("    .header.cf = LV_IMG_CF_ALPHA_4BIT,")
         c_lines.append("    .header.always_zero = 0,")
         c_lines.append("    .header.reserved = 0,")
-        c_lines.append(f"    .header.w = {gw},")
-        c_lines.append(f"    .header.h = {gh},")
+        c_lines.append(f"    .header.w = {cw},")
+        c_lines.append(f"    .header.h = {ch},")
         c_lines.append(f"    .data_size = {len(out_bytes)},")
-        c_lines.append(f"    .data = ui_icon_{name}_map,")
+        c_lines.append(f"    .data = {asset_name}_map,")
         c_lines.append("};")
         c_lines.append("")
 
@@ -184,25 +140,126 @@ svg { display: block; stroke: #000000; fill: none; stroke-linecap: round; stroke
         "#endif // UI_ICONS_H",
     ])
 
-    with open(os.path.join(ROOT, "ui_icons.h"), "w", encoding="utf-8") as f:
-        f.write("\n".join(h_lines) + "\n")
-    with open(os.path.join(ROOT, "ui_icons.c"), "w", encoding="utf-8") as f:
-        f.write("\n".join(c_lines) + "\n")
-    print(f"ui_icons.h and ui_icons.c generated successfully ({len(ICON_SPECS)} icons).")
+    out_h = "\n".join(h_lines) + "\n"
+    out_c = "\n".join(c_lines) + "\n"
+    return out_h, out_c
+
+
+def check_icons(verbose=True):
+    """Non-mutating verification of canonical masters, source PNGs, manifest, and generated code."""
+    if not os.path.exists(MANIFEST_PATH):
+        if verbose:
+            print(f"FAIL: Manifest missing: {MANIFEST_PATH}")
+        return False
+
+    try:
+        manifest = load_icon_manifest()
+    except Exception as e:
+        if verbose:
+            print(f"FAIL: Error loading manifest: {e}")
+        return False
+
+    # Check sources
+    for stem, meta in manifest.get("sources", {}).items():
+        src_path = os.path.join(REF_DIR, stem)
+        if not os.path.exists(src_path):
+            if verbose:
+                print(f"FAIL: Source reference image missing: {src_path}")
+            return False
+        with open(src_path, "rb") as f:
+            h = hashlib.sha256(f.read()).hexdigest()
+        if h != meta["sha256"]:
+            if verbose:
+                print(f"FAIL: Source hash mismatch for {stem}: {h} != {meta['sha256']}")
+            return False
+
+    # Check masters
+    for key, m_info in manifest.get("masters", {}).items():
+        m_path = os.path.join(MASTERS_DIR, m_info["master_file"])
+        if not os.path.exists(m_path):
+            if verbose:
+                print(f"FAIL: Master image missing: {m_path}")
+            return False
+        with open(m_path, "rb") as f:
+            h = hashlib.sha256(f.read()).hexdigest()
+        if h != m_info["master_sha256"]:
+            if verbose:
+                print(f"FAIL: Master hash mismatch for {key}: {h} != {m_info['master_sha256']}")
+            return False
+
+    # Check generated files
+    h_path = os.path.join(ROOT, "ui_icons.h")
+    c_path = os.path.join(ROOT, "ui_icons.c")
+    if not os.path.exists(h_path) or not os.path.exists(c_path):
+        if verbose:
+            print("FAIL: ui_icons.h or ui_icons.c does not exist")
+        return False
+
+    expected_h, expected_c = emit_icon_code(manifest)
+    with open(h_path, "r", encoding="utf-8") as f:
+        curr_h = f.read()
+    with open(c_path, "r", encoding="utf-8") as f:
+        curr_c = f.read()
+
+    if curr_h != expected_h:
+        if verbose:
+            print("FAIL: ui_icons.h does not match expected output from canonical masters")
+        return False
+    if curr_c != expected_c:
+        if verbose:
+            print("FAIL: ui_icons.c does not match expected output from canonical masters")
+        return False
+
+    if verbose:
+        print(f"PASS: Icon manifest, {len(manifest['masters'])} canonical masters, and {len(manifest['icons'])} runtime icons verified.")
+    return True
+
+
+def generate_splash():
+    print("Generating ui_splash_logo.c...")
+    in_png = os.path.join(ROOT, "docs", "prototype", "splash-logo.png")
+    out_c = os.path.join(ROOT, "ui_splash_logo.c")
+    cmd = [sys.executable, os.path.join(ROOT, "tools", "png2lvgl.py"), in_png, "ui_img_splash_logo", out_c, "--cf", "indexed_8"]
+    subprocess.check_call(cmd)
+
+
+def generate_icons(force=False):
+    c_path = os.path.join(ROOT, "ui_icons.c")
+    h_path = os.path.join(ROOT, "ui_icons.h")
+    if not force and os.path.exists(c_path) and os.path.exists(h_path):
+        if check_icons(verbose=False):
+            print("ui_icons.h and ui_icons.c exist and verified. Preserving bitmaps (pass --force-icons to re-render).")
+            return
+
+    print("Generating icons directly from canonical Quiet Architecture masters (A4 Lanczos)...")
+    manifest = load_icon_manifest()
+    out_h, out_c = emit_icon_code(manifest)
+
+    with open(h_path, "w", encoding="utf-8") as f:
+        f.write(out_h)
+    with open(c_path, "w", encoding="utf-8") as f:
+        f.write(out_c)
+    print(f"ui_icons.h and ui_icons.c generated successfully ({len(manifest['icons'])} icons).")
 
 
 def generate_fonts():
-    print("Generating fonts (Segoe UI Semibold: 18px, 24px, 34px, and 62px digits)...")
-    font_path = r"C:\Windows\Fonts\seguisb.ttf"
+    print("Generating fonts (Plus Jakarta Sans: 18px, 24px, 34px, 48px, and 62px digits)...")
+    font_path = os.path.join(ROOT, "tools", "PlusJakartaSans.ttf")
     if not os.path.exists(font_path):
-        font_path = r"C:\Windows\Fonts\segoeuisb.ttf"
-    if not os.path.exists(font_path):
-        font_path = r"C:\Windows\Fonts\segoeui.ttf"
+        raise RuntimeError(f"Required font PlusJakartaSans.ttf missing from {font_path}!")
 
-    print(f"Using font file: {font_path}")
+    print(f"Using pinned font file: {font_path}")
+
+    def load_font(size, weight="SemiBold"):
+        f = ImageFont.truetype(font_path, size)
+        try:
+            f.set_variation_by_name(weight)
+        except Exception:
+            pass
+        return f
 
     # 1. 62px Digits Font (0-9, -, ., em-dash)
-    font_62 = ImageFont.truetype(font_path, 62)
+    font_62 = load_font(62, "SemiBold")
     line_h_62 = 64
     base_l_62 = 12
     target_bl_62 = line_h_62 - base_l_62  # 52
@@ -244,13 +301,15 @@ def generate_fonts():
             "bytes": raw
         }
 
-    # 2. Standardized Font Sizes: 18, 24, 34 (User directive: min size 18)
-    sizes = [18, 24, 34]
+    # 2. Standardized Font Sizes: 18, 24, 34, 48 (User directive: min size 18)
+    sizes = [18, 24, 34, 48]
     unicode_chars = ["₂", "—", "…", "°", "·"]
 
     font_data = {}
     for sz in sizes:
-        fnt = ImageFont.truetype(font_path, sz)
+        # Sizes 18, 24, 34, 48 all use SemiBold for authentic Quiet Architecture typography
+        weight = "SemiBold"
+        fnt = load_font(sz, weight)
         ascent, descent = fnt.getmetrics()
         lh = ascent + descent
         bl = descent
@@ -404,27 +463,24 @@ def generate_fonts():
         "// Generated by tools/generate_assets.py - do not edit",
         "#ifndef UI_FONTS_H",
         "#define UI_FONTS_H",
-        "",
-        "#ifdef LV_LVGL_H_INCLUDE_SIMPLE",
         '#include "lvgl.h"',
-        "#else",
-        '#include "lvgl/lvgl.h"',
-        "#endif",
         "",
         "#ifdef __cplusplus",
         'extern "C" {',
         "#endif",
         "",
-        "/* 4 Standardized Segoe UI Semibold font sizes (User directive: min size 18) */",
+        "/* Standardized Plus Jakarta Sans font sizes (User directive: min size 18) */",
         "extern const lv_font_t ui_font_digits_62;",
         "extern const lv_font_t ui_font_18;",
         "extern const lv_font_t ui_font_24;",
         "extern const lv_font_t ui_font_34;",
+        "extern const lv_font_t ui_font_48;",
         "",
         "/* Backward compatibility aliases */",
         "#define ui_font_16 ui_font_18",
         "#define ui_font_20 ui_font_24",
         "#define ui_font_30 ui_font_34",
+        "#define ui_font_44 ui_font_48",
         "",
         "#ifdef __cplusplus",
         "}",
@@ -610,10 +666,19 @@ const lv_font_t ui_font_{sz} = {{
 
 
 def main():
-    generate_splash()
-    generate_icons()
-    generate_fonts()
-    print("All assets generated successfully.")
+    if "--check" in sys.argv:
+        ok = check_icons(verbose=True)
+        sys.exit(0 if ok else 1)
+
+    icons_only = "--icons-only" in sys.argv
+    force_icons = "--force-icons" in sys.argv or "--force" in sys.argv
+
+    if not icons_only:
+        generate_splash()
+    generate_icons(force=force_icons)
+    if not icons_only:
+        generate_fonts()
+    print("Asset processing completed successfully.")
 
 
 if __name__ == "__main__":

@@ -27,12 +27,15 @@ typedef struct {
     const ui_history_sample_t (*history)[UI_HISTORY_CAPACITY];
     const uint16_t *history_count;
     const ui_metric_id_t *selected_metric;
+    const uint32_t *history_rev;
+    const bool *history_externally_fed;
+    const bool *pending_trend_chart;
+    const bool *stage1_flush_pending;
+    const ui_metric_id_t *pending_trend_metric;
+    void (*trigger_metric_tab_click)(ui_metric_id_t metric);
+    lv_obj_t **trends_title_lbl;
 
     /* Text buffers */
-    const char *stat_cur_buf;
-    const char *stat_min_buf;
-    const char *stat_max_buf;
-    const char *chart_tooltip_buf;
     const char *co2_val_buf;
     const char *voc_val_buf;
     const char *temp_val_buf;
@@ -42,11 +45,30 @@ typedef struct {
     const char (*dev_name_buf)[24];
     const char (*dev_state_buf)[24];
     const char (*dev_mode_buf)[16];
+    const char (*trends_y_buf)[16];
+    const char (*time_axis_buf)[16];
+    const char (*trends_tab_val_buf)[16];
+    const char (*trends_tab_unit_buf)[8];
 
-    /* Widgets */
+    /* Trends Widgets */
     lv_obj_t **trends_chart;
     lv_chart_series_t **trends_chart_series;
-    lv_obj_t **trends_tooltip;
+    lv_obj_t **trends_unit_lbl;
+    lv_obj_t **trends_unavail_badge;
+    lv_obj_t **trends_empty_box;
+    lv_obj_t **trends_empty_lbl;
+    lv_obj_t **trends_empty_hint;
+    lv_obj_t **trends_y_lbls;
+    lv_obj_t **trends_tab_cards;
+    lv_obj_t **trends_tab_icons;
+    lv_obj_t **trends_tab_names;
+    lv_obj_t **trends_tab_dots;
+    lv_obj_t **trends_tab_vals;
+    lv_obj_t **trends_tab_units;
+    lv_obj_t **trends_time_labels;
+
+    /* Home & Devices Widgets */
+    lv_obj_t **home_co2_val;
     lv_obj_t **dev_page_names;
     lv_obj_t **dev_page_modes;
     lv_obj_t **dev_page_states;
@@ -80,6 +102,10 @@ typedef struct {
     lv_obj_t **dialog_subview_auto;
     lv_obj_t **dialog_btn_limits;
     lv_obj_t **dialog_btn_save_auto;
+    lv_obj_t **dialog_btn_on_minus;
+    lv_obj_t **dialog_btn_on_plus;
+    lv_obj_t **dialog_btn_off_minus;
+    lv_obj_t **dialog_btn_off_plus;
     void (*step_threshold)(bool is_on, int32_t dir);
     void (*on_dialog_reset_limits_click)(lv_event_t *e);
     void (*on_dialog_limits_back_click)(lv_event_t *e);
@@ -90,6 +116,14 @@ typedef struct {
     lv_obj_t **link_bars_cont;
     lv_obj_t **header_sep;
     lv_obj_t **uptime_label;
+    lv_obj_t **header_clock_ico;
+
+    /* Additional test inspection widgets */
+    lv_obj_t **home_temp_note;
+    lv_obj_t **home_humid_note;
+    lv_obj_t **home_air_status;
+    lv_obj_t **dialog_live_lbl;
+    void (*reset_history)(void);
 } ui_test_hooks_t;
 
 const ui_test_hooks_t *ui_get_test_hooks(void);

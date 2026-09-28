@@ -34,6 +34,7 @@ target_compile_definitions(sim_pc PRIVATE UI_TEST_HOOKS)
 target_include_directories(sim_pc PRIVATE ${UI_ROOT} ${lvgl_SOURCE_DIR})
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(sim_pc PRIVATE -Wall -Wextra -Werror -g)
+    target_link_options(sim_pc PRIVATE -Wl,--wrap=lv_mem_alloc -Wl,--wrap=lv_mem_realloc)
 endif()
 target_link_libraries(sim_pc PRIVATE lvgl gdi32 user32)
 
