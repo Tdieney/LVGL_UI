@@ -1,0 +1,38 @@
+# Compiled binaries & executables
+*.exe
+*.elf
+*.bin
+*.hex
+*.out
+*.o
+*.obj
+*.a
+*.lib
+
+# CMake & Build outputs
+build/
+sim_pc/build/
+__pycache__/
+CMakeFiles/
+CMakeCache.txt
+build.ninja
+.ninja_*
+cmake_install.cmake
+
+# IDEs & Local configurations
+.cache/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS generated files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Temporary & export artifacts
+*.log
+*.tmp
+*.raw
+smart_studio_ui_*.zip

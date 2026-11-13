@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Studio Dashboard</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 760px;
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select.baud-select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .status-pill {
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background: #f1f5f9;
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pill.online {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    button.btn-connect {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    button.btn-connect:hover {
+      background: var(--primary-hover);
+    }
+
+    button.btn-disconnect {
+      background: #f1f5f9;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    button.btn-disconnect:hover:not(:disabled) {
+      background: #fee2e2;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Kịch bản chuyển cảnh */
+    .scenes-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .scene-btn {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .scene-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    /* Grid 2x2 */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 175px;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Switch toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .2s;
+      border-radius: 24px;
+    }
+
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider-toggle {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider-toggle:before {
+      transform: translateX(20px);
+    }
+
+    /* Range controls */
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .val-display {
+      font-size: 0.9rem;
+      font-weight: 700;
+      width: 48px;
+      text-align: right;
+    }
+
+    /* AC Control */
+    .temp-control {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      margin: 8px 0;
+    }
+
+    .temp-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .btn-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      transition: background 0.1s;
+    }
+
+    .btn-circle:hover {
+      background: #f1f5f9;
+    }
+
+    /* Big Metric Displays for Temp and Humidity */
+    .big-metric {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 4px 0 10px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .big-metric-unit {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Terminal Log */
+    .terminal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .terminal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      height: 110px;
+      overflow-y: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.78rem;
+      color: #334155;
+    }
+
+    .log-row {
+      margin-bottom: 3px;
+      line-height: 1.4;
+    }
+    .log-tx { color: #2563eb; font-weight: 600; }
+    .log-rx { color: #16a34a; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <h1>Smart Studio Dashboard</h1>
+      </div>
+      <div class="header-actions">
+        <select id="selBaud" class="baud-select" title="Baudrate">
+          <option value="9600">9600 bps</option>
+          <option value="19200">19200 bps</option>
+          <option value="38400">38400 bps</option>
+          <option value="57600">57600 bps</option>
+          <option value="115200" selected>115200 bps</option>
+          <option value="230400">230400 bps</option>
+          <option value="460800">460800 bps</option>
+          <option value="921600">921600 bps</option>
+        </select>
+        <span id="connStatus" class="status-pill">
+          <span class="status-dot"></span> Chưa kết nối
+        </span>
+        <button id="btnConnect" class="btn-connect">Kết nối</button>
+        <button id="btnDisconnect" class="btn-disconnect" disabled>Ngắt kết nối</button>
+      </div>
+    </header>
+
+    <!-- 3 Kịch bản chuyển cảnh nhanh -->
+    <div class="scenes-bar">
+      <button class="scene-btn" onclick="applyScene('WELCOME')">
+        <span>🏠</span> Về nhà (Welcome)
+      </button>
+      <button class="scene-btn" onclick="applyScene('SLEEP')">
+        <span>🌙</span> Đi ngủ (Sleep)
+      </button>
+      <button class="scene-btn" onclick="applyScene('LEAVE')">
+        <span>🚪</span> Rời nhà (Leave)
+      </button>
+    </div>
+
+    <!-- 4 Card thiết bị (Lưới 2x2 cân đối) -->
+    <div class="grid">
+      <!-- Card 1: Đèn chiếu sáng chính -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">💡 Đèn chiếu sáng</div>
+          <label class="switch">
+            <input type="checkbox" id="lightSwitch">
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Độ sáng (Dimmer)</span>
+          <div class="control-row">
+            <input type="range" id="lightBright" min="0" max="100" value="0">
+            <span id="txtLightBright" class="val-display">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Điều hòa không khí -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">❄️ Điều hòa không khí</div>
+          <label class="switch">
+            <input type="checkbox" id="acSwitch">
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div class="temp-control">
+          <button class="btn-circle" id="btnTempDown">−</button>
+          <div class="temp-value"><span id="txtAcTemp">25</span>°C</div>
+          <button class="btn-circle" id="btnTempUp">+</button>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+          Cài đặt nhiệt độ: 16°C − 30°C
+        </div>
+      </div>
+
+      <!-- Card 3: Nhiệt độ -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🌡️ Nhiệt độ</div>
+        </div>
+        <div class="big-metric">
+          <span id="envTempDisplay">27</span>
+          <span class="big-metric-unit">°C</span>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Kéo giả lập gửi sang ESP32:</span>
+          <div class="control-row">
+            <input type="range" id="sliderTemp" min="16" max="40" step="1" value="27">
+            <span id="txtSliderTemp" class="val-display">27°</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Độ ẩm -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">💧 Độ ẩm</div>
+        </div>
+        <div class="big-metric">
+          <span id="envHumidDisplay">58</span>
+          <span class="big-metric-unit">%</span>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Kéo giả lập gửi sang ESP32:</span>
+          <div class="control-row">
+            <input type="range" id="sliderHumid" min="20" max="95" step="1" value="58">
+            <span id="txtSliderHumid" class="val-display">58%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Communication Log -->
+    <div class="terminal-card">
+      <div class="terminal-head">
+        <span>Giao tiếp UART (JSON + \n)</span>
+        <button onclick="clearLog()" style="background: none; border: none; font-size: 0.75rem; color: var(--text-muted); cursor: pointer;">Xóa nhật ký</button>
+      </div>
+      <div id="terminalLog" class="terminal-body">
+        <div class="log-row">Sẵn sàng. Chọn cổng COM và nhấn "Kết nối" để bắt đầu...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let port, writer, reader;
+    let isConnected = false;
+    let currentBaud = 115200;
+
+    // Trạng thái hệ thống
+    let state = {
+      light: { power: 0, bright: 0 },
+      ac: { power: 0, temp: 25 },
+      env: { temp: 27, humid: 58 }
+    };
+
+    function log(msg, type = '') {
+      const term = document.getElementById('terminalLog');
+      const row = document.createElement('div');
+      row.className = `log-row ${type}`;
+      row.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      term.appendChild(row);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('terminalLog').innerHTML = '';
+    }
+
+    // Kết nối cổng COM
+    document.getElementById('btnConnect').addEventListener('click', async () => {
+      if (isConnected) return;
+      currentBaud = parseInt(document.getElementById('selBaud').value);
+      try {
+        port = await navigator.serial.requestPort();
+        await openPort(currentBaud);
+      } catch (err) {
+        log("Lỗi kết nối COM: " + err.message);
+      }
+    });
+
+    // Ngắt kết nối
+    document.getElementById('btnDisconnect').addEventListener('click', async () => {
+      if (!isConnected) return;
+      await disconnectPort();
+    });
+
+    async function openPort(baud) {
+      await port.open({ baudRate: baud });
+      isConnected = true;
+      currentBaud = baud;
+
+      const pill = document.getElementById('connStatus');
+      pill.className = "status-pill online";
+      pill.innerHTML = `<span class="status-dot"></span> Đã kết nối (${baud})`;
+
+      document.getElementById('btnConnect').disabled = true;
+      document.getElementById('btnDisconnect').disabled = false;
+      log(`Đã mở cổng COM @ ${baud} bps`);
+
+      writer = port.writable.getWriter();
+      readSerial();
+    }
+
+    async function disconnectPort() {
+      try {
+        if (reader) await reader.cancel();
+        if (writer) await writer.close();
+        if (port) await port.close();
+      } catch (e) {}
+      isConnected = false;
+
+      const pill = document.getElementById('connStatus');
+      pill.className = "status-pill";
+      pill.innerHTML = `<span class="status-dot"></span> Chưa kết nối`;
+
+      document.getElementById('btnConnect').disabled = false;
+      document.getElementById('btnDisconnect').disabled = true;
+      log("Đã ngắt kết nối cổng COM");
+    }
+
+    // Thay đổi Baudrate trực tiếp
+    document.getElementById('selBaud').addEventListener('change', async (e) => {
+      const newBaud = parseInt(e.target.value);
+      if (!isConnected || newBaud === currentBaud) return;
+
+      log(`Chuyển baudrate sang ${newBaud} bps...`);
+      await sendPacket({ cmd: "BAUD", val: newBaud });
+      await new Promise(r => setTimeout(r, 100));
+
+      try {
+        if (reader) await reader.cancel();
+        if (writer) await writer.close();
+        await port.close();
+        await openPort(newBaud);
+        log(`Đổi baudrate thành công: ${newBaud} bps`);
+      } catch (err) {
+        log("Lỗi đổi baudrate: " + err.message);
+      }
+    });
+
+    async function sendPacket(obj) {
+      if (!writer) return;
+      const str = JSON.stringify(obj) + "\n";
+      log("TX -> " + str.trim(), "log-tx");
+      await writer.write(new TextEncoder().encode(str));
+    }
+
+    async function readSerial() {
+      const textDecoder = new TextDecoderStream();
+      port.readable.pipeTo(textDecoder.writable);
+      reader = textDecoder.readable.getReader();
+      let buf = "";
+
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += value;
+          let parts = buf.split("\n");
+          buf = parts.pop();
+
+          for (let line of parts) {
+            let clean = line.trim();
+            if (clean) {
+              log("RX <- " + clean, "log-rx");
+              try {
+                handleMcuEvent(JSON.parse(clean));
+              } catch(err) {
+                // Bỏ qua chuỗi không phải JSON
+              }
+            }
+          }
+        }
+      } catch (err) {
+        if (isConnected) log("Mất kết nối Serial: " + err.message);
+      }
+    }
+
+    // Xử lý gói tin nhận từ ESP32
+    function handleMcuEvent(data) {
+      const key = data.event || data.cmd;
+      if (!key) return;
+
+      if (key === "LIGHT") {
+        state.light.power = data.power !== undefined ? data.power : state.light.power;
+        state.light.bright = data.bright !== undefined ? data.bright : state.light.bright;
+        syncLightUi();
+      } else if (key === "AC") {
+        state.ac.power = data.power !== undefined ? data.power : state.ac.power;
+        state.ac.temp = data.temp !== undefined ? data.temp : state.ac.temp;
+        syncAcUi();
+      } else if (key === "ENV") {
+        state.env.temp = data.temp !== undefined ? Math.round(data.temp) : state.env.temp;
+        state.env.humid = data.humid !== undefined ? Math.round(data.humid) : state.env.humid;
+        syncEnvUi();
+      } else if (key === "SCENE") {
+        applySceneUi(data.mode);
+      } else if (key === "BAUD") {
+        if (data.val && data.val !== currentBaud) {
+          document.getElementById('selBaud').value = data.val;
+          document.getElementById('selBaud').dispatchEvent(new Event('change'));
+        }
+      }
+    }
+
+    function syncLightUi() {
+      document.getElementById('lightSwitch').checked = state.light.power === 1;
+      document.getElementById('lightBright').value = state.light.bright;
+      document.getElementById('txtLightBright').innerText = state.light.bright + "%";
+    }
+
+    function syncAcUi() {
+      document.getElementById('acSwitch').checked = state.ac.power === 1;
+      document.getElementById('txtAcTemp').innerText = state.ac.temp;
+    }
+
+    function syncEnvUi() {
+      document.getElementById('envTempDisplay').innerText = state.env.temp;
+      document.getElementById('envHumidDisplay').innerText = state.env.humid;
+      document.getElementById('sliderTemp').value = state.env.temp;
+      document.getElementById('txtSliderTemp').innerText = state.env.temp + "°";
+      document.getElementById('sliderHumid').value = state.env.humid;
+      document.getElementById('txtSliderHumid').innerText = state.env.humid + "%";
+    }
+
+    // Tương tác điều khiển Đèn
+    document.getElementById('lightSwitch').addEventListener('change', (e) => {
+      state.light.power = e.target.checked ? 1 : 0;
+      if (state.light.power && state.light.bright === 0) state.light.bright = 80;
+      syncLightUi();
+      sendPacket({ cmd: "LIGHT", power: state.light.power, bright: state.light.bright });
+    });
+
+    document.getElementById('lightBright').addEventListener('input', (e) => {
+      state.light.bright = parseInt(e.target.value);
+      state.light.power = state.light.bright > 0 ? 1 : 0;
+      syncLightUi();
+      sendPacket({ cmd: "LIGHT", power: state.light.power, bright: state.light.bright });
+    });
+
+    // Tương tác điều khiển Điều hòa
+    document.getElementById('acSwitch').addEventListener('change', (e) => {
+      state.ac.power = e.target.checked ? 1 : 0;
+      syncAcUi();
+      sendPacket({ cmd: "AC", power: state.ac.power, temp: state.ac.temp });
+    });
+
+    document.getElementById('btnTempUp').addEventListener('click', () => {
+      if (state.ac.temp < 30) {
+        state.ac.temp++;
+        syncAcUi();
+        sendPacket({ cmd: "AC", power: state.ac.power, temp: state.ac.temp });
+      }
+    });
+
+    document.getElementById('btnTempDown').addEventListener('click', () => {
+      if (state.ac.temp > 16) {
+        state.ac.temp--;
+        syncAcUi();
+        sendPacket({ cmd: "AC", power: state.ac.power, temp: state.ac.temp });
+      }
+    });
+
+    // Giả lập kéo Nhiệt độ từ Web
+    document.getElementById('sliderTemp').addEventListener('input', (e) => {
+      state.env.temp = parseInt(e.target.value, 10);
+      document.getElementById('envTempDisplay').innerText = state.env.temp;
+      document.getElementById('txtSliderTemp').innerText = state.env.temp + "°";
+      sendPacket({ cmd: "ENV", temp: state.env.temp, humid: state.env.humid });
+    });
+
+    // Giả lập kéo Độ ẩm từ Web
+    document.getElementById('sliderHumid').addEventListener('input', (e) => {
+      state.env.humid = parseInt(e.target.value);
+      document.getElementById('envHumidDisplay').innerText = state.env.humid;
+      document.getElementById('txtSliderHumid').innerText = state.env.humid + "%";
+      sendPacket({ cmd: "ENV", temp: state.env.temp, humid: state.env.humid });
+    });
+
+    // Kịch bản nhanh (3 Scenes)
+    function applyScene(name) {
+      applySceneUi(name);
+      sendPacket({ cmd: "SCENE", mode: name });
+    }
+
+    function applySceneUi(name) {
+      if (name === "WELCOME") {
+        state.light = { power: 1, bright: 80 };
+        state.ac = { power: 1, temp: 24 };
+      } else if (name === "SLEEP") {
+        state.light = { power: 1, bright: 10 };
+        state.ac = { power: 1, temp: 26 };
+      } else if (name === "LEAVE") {
+        state.light = { power: 0, bright: 0 };
+        state.ac = { power: 0, temp: 26 };
+      }
+      syncLightUi();
+      syncAcUi();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,691 @@
+{
+  "schema_version": "2.0",
+  "theme": "Smart Studio (zero-text high-contrast dark)",
+  "provenance_authority": "Shared masters preserved unchanged; others drawn by tools/draw_icons.py",
+  "masters": {
+    "home": {
+      "source": "Smart Hub (ui/smart-hub), copied unchanged",
+      "master_file": "masters/home_master.png",
+      "master_size": [
+        65,
+        65
+      ],
+      "master_sha256": "2a22f14c6a65b265144d4c681177bf7e14331b4aa15501e7d5fabd1f79a551cd",
+      "ink_bbox": [
+        6,
+        6,
+        58,
+        58
+      ]
+    },
+    "plus": {
+      "source": "Smart Hub (ui/smart-hub), copied unchanged",
+      "master_file": "masters/plus_master.png",
+      "master_size": [
+        58,
+        58
+      ],
+      "master_sha256": "cf3d8c9d29d721bb591d5c4833dadeb9ad9c8826e9cb40b7e5068ed87cabb6f9",
+      "ink_bbox": [
+        8,
+        8,
+        49,
+        49
+      ]
+    },
+    "minus": {
+      "source": "Smart Hub (ui/smart-hub), copied unchanged",
+      "master_file": "masters/minus_master.png",
+      "master_size": [
+        56,
+        27
+      ],
+      "master_sha256": "ba6aad6857b8304af758e37673f6e2375bf8ece1b6fffffff0fbf086142c0498",
+      "ink_bbox": [
+        8,
+        10,
+        49,
+        18
+      ]
+    },
+    "thermometer": {
+      "source": "Smart Hub (ui/smart-hub), copied unchanged",
+      "master_file": "masters/thermometer_master.png",
+      "master_size": [
+        47,
+        82
+      ],
+      "master_sha256": "37885db18139b30510b6c60e1643ef1963964e8fa9a7f63f90f805534519f831",
+      "ink_bbox": [
+        8,
+        9,
+        41,
+        76
+      ]
+    },
+    "drop": {
+      "source": "Smart Hub (ui/smart-hub), copied unchanged",
+      "master_file": "masters/drop_master.png",
+      "master_size": [
+        84,
+        110
+      ],
+      "master_sha256": "5908f4c73d29452d33c44897464c17b25ccdc9c04d3fb08badc0b74b5dc35a48",
+      "ink_bbox": [
+        9,
+        9,
+        75,
+        103
+      ]
+    },
+    "chevron_left": {
+      "source": "Smart Hub (ui/smart-hub), copied unchanged",
+      "master_file": "masters/chevron_left_master.png",
+      "master_size": [
+        40,
+        58
+      ],
+      "master_sha256": "8a86da6590de23e720b1ffebc0a10fac1a0f44de475fc610d6a4cb639fbf881b",
+      "ink_bbox": [
+        8,
+        7,
+        33,
+        52
+      ]
+    },
+    "scenes": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/scenes_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "045a769f5890f28ef3e481d0dd573b6e19b69c7b6e0019a39e482ab6fe434331",
+      "ink_bbox": [
+        24,
+        24,
+        232,
+        232
+      ]
+    },
+    "sliders": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/sliders_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "208bca5b41ad3916e52880a270849425783ed059086e26d67f0aaf61fb77c940",
+      "ink_bbox": [
+        22,
+        41,
+        234,
+        215
+      ]
+    },
+    "chevron_right": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/chevron_right_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "4b599fdcc4068702b8c10193434a4b5d47b767ea0c9ad8d58f92bc12a4c18f23",
+      "ink_bbox": [
+        76,
+        28,
+        186,
+        228
+      ]
+    },
+    "snowflake": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/snowflake_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "2ee4fab38198f69d7732a7393fa2843a2d270e709296fb55e63648a0a0c675c4",
+      "ink_bbox": [
+        26,
+        12,
+        230,
+        244
+      ]
+    },
+    "moon": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/moon_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "6967c5a7525bf5d272f091c63cea9e3ca5a6a9e7b3adab697848d59e4324b3ac",
+      "ink_bbox": [
+        22,
+        22,
+        234,
+        234
+      ]
+    },
+    "away": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/away_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "730a179f9e17d4b3b0705091b1e3168446157112872fa74edc3e82c16d5baa51",
+      "ink_bbox": [
+        29,
+        29,
+        230,
+        227
+      ]
+    },
+    "check": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/check_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "38c7e3600774610254e2f4f5b50aa08c8d4b48aa6511b837fe271a33133982ae",
+      "ink_bbox": [
+        35,
+        58,
+        221,
+        200
+      ]
+    },
+    "dots": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/dots_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "63b95fa325db5266e4fb7a28dd06ccd2e4fd95b5643b6066d0c02501c9240216",
+      "ink_bbox": [
+        30,
+        105,
+        226,
+        151
+      ]
+    },
+    "cross": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/cross_master.png",
+      "master_size": [
+        256,
+        256
+      ],
+      "master_sha256": "cf2b01b0c55fbefcec0db9af11ffc3746e54e81dca48c945ff938f8780acb075",
+      "ink_bbox": [
+        49,
+        49,
+        207,
+        207
+      ]
+    },
+    "ray_0": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_0_master.png",
+      "master_size": [
+        48,
+        184
+      ],
+      "master_sha256": "df7f099c56cabdb6a84cffba260976b9afa75bf685404eb7dd0494fd37315564",
+      "ink_bbox": [
+        13,
+        13,
+        35,
+        171
+      ]
+    },
+    "ray_1": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_1_master.png",
+      "master_size": [
+        104,
+        184
+      ],
+      "master_sha256": "dc6fee71134b9a8d61f6dc7d28c217aa9f6373e8c7a6bce243f5c5b0f1aa1745",
+      "ink_bbox": [
+        16,
+        17,
+        91,
+        166
+      ]
+    },
+    "ray_2": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_2_master.png",
+      "master_size": [
+        152,
+        152
+      ],
+      "master_sha256": "f5594d3deef74a81a2bcff84a6aeef7601f97f7eaa11316633d7b81bc23f8965",
+      "ink_bbox": [
+        14,
+        19,
+        133,
+        138
+      ]
+    },
+    "ray_3": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_3_master.png",
+      "master_size": [
+        184,
+        104
+      ],
+      "master_sha256": "0fe85dc032a6bd76d07c8a060163b135ad4b78a7b52466382330989f4ae9815c",
+      "ink_bbox": [
+        18,
+        13,
+        167,
+        88
+      ]
+    },
+    "ray_4": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_4_master.png",
+      "master_size": [
+        184,
+        48
+      ],
+      "master_sha256": "5c0cbee82c19868a832ea9461a147effd4db2eb5b8518540d08c7e38ec216bdd",
+      "ink_bbox": [
+        13,
+        13,
+        171,
+        35
+      ]
+    },
+    "ray_5": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_5_master.png",
+      "master_size": [
+        184,
+        104
+      ],
+      "master_sha256": "b768cec100b0fe8d146b18e42ff5e2b1e768b772d79baad39138fb547e31997b",
+      "ink_bbox": [
+        18,
+        16,
+        167,
+        91
+      ]
+    },
+    "ray_6": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_6_master.png",
+      "master_size": [
+        152,
+        152
+      ],
+      "master_sha256": "4990b592f11d8ec9ec02d4256e3fdd50f6ac338f0c9d9521373c9ee927751fd2",
+      "ink_bbox": [
+        14,
+        14,
+        133,
+        133
+      ]
+    },
+    "ray_7": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_7_master.png",
+      "master_size": [
+        104,
+        184
+      ],
+      "master_sha256": "141c11661663830ab3970f0d9cea18319f32f1fd0b0a01f7ae416a4c8e03f6e3",
+      "ink_bbox": [
+        16,
+        18,
+        91,
+        167
+      ]
+    },
+    "ray_8": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_8_master.png",
+      "master_size": [
+        48,
+        184
+      ],
+      "master_sha256": "df7f099c56cabdb6a84cffba260976b9afa75bf685404eb7dd0494fd37315564",
+      "ink_bbox": [
+        13,
+        13,
+        35,
+        171
+      ]
+    },
+    "ray_9": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_9_master.png",
+      "master_size": [
+        104,
+        184
+      ],
+      "master_sha256": "65e7a4593d7d44e4907f9c4ce87c23cc79eee5afc1158a3b314e9aa5e7438758",
+      "ink_bbox": [
+        13,
+        18,
+        88,
+        167
+      ]
+    },
+    "ray_10": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_10_master.png",
+      "master_size": [
+        152,
+        152
+      ],
+      "master_sha256": "8e310f7ca28172c53c16510a0c96dac3ca57f1cc6f05990a74669beaa53216ca",
+      "ink_bbox": [
+        19,
+        14,
+        138,
+        133
+      ]
+    },
+    "ray_11": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_11_master.png",
+      "master_size": [
+        184,
+        104
+      ],
+      "master_sha256": "ac029505e837bc8721fb4e7c072413b829a2dabe4ce8b47651a790ba799fd202",
+      "ink_bbox": [
+        17,
+        16,
+        166,
+        91
+      ]
+    },
+    "ray_12": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_12_master.png",
+      "master_size": [
+        184,
+        48
+      ],
+      "master_sha256": "5c0cbee82c19868a832ea9461a147effd4db2eb5b8518540d08c7e38ec216bdd",
+      "ink_bbox": [
+        13,
+        13,
+        171,
+        35
+      ]
+    },
+    "ray_13": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_13_master.png",
+      "master_size": [
+        184,
+        104
+      ],
+      "master_sha256": "877942dfc6501c64c1e68d8f06e77d013e5f9aac0f47e396063d59ec770d6d7e",
+      "ink_bbox": [
+        17,
+        13,
+        166,
+        88
+      ]
+    },
+    "ray_14": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_14_master.png",
+      "master_size": [
+        152,
+        152
+      ],
+      "master_sha256": "78e1da2a8e13e3b821051e2ea842225134da27a6346298471de74ea70ecba76e",
+      "ink_bbox": [
+        19,
+        19,
+        138,
+        138
+      ]
+    },
+    "ray_15": {
+      "source": "tools/draw_icons.py",
+      "master_file": "masters/ray_15_master.png",
+      "master_size": [
+        104,
+        184
+      ],
+      "master_sha256": "df34d6a2c0b1dec7fdde85361c2fb5897811fed41645a59026be12f52de745ea",
+      "ink_bbox": [
+        13,
+        17,
+        88,
+        166
+      ]
+    }
+  },
+  "icons": [
+    {
+      "asset_name": "ui_icon_scenes_24",
+      "master_key": "scenes",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1
+    },
+    {
+      "asset_name": "ui_icon_sliders_24",
+      "master_key": "sliders",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1
+    },
+    {
+      "asset_name": "ui_icon_chevron_left_24",
+      "master_key": "chevron_left",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1
+    },
+    {
+      "asset_name": "ui_icon_chevron_right_24",
+      "master_key": "chevron_right",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 1
+    },
+    {
+      "asset_name": "ui_icon_ray_0",
+      "master_key": "ray_0",
+      "canvas_width": 12,
+      "canvas_height": 46,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_1",
+      "master_key": "ray_1",
+      "canvas_width": 26,
+      "canvas_height": 46,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_2",
+      "master_key": "ray_2",
+      "canvas_width": 38,
+      "canvas_height": 38,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_3",
+      "master_key": "ray_3",
+      "canvas_width": 46,
+      "canvas_height": 26,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_4",
+      "master_key": "ray_4",
+      "canvas_width": 46,
+      "canvas_height": 12,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_5",
+      "master_key": "ray_5",
+      "canvas_width": 46,
+      "canvas_height": 26,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_6",
+      "master_key": "ray_6",
+      "canvas_width": 38,
+      "canvas_height": 38,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_7",
+      "master_key": "ray_7",
+      "canvas_width": 26,
+      "canvas_height": 46,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_8",
+      "master_key": "ray_8",
+      "canvas_width": 12,
+      "canvas_height": 46,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_9",
+      "master_key": "ray_9",
+      "canvas_width": 26,
+      "canvas_height": 46,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_10",
+      "master_key": "ray_10",
+      "canvas_width": 38,
+      "canvas_height": 38,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_11",
+      "master_key": "ray_11",
+      "canvas_width": 46,
+      "canvas_height": 26,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_12",
+      "master_key": "ray_12",
+      "canvas_width": 46,
+      "canvas_height": 12,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_13",
+      "master_key": "ray_13",
+      "canvas_width": 46,
+      "canvas_height": 26,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_14",
+      "master_key": "ray_14",
+      "canvas_width": 38,
+      "canvas_height": 38,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_ray_15",
+      "master_key": "ray_15",
+      "canvas_width": 26,
+      "canvas_height": 46,
+      "exact_canvas": true
+    },
+    {
+      "asset_name": "ui_icon_snowflake_56",
+      "master_key": "snowflake",
+      "canvas_width": 56,
+      "canvas_height": 56,
+      "padding": 4
+    },
+    {
+      "asset_name": "ui_icon_plus_28",
+      "master_key": "plus",
+      "canvas_width": 28,
+      "canvas_height": 28,
+      "padding": 2
+    },
+    {
+      "asset_name": "ui_icon_minus_28",
+      "master_key": "minus",
+      "canvas_width": 28,
+      "canvas_height": 28,
+      "padding": 2
+    },
+    {
+      "asset_name": "ui_icon_thermometer_64",
+      "master_key": "thermometer",
+      "canvas_width": 64,
+      "canvas_height": 64,
+      "padding": 3
+    },
+    {
+      "asset_name": "ui_icon_drop_64",
+      "master_key": "drop",
+      "canvas_width": 64,
+      "canvas_height": 64,
+      "padding": 3
+    },
+    {
+      "asset_name": "ui_icon_home_48",
+      "master_key": "home",
+      "canvas_width": 48,
+      "canvas_height": 48,
+      "padding": 3
+    },
+    {
+      "asset_name": "ui_icon_moon_48",
+      "master_key": "moon",
+      "canvas_width": 48,
+      "canvas_height": 48,
+      "padding": 3
+    },
+    {
+      "asset_name": "ui_icon_away_48",
+      "master_key": "away",
+      "canvas_width": 48,
+      "canvas_height": 48,
+      "padding": 3
+    },
+    {
+      "asset_name": "ui_icon_check_28",
+      "master_key": "check",
+      "canvas_width": 28,
+      "canvas_height": 28,
+      "padding": 2
+    },
+    {
+      "asset_name": "ui_icon_dots_28",
+      "master_key": "dots",
+      "canvas_width": 28,
+      "canvas_height": 28,
+      "padding": 2
+    },
+    {
+      "asset_name": "ui_icon_cross_24",
+      "master_key": "cross",
+      "canvas_width": 24,
+      "canvas_height": 24,
+      "padding": 2
+    }
+  ]
+}

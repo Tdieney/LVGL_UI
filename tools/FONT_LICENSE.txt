@@ -1,0 +1,10 @@
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+
+Font: Plus Jakarta Sans
+Designed by: Tokotype (Gumpita Rahayu)
+Source: https://github.com/tokotype/PlusJakartaSans
+License: SIL Open Font License, Version 1.1 (OFL-1.1)
+
+This font software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL

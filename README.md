@@ -1,39 +1,50 @@
-# LVGL Embedded UI Solutions
+# Smart Studio UI
 
-Welcome to the LVGL Embedded UI Repository. This repository hosts production-grade, highly optimized C UI implementations powered by LVGL v8.4 for bare-metal and RTOS microcontrollers.
+LVGL v8.4 touch UI for the ESP32 course Session 08 midterm, "Smart Studio UI":
+ESP32-S3, 3.5-inch 480 x 320 ST7796 SPI LCD in RGB565, FT6336 touch. The PC
+side is the Web Serial page in [docs/](docs/).
 
----
+Four swipe pages (Light with a 16-ray radiant sun dial and tap/drag core,
+Air conditioner, Temperature, Humidity), a circular Scenes panel (Home, Sleep,
+Away) and a Connection baud-stepper panel, in a zero-text high-contrast dark
+design. See the [assignment](docs/MIDTERM_ASSIGNMENT.md), the
+[design brief](docs/UI_DESIGN_BRIEF.md) and the
+[screenshots](docs/screenshots/).
 
-## 1. Repository Structure & Branching Strategy
+## Quick start (Windows)
 
-To maintain clean separation between projects and target platforms, the `main` branch serves strictly as an architectural entry point and directory index. Specific UI feature implementations, target drivers, and tools reside on dedicated feature branches:
-
-| Branch Name | Target Display | Platform / Architecture | Description |
-|---|---|---|---|
-| **[`ui/motor-control`](../../tree/ui/motor-control)** | 7" 800x480 RGB565 (xSPI + GRAM) | 80 MHz MCU (128 KB SRAM, 1 MB Flash) | Industrial HMI for BLDC Motor Control with zero-alloc tick scheduler and 52 KB heap profile |
-
----
-
-## 2. Accessing Project Branches
-
-To clone and check out a specific UI implementation:
-
-```bash
-# Clone the repository:
-git clone https://github.com/Tdieney/LVGL_UI.git
-cd LVGL_UI
-
-# Switch to the BLDC Motor Control HMI branch:
-git checkout ui/motor-control
+```powershell
+tools/build_sim.bat
+tools/run_regression.bat
+sim_pc\build\sim_pc.exe
 ```
 
----
+The simulator opens at the panel's real size on your monitor. If it does not
+measure 73 mm wide, press `+` or `-` until it does; the setting is kept per
+monitor resolution. `V` switches to pixel 1:1 and 2:1 views. Other keys and the
+headless modes are in [sim_pc/README.md](sim_pc/README.md).
 
-## 3. General Architecture Standards
+The first build needs network access to fetch LVGL v8.4.0; later builds use the
+cached source in `sim_pc/build/_deps`.
 
-All embedded UI branches in this repository follow strict bare-metal engineering constraints:
+## Layout
 
-- **Strict SRAM Allocation:** Memory profiles are hard-budgeted and verified against LVGL heap limits (e.g., 52 KB heap with 16 KB partial draw buffers).
-- **Zero Dynamic Allocation in Hot Paths:** Static string pointers reference Flash memory directly. Dynamic metrics use static buffer pools to prevent heap fragmentation.
-- **Fixed-Point & Integer Math:** Hot-path animation, tick updates, and gauge calculations avoid soft-float operations (`float`, `sinf`, `cosf`).
-- **Coalesced & Rate-Limited Teardown:** Screen transitions use single-resident SPA architecture with rate-limited clean-and-rebuild loops to eliminate OOM spikes.
+| Path | Contents |
+|---|---|
+| `ui.c`, `ui.h`, `ui_*.c/.h`, `studio_comm.h` | Portable UI, exported to the firmware |
+| `sim_pc/` | Windows simulator, regression, production smoke test, `lv_conf.h` |
+| `tools/` | Build, regression, export, asset and screenshot scripts |
+| `assets/icons/studio/` | Icon masters and manifest |
+| `docs/` | Assignment, Web starter, design brief, firmware guide, screenshots |
+
+## Firmware
+
+```powershell
+tools/export_mcu.bat --verify
+tools/export_mcu.bat D:\path\to\firmware
+```
+
+[docs/FIRMWARE_INTEGRATION.md](docs/FIRMWARE_INTEGRATION.md) covers the LVGL
+settings, the four calls (`ui_init`, `ui_apply`, `ui_note_rx`,
+`ui_baud_complete`), the UART-to-GUI flow and the baud change. The JSON field
+mapping is in [studio_comm.h](studio_comm.h).
